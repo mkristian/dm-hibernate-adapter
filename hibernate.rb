@@ -1,12 +1,4 @@
 require 'java'
-require 'lib/antlr-2.7.6.jar'
-require 'lib/commons-collections-3.1.jar'
-require 'lib/dom4j-1.6.1.jar'
-require 'lib/javassist-3.9.0.GA.jar'
-require 'lib/jta-1.1.jar'
-require 'lib/slf4j-simple-1.5.8.jar'
-require 'lib/slf4j-api-1.5.8.jar'
-require 'lib/hibernate3.jar'
 require 'stringio'
 
 require 'dialects'
