@@ -93,7 +93,24 @@ module Hibernate
   end
 
   def self.add_model(mapping)
-    config.add_xml(File.read(mapping))
+    #TODO workaround
+    mapping_file = mapping[/\w+.hbm.xml/] #produces ie. "Book.hbm.xml"
+    unless mapped?(mapping_file)
+      config.add_xml(File.read(mapping))
+      @mapped_classes ||= []
+      @mapped_classes << mapping_file
+    else
+      puts "mapping file/class registered already"
+    end
+  end
+
+  private
+  def self.mapped?(mapping_file)
+    if @mapped_classes.member?(mapping_file)
+      return true
+    else
+      return false
+    end
   end
 
   module Model
@@ -121,10 +138,21 @@ module Hibernate
     end
     
     def hibernate!
-      become_java!
+      #TODO workaround
+      unless mapped?
+        become_java!
+        @mapped_class = true
+      else
+        puts "model fired become_java! already"
+      end
 
-    # Hibernate.mappings.
-    # Hibernate.add_mapping reified_class,
+      # Hibernate.mappings.
+      # Hibernate.add_mapping reified_class,
+    end
+
+    private
+    def mapped?
+      !instance_variable_get('@mapped_class').nil?
     end
   end
 end

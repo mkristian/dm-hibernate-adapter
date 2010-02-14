@@ -1,6 +1,9 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
-require 'dm-core/spec/adapter_shared_spec'
+# TODO should be:
+#require 'dm-core/spec/adapter_shared_spec'
+# TODO but for now there is modified AbstractAdapter spec:
+require 'adapter_shared_spec'
 
 describe DataMapper::Adapters::HibernateAdapter do
   before :all do

@@ -1,8 +1,9 @@
-
 require 'rubygems'
 require 'spec'
 
 require 'dm-hibernate-adapter'
 
-require 'dm-core'
-
+require 'java'
+require 'jruby/core_ext'
+# TODO
+#require 'dm-core'
