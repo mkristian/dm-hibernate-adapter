@@ -21,12 +21,12 @@ share_examples_for 'An Adapter' do
       property :id,        Serial
       property :color,     String
       # TODO add more supported types
-      #  property :num_spots, Integer
-      #  property :striped,   Boolean
+      property :num_spots, Integer
+      property :striped,   Boolean
 
       # TODO
       extend Hibernate::Model
-      hibernate_attr :id => :long, :color => :string
+      hibernate_attr :id => :long, :color => :string, :num_spots => :integer, :striped => :boolean
       hibernate!
     end
 

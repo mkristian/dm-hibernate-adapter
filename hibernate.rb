@@ -97,7 +97,6 @@ module Hibernate
     mapping_file = mapping[/\w+.hbm.xml/] #produces ie. "Book.hbm.xml"
     unless mapped?(mapping_file)
       config.add_xml(File.read(mapping))
-      @mapped_classes ||= []
       @mapped_classes << mapping_file
     else
       puts "mapping file/class registered already"
@@ -106,6 +105,7 @@ module Hibernate
 
   private
   def self.mapped?(mapping_file)
+    @mapped_classes ||= []
     if @mapped_classes.member?(mapping_file)
       return true
     else
@@ -114,10 +114,13 @@ module Hibernate
   end
 
   module Model
+    # TODO enhance TYPEs list
     TYPES = {
       :string => java.lang.String,
       :long => java.lang.Long,
-      :date => java.util.Date
+      :integer => java.lang.Integer,
+      :date => java.util.Date,
+      :boolean => java.lang.Boolean
     }
 
     def hibernate_sigs

@@ -12,4 +12,7 @@ describe DataMapper::Adapters::HibernateAdapter do
 
   it_should_behave_like 'An Adapter'
 
+  #TODO add hibernate specyfic specs
+  # it_should_behave_like 'An Hibernate Adapter'
+
 end
