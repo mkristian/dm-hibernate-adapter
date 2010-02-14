@@ -57,6 +57,14 @@
       <layout>gem</layout>
     </repository>
   </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>saumya</id>
+      <name>Saumya's Plugins</name>
+      <url>http://mojo.saumya.de</url>
+      <layout>default</layout>
+    </pluginRepository>
+  </pluginRepositories>
   <build>
     <plugins>
       <plugin>
