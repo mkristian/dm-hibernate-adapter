@@ -17,6 +17,7 @@ module DataMapper
         Hibernate.connection_password = ""
         Hibernate.connection_pool_size = "1"
         Hibernate.properties["hbm2ddl.auto"] = "update"
+        Hibernate.properties["format_sql"] = "true"
         Hibernate.properties["show_sql"] = "true"
         Hibernate.properties["cache.provider_class"] = "org.hibernate.cache.NoCacheProvider"
       end
