@@ -123,8 +123,8 @@ module Hibernate
     def hibernate!
       become_java!
 
-#      Hibernate.mappings.
-#      Hibernate.add_mapping reified_class,
+    # Hibernate.mappings.
+    # Hibernate.add_mapping reified_class,
     end
   end
 end

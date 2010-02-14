@@ -8,11 +8,11 @@ module DataMapper
 
       def initialize(name, options = {})
         super
-        Hibernate.dialect = Hibernate::Dialects::HSQL
+        Hibernate.dialect = Hibernate::Dialects::H2
         Hibernate.current_session_context_class = "thread"
         
-        Hibernate.connection_driver_class = "org.hsqldb.jdbcDriver"
-        Hibernate.connection_url = "jdbc:hsqldb:file:jibernate"
+        Hibernate.connection_driver_class = "org.h2.Driver"
+        Hibernate.connection_url = "jdbc:h2:jibernate"
         Hibernate.connection_username = "sa"
         Hibernate.connection_password = ""
         Hibernate.connection_pool_size = "1"
