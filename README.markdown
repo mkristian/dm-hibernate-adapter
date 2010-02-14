@@ -23,9 +23,13 @@ run the eventlog - store
 
     mvn3 ruby:jruby -Djruby.args="eventlog.rb store something"
 
-rake tasks (please note the jruby.rake.args part(var name))
+rake tasks list (please note the jruby.rake.args part(var name))
 
-    mvn3 ruby:rake -Dverbose=true -Djruby.rake.args="--trace -T"
+    mvn3 ruby:rake -Djruby.rake.args="-T"
+
+how to run specs?
+
+    mvn3 ruby:rake -e -Dverbose=true -Djruby.rake.args="spec"
 
 maybe you need to replace ther respective line in jibernate.script with
 
