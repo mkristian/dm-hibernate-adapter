@@ -4,15 +4,17 @@ require 'stringio'
 require 'dialects'
 
 module Hibernate
-  import org.hibernate.cfg.Configuration
-  import javax.xml.parsers.DocumentBuilderFactory
-  import org.xml.sax.InputSource
+  # XXX http://jira.codehaus.org/browse/JRUBY-3538
+  java_import org.hibernate.cfg.Configuration
+  # XXX not needed for now
+  # import javax.xml.parsers.DocumentBuilderFactory
+  # import org.xml.sax.InputSource
+  # DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.new_instance
+  # DOCUMENT_BUILDER_FACTORY.validating = false
+  # DOCUMENT_BUILDER_FACTORY.expand_entity_references = false
+  # DOCUMENT_BUILDER = DOCUMENT_BUILDER_FACTORY.new_document_builder
   JClass = java.lang.Class
   JVoid = java.lang.Void::TYPE
-  DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.new_instance
-  DOCUMENT_BUILDER_FACTORY.validating = false
-  DOCUMENT_BUILDER_FACTORY.expand_entity_references = false
-  DOCUMENT_BUILDER = DOCUMENT_BUILDER_FACTORY.new_document_builder
 
   def self.dialect=(dialect)
     config.set_property "hibernate.dialect", dialect
@@ -36,6 +38,10 @@ module Hibernate
 
   def self.connection_password=(password)
     config.set_property "hibernate.connection.password", password
+  end
+
+  def self.connection_pool_size=(size)
+    config.set_property "hibernate.connection.pool_size", size
   end
   
   class PropertyShim
