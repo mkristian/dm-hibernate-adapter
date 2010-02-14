@@ -1,4 +1,7 @@
 require 'hibernate'
+require 'dm-core'
+require 'dm-core/adapters/abstract_adapter'
+
 module DataMapper
   module Adapters
     class HibernateAdapter < AbstractAdapter
@@ -12,7 +15,10 @@ module DataMapper
         Hibernate.connection_url = "jdbc:hsqldb:file:jibernate"
         Hibernate.connection_username = "sa"
         Hibernate.connection_password = ""
+        Hibernate.connection_pool_size = "1"
         Hibernate.properties["hbm2ddl.auto"] = "update"
+        Hibernate.properties["show_sql"] = "true"
+        Hibernate.properties["cache.provider_class"] = "org.hibernate.cache.NoCacheProvider"
       end
 
       # @param [Enumerable<Resource>] resources
