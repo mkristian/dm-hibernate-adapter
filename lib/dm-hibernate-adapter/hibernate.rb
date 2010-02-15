@@ -91,6 +91,7 @@ module Hibernate
   end
 
   private
+
   def self.mapped?(clazz)
     @mapped_classes ||= []
     if @mapped_classes.member?(clazz)
@@ -101,6 +102,7 @@ module Hibernate
   end
 
   module Model
+
     # TODO enhance TYPEs list
     TYPES = {
       ::String => java.lang.String,
@@ -110,68 +112,78 @@ module Hibernate
       ::DataMapper::Types::Serial => java.lang.Long
     }
 
-    def hibernate_sigs
-      @hibernate_sigs ||= {}
+    def self.included(model)
+      model.extend(ClassMethods)
     end
 
-    # "stolen" from http://github.com/superchris/hibernate
-    def add_java_property(name, type, annotation = nil)
-      attr_accessor name
-      get_name = "get#{name.to_s.capitalize}"
-      set_name = "set#{name.to_s.capitalize}"
+    module ClassMethods
 
-      alias_method get_name.intern, name
-      add_method_signature get_name, [TYPES[type].java_class]
-      add_method_annotation get_name, annotation if annotation
-      alias_method set_name.intern, :"#{name.to_s}="
-      add_method_signature set_name, [JVoid, TYPES[type].java_class]
-    end
-
-    def hibernate_attr(attrs)
-      attrs.each do |name, type|
-        add_java_property(name, type)
+      def auto_migrate!
+        #TODO add support for auto_migrate!
+        puts "---- auto_migrate! invoked! ----"
       end
-    end
 
-    # "stolen" from http://github.com/superchris/hibernate
-    def hibernate_identifier(name, type)
-      add_java_property(name, type, javax.persistence.Id => {}, javax.persistence.GeneratedValue => {})
-    end
+      private
 
-    def auto_migrate!
-      #TODO
-       puts "---- auto_migrate! invoked! ----"
-    end
+      def hibernate_sigs
+        @hibernate_sigs ||= {}
+      end
 
-    def hibernate!
-      #TODO workaround
-      unless mapped?
-        properties.each do |prop|
-          # TODO honor prop.field mapping and maybe more
-          if prop.serial?
-            hibernate_identifier(prop.name, prop.type)
-          else
-            add_java_property(prop.name, prop.type)
+      # "stolen" from http://github.com/superchris/hibernate
+      def add_java_property(name, type, annotation = nil)
+        attr_accessor name
+        get_name = "get#{name.to_s.capitalize}"
+        set_name = "set#{name.to_s.capitalize}"
+
+        alias_method get_name.intern, name
+        add_method_signature get_name, [TYPES[type].java_class]
+        add_method_annotation get_name, annotation if annotation
+        alias_method set_name.intern, :"#{name.to_s}="
+        add_method_signature set_name, [JVoid, TYPES[type].java_class]
+      end
+
+      def hibernate_attr(attrs)
+        attrs.each do |name, type|
+          add_java_property(name, type)
+        end
+      end
+
+      # "stolen" from http://github.com/superchris/hibernate
+      def hibernate_identifier(name, type)
+        add_java_property(name, type, javax.persistence.Id => {}, javax.persistence.GeneratedValue => {})
+      end
+
+      def hibernate!
+        #TODO workaround
+        unless mapped?
+          properties.each do |prop|
+            # TODO honor prop.field mapping and maybe more
+            if prop.serial?
+              hibernate_identifier(prop.name, prop.type)
+            else
+              add_java_property(prop.name, prop.type)
+            end
           end
+
+          # "stolen" from http://github.com/superchris/hibernate
+          # TODO honor self.storage_name as table
+          add_class_annotation(javax.persistence.Entity => {})
+          java_class = become_java!
+          Hibernate.add_model(java_class)
+          @mapped_class = true
+        else
+          puts "model fired become_java! already"
         end
 
-        # "stolen" from http://github.com/superchris/hibernate
-        # TODO honor self.storage_name as table
-        add_class_annotation(javax.persistence.Entity => {})
-        java_class = become_java!
-        Hibernate.add_model(java_class)
-        @mapped_class = true
-      else
-        puts "model fired become_java! already"
+        # Hibernate.mappings.
+        # Hibernate.add_mapping reified_class,
       end
 
-      # Hibernate.mappings.
-      # Hibernate.add_mapping reified_class,
-    end
+      #helper method
+      def mapped?
+        !instance_variable_get('@mapped_class').nil?
+      end
 
-    private
-    def mapped?
-      !instance_variable_get('@mapped_class').nil?
     end
   end
 end

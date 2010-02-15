@@ -14,6 +14,8 @@ module DataMapper
   module Adapters
     class HibernateAdapter < AbstractAdapter
 
+      DataMapper::Model.append_inclusions Hibernate::Model
+
       def initialize(name, options = {})
         super
         Hibernate.dialect = Hibernate::Dialects::H2
@@ -73,6 +75,13 @@ module DataMapper
         result
       end
 
+      # @param [Collection] collection
+      #   collection of records to be deleted
+      #
+      # @return [Integer]
+      #   the number of records deleted
+      #
+      # @api semipublic
       def delete(resources)
         resources.each do |resource|
           puts "deleting #{resource.inspect}"
@@ -85,6 +94,10 @@ module DataMapper
 
 # helper methods - printers
 private
+# @param [Query] query
+#   the query to print it out formatted
+#
+# @api private
 def log_read(query)
 puts <<EOT
   read()

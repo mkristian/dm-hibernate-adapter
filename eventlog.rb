@@ -10,13 +10,9 @@ class Event
   property :title, String
   property :date, Date
 
-  # TODO get this out of the model into the adapter 
-  extend Hibernate::Model
+  # TODO make it automagic
   hibernate!
 end
-
-# Hack for HSQLDB's write delay
-#  session.createSQLQuery("SET WRITE_DELAY FALSE").execute_update
 
 case ARGV[0]
 when /store/
