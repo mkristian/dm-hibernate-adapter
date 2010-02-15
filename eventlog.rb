@@ -1,10 +1,6 @@
-# Basic requires
 require 'rubygems'
-require 'java'
-require 'jruby/core_ext'
-require 'dm-core'
-
 require 'lib/dm-hibernate-adapter.rb'
+
 DataMapper.setup(:default, :adapter => "hibernate")
 
 class Event

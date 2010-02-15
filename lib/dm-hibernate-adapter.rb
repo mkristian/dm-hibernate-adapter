@@ -1,6 +1,14 @@
-require 'hibernate'
 require 'dm-core'
 require 'dm-core/adapters/abstract_adapter'
+
+require 'java'
+require 'jruby/core_ext'
+require 'stringio'
+
+dir = Pathname(__FILE__).dirname.expand_path / 'dm-hibernate-adapter'
+
+require dir / 'dialects'
+require dir / 'hibernate'
 
 module DataMapper
   module Adapters
