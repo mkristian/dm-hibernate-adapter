@@ -30,10 +30,10 @@ share_examples_for 'An Adapter' do
       hibernate!
     end
 
-    # TODO uglyyy
+    # TODO uglyyy stuff
     Hibernate.add_model File.dirname(__FILE__)+"/Heffalump.hbm.xml"
 
-    # create all tables and constraints before each spec
+    # TODO create all tables and constraints before each spec
     if @repository.respond_to?(:auto_migrate!)
       Heffalump.auto_migrate!
     end

@@ -49,9 +49,12 @@ module DataMapper
       #
       # @api semipublic
       def read(query)
-        puts "query #{query.inspect}"
+        log_read(query)
+        conditions = query.conditions
+
         result = []
         Hibernate.tx do |session|
+          #TODO add support for 'where'
           list = session.create_query("from #{query.model}").list
           #TODO maybe there is a direct way to get a ruby array ?
           list.each do |resource|
@@ -61,6 +64,31 @@ module DataMapper
         end
         result
       end
+
+      def delete(resources)
+        resources.each do |resource|
+          puts "deleting #{resource.inspect}"
+          Hibernate.tx do |session|
+            session.delete(resource)
+          end
+        end
+        resources.size
+      end
+
+# helper methods - printers
+private
+def log_read(query)
+puts <<EOT
+  read()
+    query:
+      #{query.inspect}
+    model:
+      #{query.model}
+    conditions:
+      #{query.conditions}
+EOT
+end
+
     end
   end
 end

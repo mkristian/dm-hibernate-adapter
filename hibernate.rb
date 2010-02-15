@@ -139,7 +139,12 @@ module Hibernate
         add_method_signature set_name, [JVoid, TYPES[type].java_class]
       end
     end
-    
+
+    def auto_migrate!
+      #TODO
+       puts "---- auto_migrate! invoked! ----"
+    end
+
     def hibernate!
       #TODO workaround
       unless mapped?
