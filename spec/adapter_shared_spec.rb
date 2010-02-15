@@ -26,8 +26,6 @@ share_examples_for 'An Adapter' do
 
       # TODO
       extend Hibernate::Model
-      hibernate_attr :color => :string, :num_spots => :integer, :striped => :boolean
-      hibernate_identifier :id, :long
       hibernate!
     end
 

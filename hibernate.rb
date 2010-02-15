@@ -1,18 +1,12 @@
 require 'java'
 require 'stringio'
+require 'dm-core'
 
 require 'dialects'
 
 module Hibernate
   # XXX http://jira.codehaus.org/browse/JRUBY-3538
   java_import org.hibernate.cfg.AnnotationConfiguration
-  # XXX not needed for now
-  # import javax.xml.parsers.DocumentBuilderFactory
-  # import org.xml.sax.InputSource
-  # DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.new_instance
-  # DOCUMENT_BUILDER_FACTORY.validating = false
-  # DOCUMENT_BUILDER_FACTORY.expand_entity_references = false
-  # DOCUMENT_BUILDER = DOCUMENT_BUILDER_FACTORY.new_document_builder
   JClass = java.lang.Class
   JVoid = java.lang.Void::TYPE
 
@@ -115,11 +109,11 @@ module Hibernate
   module Model
     # TODO enhance TYPEs list
     TYPES = {
-      :string => java.lang.String,
-      :long => java.lang.Long,
-      :integer => java.lang.Integer,
-      :date => java.util.Date,
-      :boolean => java.lang.Boolean
+      ::String => java.lang.String,
+      ::Integer => java.lang.Integer,
+      ::Date => java.util.Date,
+      ::DataMapper::Types::Boolean => java.lang.Boolean,
+      ::DataMapper::Types::Serial => java.lang.Long
     }
 
     def hibernate_sigs
@@ -158,7 +152,17 @@ module Hibernate
     def hibernate!
       #TODO workaround
       unless mapped?
+        properties.each do |prop|
+          # TODO honor prop.field mapping and maybe more
+          if prop.serial?
+            hibernate_identifier(prop.name, prop.type)
+          else
+            add_java_property(prop.name, prop.type)
+          end
+        end
+
         # "stolen" from http://github.com/superchris/hibernate
+        # TODO honor self.storage_name as table
         add_class_annotation(javax.persistence.Entity => {})
         java_class = become_java!
         Hibernate.add_model(java_class)

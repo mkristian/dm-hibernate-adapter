@@ -16,8 +16,6 @@ class Event
 
   # TODO get this out of the model into the adapter 
   extend Hibernate::Model
-  hibernate_attr :title => :string, :date => :date
-  hibernate_identifier :id, :long
   hibernate!
 end
 
