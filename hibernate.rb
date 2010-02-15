@@ -5,7 +5,7 @@ require 'dialects'
 
 module Hibernate
   # XXX http://jira.codehaus.org/browse/JRUBY-3538
-  java_import org.hibernate.cfg.Configuration
+  java_import org.hibernate.cfg.AnnotationConfiguration
   # XXX not needed for now
   # import javax.xml.parsers.DocumentBuilderFactory
   # import org.xml.sax.InputSource
@@ -43,12 +43,12 @@ module Hibernate
   def self.connection_pool_size=(size)
     config.set_property "hibernate.connection.pool_size", size
   end
-  
+
   class PropertyShim
     def initialize(config)
       @config = config
     end
-    
+
     def []=(key, value)
       key = ensure_hibernate_key(key)
       @config.set_property key, value
@@ -89,24 +89,23 @@ module Hibernate
   end
 
   def self.config
-    @config ||= Configuration.new
+    @config ||= AnnotationConfiguration.new
   end
 
-  def self.add_model(mapping)
+  def self.add_model(model_java_class)
     #TODO workaround
-    mapping_file = mapping[/\w+.hbm.xml/] #produces ie. "Book.hbm.xml"
-    unless mapped?(mapping_file)
-      config.add_xml(File.read(mapping))
-      @mapped_classes << mapping_file
+    unless mapped?(model_java_class)
+      config.add_annotated_class(model_java_class)
+      @mapped_classes << model_java_class
     else
-      puts "mapping file/class registered already"
+      puts "model/class #{model_java_class} registered already"
     end
   end
 
   private
-  def self.mapped?(mapping_file)
+  def self.mapped?(clazz)
     @mapped_classes ||= []
-    if @mapped_classes.member?(mapping_file)
+    if @mapped_classes.member?(clazz)
       return true
     else
       return false
@@ -127,17 +126,28 @@ module Hibernate
       @hibernate_sigs ||= {}
     end
 
+    # "stolen" from http://github.com/superchris/hibernate
+    def add_java_property(name, type, annotation = nil)
+      attr_accessor name
+      get_name = "get#{name.to_s.capitalize}"
+      set_name = "set#{name.to_s.capitalize}"
+
+      alias_method get_name.intern, name
+      add_method_signature get_name, [TYPES[type].java_class]
+      add_method_annotation get_name, annotation if annotation
+      alias_method set_name.intern, :"#{name.to_s}="
+      add_method_signature set_name, [JVoid, TYPES[type].java_class]
+    end
+
     def hibernate_attr(attrs)
       attrs.each do |name, type|
-        attr_accessor name
-        get_name = "get#{name.to_s.capitalize}"
-        set_name = "set#{name.to_s.capitalize}"
-
-        alias_method get_name.intern, name
-        add_method_signature get_name, [TYPES[type].java_class]
-        alias_method set_name.intern, :"#{name.to_s}="
-        add_method_signature set_name, [JVoid, TYPES[type].java_class]
+        add_java_property(name, type)
       end
+    end
+
+    # "stolen" from http://github.com/superchris/hibernate
+    def hibernate_identifier(name, type)
+      add_java_property(name, type, javax.persistence.Id => {}, javax.persistence.GeneratedValue => {})
     end
 
     def auto_migrate!
@@ -148,7 +158,10 @@ module Hibernate
     def hibernate!
       #TODO workaround
       unless mapped?
-        become_java!
+        # "stolen" from http://github.com/superchris/hibernate
+        add_class_annotation(javax.persistence.Entity => {})
+        java_class = become_java!
+        Hibernate.add_model(java_class)
         @mapped_class = true
       else
         puts "model fired become_java! already"

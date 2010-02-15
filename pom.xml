@@ -44,6 +44,12 @@
       <artifactId>hibernate-core</artifactId>
       <version>3.3.2.GA</version>
     </dependency>
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-annotations</artifactId>
+      <version>3.4.0.GA</version>
+    </dependency>
+
     <!-- L2 cache for Hibernate -->
     <!--<dependency>-->
       <!--<groupId>org.hibernate</groupId>-->

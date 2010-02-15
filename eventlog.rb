@@ -16,11 +16,10 @@ class Event
 
   # TODO get this out of the model into the adapter 
   extend Hibernate::Model
-  hibernate_attr :id => :long, :title => :string, :date => :date
+  hibernate_attr :title => :string, :date => :date
+  hibernate_identifier :id, :long
   hibernate!
 end
-
-Hibernate.add_model "Event.hbm.xml"
 
 # Hack for HSQLDB's write delay
 #  session.createSQLQuery("SET WRITE_DELAY FALSE").execute_update
