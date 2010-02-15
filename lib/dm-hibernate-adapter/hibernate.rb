@@ -1,8 +1,3 @@
-require 'java'
-require 'stringio'
-
-require 'dialects'
-
 module Hibernate
   # XXX http://jira.codehaus.org/browse/JRUBY-3538
   java_import org.hibernate.cfg.AnnotationConfiguration
