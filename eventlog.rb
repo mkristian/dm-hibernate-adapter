@@ -19,9 +19,15 @@ when /store/
   # Create event and store it
   event = Event.new
   event.title = ARGV[1]
-  event.date = java.util.Date.new
+  event.date = Date.today
   event.save
   puts "Stored!"
+when /update/
+   # Update event and store it
+   event = Event.get(ARGV[1])
+   event.title = ARGV[2]
+   event.save
+   puts "Updated!"
 when /list/
   list = Event.all
   puts "Listing all events:"

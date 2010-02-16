@@ -131,10 +131,23 @@ module Hibernate
 
       # "stolen" from http://github.com/superchris/hibernate
       def add_java_property(name, type, annotation = nil)
-        attr_accessor name
         get_name = "get#{name.to_s.capitalize}"
         set_name = "set#{name.to_s.capitalize}"
 
+        # TODO DateTime and Time
+        if(type == ::Date)
+          class_eval <<-EOT
+ def _#{name}=(d)
+   attribute_set(:#{name}, Date.civil(d.year + 1900, d.month + 1, d.date))
+ end
+
+ def _#{name}
+   d = attribute_get(:#{name})
+   org.joda.time.DateTime.new(d.year, d.month, d.day, 0, 0, 0, 0).to_date
+ end
+          EOT
+          name = :"_#{name}"
+        end
         alias_method get_name.intern, name
         add_method_signature get_name, [TYPES[type].java_class]
         add_method_annotation get_name, annotation if annotation

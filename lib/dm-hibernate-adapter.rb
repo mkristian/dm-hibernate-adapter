@@ -61,7 +61,15 @@ module DataMapper
       #
       # @api semipublic
       def update(attributes, collection)
-        log_update(attributes,collection)
+        log_update(attributes, collection)
+        count = 0
+        Hibernate.tx do |session|
+          collection.each do |resource|
+            session.update(resource)
+            count += 1
+          end
+        end
+        count
       end
 
       # @param [Query] query
@@ -78,7 +86,7 @@ module DataMapper
         result = []
         Hibernate.tx do |session|
           #TODO add support for 'where'
-          list = session.create_query("from #{query.model}").list
+          list = session.create_query("from #{query.model}" + (conditions.nil? ? "" : " where #{conditions}")).list
           #TODO maybe there is a direct way to get a ruby array ?
           list.each do |resource|
             result << resource
