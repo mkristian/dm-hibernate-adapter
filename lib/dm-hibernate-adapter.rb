@@ -51,6 +51,19 @@ module DataMapper
         count
       end
 
+      # @param [Hash(Property => Object)] attributes
+      #   hash of attribute values to set, keyed by Property
+      # @param [Collection] collection
+      #   collection of records to be updated
+      #
+      # @return [Integer]
+      #   the number of records updated
+      #
+      # @api semipublic
+      def update(attributes, collection)
+        log_update(attributes,collection)
+      end
+
       # @param [Query] query
       #   the query to match resources in the datastore
       #
@@ -92,8 +105,11 @@ module DataMapper
         resources.size
       end
 
-# helper methods - printers
+
 private
+
+# helper methods - printers
+
 # @param [Query] query
 #   the query to print it out formatted
 #
@@ -107,6 +123,22 @@ puts <<EOT
       #{query.model}
     conditions:
       #{query.conditions}
+EOT
+end
+
+# @param [Hash(Property => Object)] attributes
+#   hash of attribute values to print it out formatted, keyed by Property
+# @param [Collection] collection
+#   collection of records to print it out formatted
+#
+# @api private
+def log_update(attributes,collection)
+puts <<EOT
+  update()
+   attributes:
+     #{attributes.to_s}
+   collection:
+     #{collection.to_s}
 EOT
 end
 
