@@ -75,6 +75,40 @@ share_examples_for 'An Adapter' do
   end
 
   if adapter_supports?(:update)
+
+    # <added>
+    # XXX this part is added to dm-core's specs
+    describe '#update called directly' do
+      before do
+        @heffalump = Heffalump.create(:color => 'indigo')
+      end
+
+      it 'should not raise any errors' do
+        lambda{
+          @heffalump.update(:color => 'violet')
+        }.should_not raise_error
+      end
+
+      it 'should not alter the identity field' do
+        id = @heffalump.id
+        @heffalump.update(:color => 'violet')
+        @heffalump.id.should == id
+      end
+
+      it 'should update altered fields' do
+        @heffalump.update(:color => 'violet')
+        Heffalump.get(*@heffalump.key).color.should == 'violet'
+      end
+
+      it 'should not alter other fields' do
+        color = @heffalump.color
+        @heffalump.update(:color => 'violet')
+        Heffalump.get(*@heffalump.key).color.should == color
+      end
+      
+    end
+    # </added>
+
     describe '#update' do
       before do
         @heffalump = Heffalump.create(:color => 'indigo')

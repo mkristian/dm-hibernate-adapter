@@ -15,6 +15,15 @@ class Event
 end
 
 case ARGV[0]
+when /store_update/
+  # Create event and store it, then it's updated
+  event = Event.new
+  event.title = ARGV[1]
+  event.date = java.util.Date.new
+  event.save
+  puts "Stored!"
+  event.update(:title =>ARGV[2])
+  puts "Updated!"
 when /store/
   # Create event and store it
   event = Event.new
@@ -39,6 +48,6 @@ when /list/
 EOS
   end
 else
-  puts "Usage:\n\tstore <title>\n\tlist"
+  puts "Usage:\n\tstore <title>\n\tstore_update <title> <title2>\n\tlist"
 end
 
