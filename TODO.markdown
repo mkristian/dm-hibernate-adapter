@@ -1,0 +1,11 @@
+- add more specs for adapter
+- add specs for hibernate specific stuff
+- add metrics tool (test coverage etc)
+- add more supported types
+- rework classes structure
+- make adapter 'automagic' (ie. remove #hibernate!)
+- add support to auto_migrate!
+- add ability to configure adapter (other dbs)
+- add docs
+- add examples
+- make a gem
