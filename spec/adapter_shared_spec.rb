@@ -133,7 +133,7 @@ share_examples_for 'An Adapter' do
 
       it 'should not alter other fields' do
         color = @heffalump.color
-        @heffalump.update(:color => 'violet')
+        @heffalump.update(:num_spots => 567)
         Heffalump.get(*@heffalump.key).color.should == color
       end
       

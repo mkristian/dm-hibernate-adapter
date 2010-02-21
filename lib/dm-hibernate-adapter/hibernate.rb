@@ -1,5 +1,5 @@
 module Hibernate
-  # XXX http://jira.codehaus.org/browse/JRUBY-3538
+  # XXX java_import: http://jira.codehaus.org/browse/JRUBY-3538
   java_import org.hibernate.cfg.AnnotationConfiguration
   JClass = java.lang.Class
   JVoid = java.lang.Void::TYPE

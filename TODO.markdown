@@ -1,8 +1,10 @@
+- add support for 'between' instead of 'in' for Ranges
+- enhance queries support: (join(links), group by + having, raw queries, one row in RS, subqueries in raw queries)
 - add more specs for adapter
 - add specs for hibernate specific stuff
 - add metrics tool (test coverage etc)
 - add more supported types
-- rework classes structure
+- refactor classes structure
 - make adapter 'automagic' (ie. remove #hibernate!)
 - add support to auto_migrate!
 - add ability to configure adapter (other dbs)
