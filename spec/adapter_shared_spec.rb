@@ -53,6 +53,37 @@ share_examples_for 'An Adapter' do
   end
 
   if adapter_supports?(:read)
+
+   # <added>
+    # XXX this part is added to dm-core's specs
+    describe '#read specific object' do
+      before :all do
+        @heffalump = Heffalump.create(:color => 'brownish hue')
+        #just going to borrow this, so I can check the return values
+        @query = Heffalump.all.query
+      end
+
+      it 'should not raise any errors' do
+        lambda {
+          Heffalump.get(@heffalump.id)
+        }.should_not raise_error
+      end
+
+      it 'should raise ObjectNotFoundError' do
+        lambda {
+          id =  -600
+          Heffalump.get!(id)
+        }.should raise_error(DataMapper::ObjectNotFoundError)
+      end
+
+      it 'should return correct result' do
+        id = @heffalump.id
+        Heffalump.get(id).id.should == id
+      end
+
+    end
+    # </added>
+
     describe '#read' do
       before :all do
         @heffalump = Heffalump.create(:color => 'brownish hue')
