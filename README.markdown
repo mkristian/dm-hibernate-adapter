@@ -29,4 +29,4 @@ how to list rake tasks (please note the jruby.rake.args part(var name))
 
 how to run specs?
 
-    mvn3 ruby:rake -e -Dverbose=true -Djruby.rake.args="spec"
+    rm jibernate.h2.db ; mvn3 ruby:rake -e -Dverbose=true -Djruby.rake.args="spec"    
