@@ -6,8 +6,8 @@
 - add more supported types
 - refactor classes structure
 - make adapter 'automagic' (ie. remove #hibernate!)
-- add support for auto_migrate!
-- add ability to configure adapter (other dbs)
+- add support for auto_migrate! (https://www.hibernate.org/hib_docs/v3/api/org/hibernate/tool/hbm2ddl/SchemaUpdate.html)
+- add ability to configure adapter (other dbs, hibernate specific configuration)
 - add docs
 - add examples
 - make a gem
