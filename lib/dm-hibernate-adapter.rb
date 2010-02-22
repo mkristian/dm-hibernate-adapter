@@ -106,7 +106,7 @@ module DataMapper
           # order by
           order.each do |direction|
             operator = direction.operator
-            # TODO column name differs from property name
+            # TODO column name may differ from property name
             column = direction.target.name
 
             if operator == :desc
@@ -149,7 +149,7 @@ module DataMapper
         #TODO ADD MORE TYPES!!!
         case value
           when Fixnum
-            # XXX Warning. #value_of(value) returns cached objects already converted to Ruby objects!
+            # XXX Warning. ie Integer.value_of(value) returns cached objects already converted to Ruby objects!
             if    model_type == Java::JavaLang::Integer then java.lang.Integer.new(value)
             elsif model_type == Java::JavaLang::Long    then java.lang.Long.new(value)
             else  puts "---other Hibernate type, object: #{value} type: #{value.class} Hibernate type: #{model_type} ---"
@@ -165,10 +165,6 @@ module DataMapper
             value.to_s.to_java_string
         end
       end
-
-#      def cast_to_hibernate(value, model_type)
-#        convert_ruby_object_for_hibernate(value, model_type)
-#      end
 
       def handle_comparison(con, model)
         subject = con.subject.name.to_s #property/column name

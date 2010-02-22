@@ -6,7 +6,7 @@
 - add more supported types
 - refactor classes structure
 - make adapter 'automagic' (ie. remove #hibernate!)
-- add support to auto_migrate!
+- add support for auto_migrate!
 - add ability to configure adapter (other dbs)
 - add docs
 - add examples
