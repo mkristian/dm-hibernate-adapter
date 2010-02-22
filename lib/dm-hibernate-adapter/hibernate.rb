@@ -113,7 +113,140 @@ module Hibernate
     }
 
     def self.included(model)
+
       model.extend(ClassMethods)
+
+      # XXX WARNING
+      # <monkey-patching>
+      # if class wasn't mapped before
+      unless model.mapped?
+
+        # TODO implement that on method_missing ?
+        # TODO or
+        # TODO prepare list of methods and iterate over and generate that code dynamically ?
+        # what about performance ?
+        model.instance_eval do
+          alias :wrapped_auto_migrate!   :auto_migrate!
+          alias :wrapped_create          :create
+          alias :wrapped_create!         :create!
+          alias :wrapped_all             :all
+          alias :wrapped_copy            :copy
+          alias :wrapped_first           :first
+          alias :wrapped_first_or_create :first_or_create
+          alias :wrapped_first_or_new    :first_or_new
+          alias :wrapped_get             :get
+          alias :wrapped_get!            :get!
+          alias :wrapped_last            :last
+          alias :wrapped_load            :load
+
+          def self.auto_migrate!
+            hibernate!
+            wrapped_auto_migrate!
+          end
+
+          def self.create(attributes = {})
+            hibernate!
+            wrapped_create(attributes)
+          end
+
+          def self.create!(attributes = {})
+            hibernate!
+            wrapped_create!(attributes)
+          end
+
+          def self.all(query = nil)
+            hibernate!
+            wrapped_all(query)
+          end
+
+          def self.copy(source, destination, query = {})
+            hibernate!
+            wrapped_copy(source,destination,query)
+          end
+
+          def self.first(*args)
+            hibernate!
+            wrapped_first(*args)
+          end
+
+          def self.first_or_create(conditions = {}, attributes = {})
+            hibernate!
+            wrapped_first_or_create(conditions,attributes)
+          end
+
+          def self.first_or_new(conditions = {}, attributes = {})
+            hibernate!
+            wrapped_first_or_new(conditions,attributes)
+          end
+
+          def self.get(*key)
+            hibernate!
+            wrapped_get(*key)
+          end
+
+          def self.get!(*key)
+            hibernate!
+            wrapped_get!(*key)
+          end
+
+          def self.last(*args)
+            hibernate!
+            wrapped_last(*args)
+          end
+
+          def self.load(records, query)
+            hibernate!
+            wrapped_load(records,query)
+          end
+        end
+
+        model.class_eval do
+          alias :wrapped_save     :save
+          alias :wrapped_save!    :save!
+          alias :wrapped_update   :update
+          alias :wrapped_update!  :update!
+          alias :wrapped_destroy  :destroy
+          alias :wrapped_destroy! :destroy!
+
+          def save
+            model.hibernate!
+            wrapped_save
+          end
+
+          def save!
+            model.hibernate!
+            wrapped_save!
+          end
+
+          def update(attributes = {})
+            model.hibernate!
+            wrapped_update(attributes)
+          end
+
+          def update!(attributes = {})
+            model.hibernate!
+            wrapped_update!(attributes)
+          end
+
+          def destroy
+            model.hibernate!
+            wrapped_destroy
+          end
+
+          def destroy!
+            model.hibernate!
+            wrapped_destroy!
+          end
+
+          def update_attributes(attributes = {}, *allowed)
+            model.hibernate!
+            wrapped_update_attributes(attributes,*allowed)
+          end
+        end
+
+      end
+      # </monkey-patching>
+
     end
 
     module ClassMethods
@@ -121,6 +254,35 @@ module Hibernate
       def auto_migrate!
         #TODO add support for auto_migrate!
         puts "---- auto_migrate! invoked! ----"
+      end
+
+      def hibernate!
+        #TODO workaround
+        unless mapped?
+          properties.each do |prop|
+            # TODO honor prop.field mapping and maybe more
+            if prop.serial?
+              hibernate_identifier(prop.name, prop.type)
+            else
+              add_java_property(prop.name, prop.type)
+            end
+          end
+
+          # "stolen" from http://github.com/superchris/hibernate
+          # TODO honor self.storage_name as table
+          add_class_annotation(javax.persistence.Entity => {})
+          java_class = become_java!
+          Hibernate.add_model(java_class)
+          @mapped_class = true
+        # else
+        # puts "model fired become_java! already"
+        end
+
+      end
+
+      #helper method
+      def mapped?
+        !instance_variable_get('@mapped_class').nil?
       end
 
       private
@@ -164,37 +326,6 @@ module Hibernate
       # "stolen" from http://github.com/superchris/hibernate
       def hibernate_identifier(name, type)
         add_java_property(name, type, javax.persistence.Id => {}, javax.persistence.GeneratedValue => {})
-      end
-
-      def hibernate!
-        #TODO workaround
-        unless mapped?
-          properties.each do |prop|
-            # TODO honor prop.field mapping and maybe more
-            if prop.serial?
-              hibernate_identifier(prop.name, prop.type)
-            else
-              add_java_property(prop.name, prop.type)
-            end
-          end
-
-          # "stolen" from http://github.com/superchris/hibernate
-          # TODO honor self.storage_name as table
-          add_class_annotation(javax.persistence.Entity => {})
-          java_class = become_java!
-          Hibernate.add_model(java_class)
-          @mapped_class = true
-        else
-          puts "model fired become_java! already"
-        end
-
-        # Hibernate.mappings.
-        # Hibernate.add_mapping reified_class,
-      end
-
-      #helper method
-      def mapped?
-        !instance_variable_get('@mapped_class').nil?
       end
 
     end

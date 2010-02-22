@@ -10,8 +10,6 @@ class Event
   property :title, String
   property :date, Date
 
-  # TODO make it automagic
-  hibernate!
 end
 
 case ARGV[0]

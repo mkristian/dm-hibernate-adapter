@@ -23,8 +23,6 @@ share_examples_for 'An Adapter' do
       property :num_spots, Integer
       property :striped,   Boolean
 
-      # TODO make it automagic
-      hibernate!
     end
 
     # TODO create all tables and constraints before each spec
@@ -136,7 +134,7 @@ share_examples_for 'An Adapter' do
         @heffalump.update(:num_spots => 567)
         Heffalump.get(*@heffalump.key).color.should == color
       end
-      
+
     end
     # </added>
 
