@@ -269,6 +269,17 @@ module Hibernate
         @hibernate_sigs ||= {}
       end
 
+      def hibernate_attr(attrs)
+        attrs.each do |name, type|
+          add_java_property(name, type)
+        end
+      end
+
+      # "stolen" from http://github.com/superchris/hibernate
+      def hibernate_identifier(name, type)
+        add_java_property(name, type, javax.persistence.Id => {}, javax.persistence.GeneratedValue => {})
+      end
+      
       # "stolen" from http://github.com/superchris/hibernate
       def add_java_property(name, type, annotation = nil)
         get_name = "get#{name.to_s.capitalize}"
@@ -293,17 +304,6 @@ module Hibernate
         add_method_annotation get_name, annotation if annotation
         alias_method set_name.intern, :"#{name.to_s}="
         add_method_signature set_name, [JVoid, TYPES[type].java_class]
-      end
-
-      def hibernate_attr(attrs)
-        attrs.each do |name, type|
-          add_java_property(name, type)
-        end
-      end
-
-      # "stolen" from http://github.com/superchris/hibernate
-      def hibernate_identifier(name, type)
-        add_java_property(name, type, javax.persistence.Id => {}, javax.persistence.GeneratedValue => {})
       end
 
     end
