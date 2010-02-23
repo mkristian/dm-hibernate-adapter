@@ -136,7 +136,7 @@ module DataMapper
             end
           end
 
-          # puts criteria.to_s # XXX logger
+          puts criteria.to_s # XXX logger
 
           # TODO handle exceptions
           result = criteria.list
