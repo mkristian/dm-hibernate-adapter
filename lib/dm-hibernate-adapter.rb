@@ -32,7 +32,7 @@ module DataMapper
         Hibernate.connection_pool_size = "1"
         Hibernate.properties["hbm2ddl.auto"] = "update"
         Hibernate.properties["format_sql"] = "false"
-        Hibernate.properties["show_sql"] = "true"
+        Hibernate.properties["show_sql"] = "false"
         Hibernate.properties["cache.provider_class"] = "org.hibernate.cache.NoCacheProvider"
       end
 
@@ -116,7 +116,7 @@ module DataMapper
             end
           end
 
-          puts "Criteria: #{criteria.to_s}"
+          # puts criteria.to_s # XXX logger
 
           # TODO handle exceptions
           result = criteria.list
