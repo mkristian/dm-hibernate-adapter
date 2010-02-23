@@ -8,6 +8,10 @@ module Hibernate
     config.set_property "hibernate.dialect", dialect
   end
 
+  def self.dialect
+    config.get_property "hibernate.dialect"
+  end
+
   def self.current_session_context_class=(ctx_cls)
     config.set_property "hibernate.current_session_context_class", ctx_cls
   end

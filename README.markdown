@@ -31,15 +31,14 @@ how to run specs?
 
     mvn3 ruby:rake -e -Dverbose=true -Djruby.rake.args="spec"
 
-
 TODOs
 ---------
 
 - add support for 'between' instead of 'in' for Ranges
-- add support for "empty sets"
-- add support for regexps
+- add support for "empty sets" (done)
+- add support for regexps (add custom sql function for Derby http://db.apache.org/derby/docs/10.5/ref/rrefcreatefunctionstatement.html,
+  use hsqldb 2.0.0.rc8 (regexps) http://www.reverttoconsole.com/blog/java/upgrading-to-hsqldb-2rc8-part-1-maven-integration)
 - enhance queries support: (join(links), group by + having, raw queries, one row in RS, subqueries in raw queries)
-- add suport for hsqldb 2.0.0.rc8 (regexps) http://www.reverttoconsole.com/blog/java/upgrading-to-hsqldb-2rc8-part-1-maven-integration/
 - add more specs for adapter
 - add specs for hibernate specific stuff
 - add metrics tool (test coverage etc)

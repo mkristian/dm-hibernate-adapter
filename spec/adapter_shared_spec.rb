@@ -244,6 +244,7 @@ share_examples_for 'An Adapter' do
             Heffalump.all(:id.not => nil).should == [ @red, @two, @five ]
           end
 
+          # XXX That case generates SICK sql code !
           it 'should be able to search for objects not in an empty list (match all)' do
             Heffalump.all(:color.not => []).should == [ @red, @two, @five ]
           end
@@ -289,6 +290,36 @@ share_examples_for 'An Adapter' do
             Heffalump.all(:color.like => '%blak%').should_not be_include(@red)
           end
         end
+
+        # <added>
+        # XXX this part is added to dm-core's specs
+        # XX ie. HSQLDB support "Java" regexps only
+        describe 'Java regexp' do
+          before do
+            if (defined?(DataMapper::Adapters::Sqlite3Adapter) && @adapter.kind_of?(DataMapper::Adapters::Sqlite3Adapter) ||
+                defined?(DataMapper::Adapters::SqlserverAdapter) && @adapter.kind_of?(DataMapper::Adapters::SqlserverAdapter))
+              pending 'delegate regexp matches to same system that the InMemory and YAML adapters use'
+            end
+          end
+
+          it 'should be able to search for objects that match value' do
+            Heffalump.all(:color => /.*ed.*/).should be_include(@red)
+          end
+
+          it 'should not be able to search for objects that do not match the value' do
+            Heffalump.all(:color => /.*blak.*/).should_not be_include(@red)
+          end
+
+          it 'should be able to do a negated search for objects that match value' do
+            Heffalump.all(:color.not => /.*blak.*/).should be_include(@red)
+          end
+
+          it 'should not be able to do a negated search for objects that do not match value' do
+            Heffalump.all(:color.not => /.*ed.*/).should_not be_include(@red)
+          end
+
+        end
+        # <added>
 
         describe 'regexp' do
           before do
