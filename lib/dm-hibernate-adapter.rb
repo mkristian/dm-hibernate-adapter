@@ -18,7 +18,7 @@ module DataMapper
 
     class HibernateAdapter < AbstractAdapter
 
-      # TODO maybe more drivers
+      # TODO maybe more drivers (Oracle, SQLITE3)
       DRIVERS = {
         :H2 => "org.h2.Driver",
         :HSQL => "org.hsqldb.jdbcDriver",
@@ -52,7 +52,7 @@ module DataMapper
         Hibernate.connection_pool_size = pool_size.to_s
         Hibernate.properties["hbm2ddl.auto"] = "update"
         Hibernate.properties["format_sql"] = "false"
-        Hibernate.properties["show_sql"] = "false"
+        Hibernate.properties["show_sql"] = "true"
         Hibernate.properties["cache.provider_class"] = "org.hibernate.cache.NoCacheProvider"
       end
 
@@ -176,9 +176,12 @@ module DataMapper
             end
           when Float    then java.lang.Float.new(value)
           when String   then value.to_java_string
-          when Array    then (value.map{|object| cast_to_hibernate(object, model_type)}).to_java
-          when Range    then(value.to_a.map{|object| cast_to_hibernate(object, model_type)}).to_java
-          when NilClass then "null".to_java_string # TODO is it ok?
+          when Array
+            # if there is WHERE x IN ( ) -> WHERE x IN ( null ) should be used 
+            value = [nil] if value.empty?
+            (value.map{|object| cast_to_hibernate(object, model_type)}).to_java
+          when Range    then (value.to_a.map{|object| cast_to_hibernate(object, model_type)}).to_java
+          when NilClass then nil # TODO is it ok?
           when Regexp   then value.source.to_java_string
           else
             puts "---other Ruby type, object: #{value} type: #{value.class} ---"
@@ -190,7 +193,8 @@ module DataMapper
         subject = con.subject.name.to_s #property/column name
         # Java type of property (used in typecasting)
         model_type = Hibernate::Model::TYPES[model.properties[subject.to_sym].type]
-        # value = convert_ruby_to_java(con.value,model_type)
+        # SQL dialect for current configuration
+        dialect = Hibernate.dialect
 
         case con
           when DataMapper::Query::Conditions::EqualToComparison
@@ -213,9 +217,19 @@ module DataMapper
           when DataMapper::Query::Conditions::InclusionComparison
             Restrictions.in(subject, cast_to_hibernate(con.value, model_type))
           when DataMapper::Query::Conditions::RegexpComparison
-            # TODO is it ok for all dbs (regexp operator) ?
-            Restrictions.sqlRestriction(subject +" regexp ?",
-                         cast_to_hibernate(con.value, model_type), org::hibernate::Hibernate::STRING)
+
+            if dialect == "org.hibernate.dialect.HSQLDialect"
+              Restrictions.sqlRestriction(" ( regexp_matches ( " +subject + " ,  ?  ))",
+                           cast_to_hibernate(con.value, model_type), org::hibernate::Hibernate::STRING)
+            elsif dialect == "org.hibernate.dialect.PostgreSQLDialect"
+              Restrictions.sqlRestriction(" ( " + subject +" ~ ? )",
+                           cast_to_hibernate(con.value, model_type), org::hibernate::Hibernate::STRING)
+            # elsif dialect ==  "org.hibernate.dialect.DerbyDialect"
+            # TODO implement custom matching function (see README)
+            else
+              Restrictions.sqlRestriction(" ( " + subject +" regexp ? )",
+                           cast_to_hibernate(con.value, model_type), org::hibernate::Hibernate::STRING)
+            end
           else
             # TODO remove that - this case should never be reached
             puts "-----------other comparison: #{con.to_s}--------"
@@ -244,9 +258,18 @@ module DataMapper
             operand = Restrictions.disjunction()
             return parse_all_children(children, model, operand)
           when DataMapper::Query::Conditions::NotOperation
-            #TODO only one child may be negated in DM?
+            #XXX only one child may be negated in DM?
             child = children.first
-            return  Restrictions.not(parse_the_only_child(child,model))
+            # TODO REFACTOR IT :)
+            if !(child.respond_to? :children) &&
+                     (child.class == DataMapper::Query::Conditions::InclusionComparison) &&
+                      child.value.class == Array  && child.value.empty?
+              subject = child.subject.name.to_s
+              # XXX ugly workaround for Model.all(:x.not => [])
+              Restrictions.sqlRestriction(" ( "+ subject +" is null or " + subject +" is not null ) ")
+            else
+              Restrictions.not(parse_the_only_child(child,model))
+            end
           # when DataMapper::Query::Conditions::NullOperation
           # XXX NullOperation is not used in dm-core at the moment
 
