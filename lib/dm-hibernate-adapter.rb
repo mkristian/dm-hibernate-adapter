@@ -18,18 +18,38 @@ module DataMapper
 
     class HibernateAdapter < AbstractAdapter
 
+      # TODO maybe more drivers
+      DRIVERS = {
+        :H2 => "org.h2.Driver",
+        :HSQL => "org.hsqldb.jdbcDriver",
+        :Derby => "org.apache.derby.jdbc.EmbeddedDriver",
+        :MySQL5 => "com.mysql.jdbc.Driver",
+        :MySQL5InnoDB => "com.mysql.jdbc.Driver",
+        :MySQL => "com.mysql.jdbc.Driver",
+        :MySQLInnoDB => "com.mysql.jdbc.Driver",
+        :MySQLMyISAM => "com.mysql.jdbc.Driver",
+        :PostgreSQL => "org.postgresql.Driver",
+      }
+
       DataMapper::Model.append_inclusions Hibernate::Model
 
       def initialize(name, options = {})
+        dialect = options.delete(:dialect)
+        username = options.delete(:username)
+        password = options.delete(:password)
+        url = options.delete(:url)
+        url += "jdbc:" unless url =~ /^jdbc:/
+        driver = options.delete(:driver) || DRIVERS[dialect.to_sym]
+        pool_size = options.delete(:pool_size) || "1"
         super
-        Hibernate.dialect = Hibernate::Dialects::H2
+        Hibernate.dialect = Hibernate::Dialects.const_get(dialect.to_s)
         Hibernate.current_session_context_class = "thread"
         
-        Hibernate.connection_driver_class = "org.h2.Driver"
-        Hibernate.connection_url = "jdbc:h2:jibernate"
-        Hibernate.connection_username = "sa"
-        Hibernate.connection_password = ""
-        Hibernate.connection_pool_size = "1"
+        Hibernate.connection_driver_class = driver.to_s
+        Hibernate.connection_url = url.to_s # "jdbc:h2:jibernate"
+        Hibernate.connection_username = username.to_s # "sa"
+        Hibernate.connection_password = password.to_s # ""
+        Hibernate.connection_pool_size = pool_size.to_s
         Hibernate.properties["hbm2ddl.auto"] = "update"
         Hibernate.properties["format_sql"] = "false"
         Hibernate.properties["show_sql"] = "true"

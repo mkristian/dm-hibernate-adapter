@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'lib/dm-hibernate-adapter.rb'
 
-DataMapper.setup(:default, :adapter => "hibernate")
+DataMapper.setup(:default, :adapter => "hibernate", :dialect => "H2", :username => "sa", :url => "jdbc:h2:jibernate")
 
 class Event
   include DataMapper::Resource
