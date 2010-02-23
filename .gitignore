@@ -1,3 +1,7 @@
 jibernate.*
+jibernate/**
 target
 *.*~
+*.log
+testdb.*
+
