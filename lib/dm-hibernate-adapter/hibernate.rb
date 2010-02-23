@@ -117,7 +117,7 @@ module Hibernate
       # if class wasn't mapped before
       unless model.mapped?
 
-        # TODO implement that on method_missing ?
+        # TODO implement that using method_missing ?
         # TODO or
         # TODO prepare list of methods and iterate over and generate that code dynamically ?
         # what about performance ?
@@ -185,9 +185,10 @@ module Hibernate
         end
 
         model.class_eval do
-          alias :wrapped_save     :save
-          alias :wrapped_update   :update
-          alias :wrapped_destroy  :destroy
+          alias :wrapped_save              :save
+          alias :wrapped_update            :update
+          alias :wrapped_destroy           :destroy
+          alias :wrapped_update_attributes :update_attributes
 
           def save
             model.hibernate!
