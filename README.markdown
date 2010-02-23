@@ -30,3 +30,24 @@ how to list rake tasks (please note the jruby.rake.args part(var name))
 how to run specs?
 
     mvn3 ruby:rake -e -Dverbose=true -Djruby.rake.args="spec"
+
+
+TODOs
+---------
+
+- add support for 'between' instead of 'in' for Ranges
+- add support for "empty sets"
+- add support for regexps
+- enhance queries support: (join(links), group by + having, raw queries, one row in RS, subqueries in raw queries)
+- add suport for hsqldb 2.0.0.rc8 (regexps) http://www.reverttoconsole.com/blog/java/upgrading-to-hsqldb-2rc8-part-1-maven-integration/
+- add more specs for adapter
+- add specs for hibernate specific stuff
+- add metrics tool (test coverage etc)
+- add more supported types
+- refactor classes structure
+- make adapter 'automagic' (ie. remove #hibernate!)
+- add support for auto_migrate! (https://www.hibernate.org/hib_docs/v3/api/org/hibernate/tool/hbm2ddl/SchemaUpdate.html)
+- add ability to configure adapter (other dbs, hibernate specific configuration)
+- add docs
+- add examples
+- make a gem
