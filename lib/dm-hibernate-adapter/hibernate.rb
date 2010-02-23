@@ -85,8 +85,8 @@ module Hibernate
     unless mapped?(model_java_class)
       config.add_annotated_class(model_java_class)
       @mapped_classes << model_java_class
-    else
-      puts "model/class #{model_java_class} registered already"
+    # else
+    #  puts "model/class #{model_java_class} registered already"
     end
   end
 
@@ -94,11 +94,7 @@ module Hibernate
 
   def self.mapped?(clazz)
     @mapped_classes ||= []
-    if @mapped_classes.member?(clazz)
-      return true
-    else
-      return false
-    end
+    @mapped_classes.member?(clazz)
   end
 
   module Model
@@ -121,21 +117,19 @@ module Hibernate
       # if class wasn't mapped before
       unless model.mapped?
 
-        # TODO implement that on method_missing ?
+        # TODO implement that using method_missing ?
         # TODO or
         # TODO prepare list of methods and iterate over and generate that code dynamically ?
         # what about performance ?
         model.instance_eval do
           alias :wrapped_auto_migrate!   :auto_migrate!
           alias :wrapped_create          :create
-          alias :wrapped_create!         :create!
           alias :wrapped_all             :all
           alias :wrapped_copy            :copy
           alias :wrapped_first           :first
           alias :wrapped_first_or_create :first_or_create
           alias :wrapped_first_or_new    :first_or_new
           alias :wrapped_get             :get
-          alias :wrapped_get!            :get!
           alias :wrapped_last            :last
           alias :wrapped_load            :load
 
@@ -147,11 +141,6 @@ module Hibernate
           def self.create(attributes = {})
             hibernate!
             wrapped_create(attributes)
-          end
-
-          def self.create!(attributes = {})
-            hibernate!
-            wrapped_create!(attributes)
           end
 
           def self.all(query = nil)
@@ -184,11 +173,6 @@ module Hibernate
             wrapped_get(*key)
           end
 
-          def self.get!(*key)
-            hibernate!
-            wrapped_get!(*key)
-          end
-
           def self.last(*args)
             hibernate!
             wrapped_last(*args)
@@ -201,21 +185,14 @@ module Hibernate
         end
 
         model.class_eval do
-          alias :wrapped_save     :save
-          alias :wrapped_save!    :save!
-          alias :wrapped_update   :update
-          alias :wrapped_update!  :update!
-          alias :wrapped_destroy  :destroy
-          alias :wrapped_destroy! :destroy!
+          alias :wrapped_save              :save
+          alias :wrapped_update            :update
+          alias :wrapped_destroy           :destroy
+          alias :wrapped_update_attributes :update_attributes
 
           def save
             model.hibernate!
             wrapped_save
-          end
-
-          def save!
-            model.hibernate!
-            wrapped_save!
           end
 
           def update(attributes = {})
@@ -223,19 +200,9 @@ module Hibernate
             wrapped_update(attributes)
           end
 
-          def update!(attributes = {})
-            model.hibernate!
-            wrapped_update!(attributes)
-          end
-
           def destroy
             model.hibernate!
             wrapped_destroy
-          end
-
-          def destroy!
-            model.hibernate!
-            wrapped_destroy!
           end
 
           def update_attributes(attributes = {}, *allowed)
@@ -251,13 +218,20 @@ module Hibernate
 
     module ClassMethods
 
+      java_import org.hibernate.tool.hbm2ddl.SchemaExport
+      java_import org.hibernate.tool.hbm2ddl.SchemaUpdate
+
       def auto_migrate!
-        #TODO add support for auto_migrate!
-        puts "---- auto_migrate! invoked! ----"
+        config = Hibernate::config
+
+        # TODO drop only one table, not all of them !
+        schema_export = SchemaExport.new(config)
+        schema_export.drop(false,true) # XXX here you can turn on/off logger
+        schema_export.create(false,true) # XXX here you can turn on/off logger
       end
 
       def hibernate!
-        #TODO workaround
+        #XXX workaround
         unless mapped?
           properties.each do |prop|
             # TODO honor prop.field mapping and maybe more

@@ -25,10 +25,10 @@ share_examples_for 'An Adapter' do
 
     end
 
-    # TODO create all tables and constraints before each spec
-    if @repository.respond_to?(:auto_migrate!)
+    # TODO ?
+    # if @repository.respond_to?(:auto_migrate!)
       Heffalump.auto_migrate!
-    end
+    # end
   end
 
   if adapter_supports?(:create)
