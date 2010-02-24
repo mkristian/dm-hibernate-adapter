@@ -50,3 +50,5 @@ TODOs
 - add docs
 - add examples
 - make a gem
+- obey the properties field and required constraints as well the storagename for the tablename
+- make the logger a "ruby logger" with the same API as a standard ruby logger and log only if the logger level allows it (do not rely on underlying logger, i.e. avoid unnessecary string operations)

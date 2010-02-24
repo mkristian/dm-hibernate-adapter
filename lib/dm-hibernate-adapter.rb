@@ -34,6 +34,7 @@ module DataMapper
       DataMapper::Model.append_inclusions Hibernate::Model
 
       def initialize(name, options = {})
+        @logger = org.slf4j.LoggerFactory.getLogger(HibernateAdapter.to_s.gsub(/::/, '.'))
         dialect = options.delete(:dialect)
         username = options.delete(:username)
         password = options.delete(:password)
@@ -52,7 +53,7 @@ module DataMapper
         Hibernate.connection_pool_size = pool_size.to_s
         Hibernate.properties["hbm2ddl.auto"] = "update"
         Hibernate.properties["format_sql"] = "false"
-        Hibernate.properties["show_sql"] = "true"
+        Hibernate.properties["show_sql"] = "false"
         Hibernate.properties["cache.provider_class"] = "org.hibernate.cache.NoCacheProvider"
       end
 
@@ -64,7 +65,7 @@ module DataMapper
       #
       # @api semipublic
       def create(resources)
-        # puts "create #{resources.inspect}" # XXX logger
+        @logger.debug("create #{resources.inspect}")
         count = 0
         Hibernate.tx do |session|
           resources.each do |resource|
@@ -85,7 +86,7 @@ module DataMapper
       #
       # @api semipublic
       def update(attributes, collection)
-        # log_update(attributes, collection) # XXX logger
+        log_update(attributes, collection)
         count = 0
         Hibernate.tx do |session|
           collection.each do |resource|
@@ -104,7 +105,7 @@ module DataMapper
       #
       # @api semipublic
       def read(query)
-        # log_read(query) # XXX logger
+        log_read(query)
         conditions = query.conditions
         model = query.model
         limit = query.limit
@@ -136,7 +137,7 @@ module DataMapper
             end
           end
 
-          puts criteria.to_s # XXX logger
+          @logger.debug(criteria.to_s)
 
           # TODO handle exceptions
           result = criteria.list
@@ -154,7 +155,7 @@ module DataMapper
       # @api semipublic
       def delete(resources)
         resources.each do |resource|
-          # puts "deleting #{resource.inspect}" #XXX logger
+          @logger.debug("deleting #{resource.inspect}")
           Hibernate.tx do |session|
             session.delete(resource)
           end
@@ -295,8 +296,8 @@ module DataMapper
 #
 # @api private
 def log_read(query)
-puts <<EOT
-  read()
+@logger.debug <<EOT
+read()
     query:
       #{query.inspect}
     model:
@@ -313,8 +314,8 @@ end
 #
 # @api private
 def log_update(attributes,collection)
-puts <<EOT
-  update()
+@logger.debug <<EOT
+update()
    attributes:
      #{attributes.inspect}
    collection:

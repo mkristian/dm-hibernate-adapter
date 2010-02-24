@@ -1,5 +1,4 @@
 require 'rake'
-require 'lib/dm-hibernate-adapter'
 
 def with_gem(gemname, &blk)
   begin
