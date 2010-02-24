@@ -182,7 +182,7 @@ module DataMapper
             value = [nil] if value.empty?
             (value.map{|object| cast_to_hibernate(object, model_type)}).to_java
           when Range    then (value.to_a.map{|object| cast_to_hibernate(object, model_type)}).to_java
-          when NilClass then nil # TODO is it ok?
+          when NilClass then nil
           when Regexp   then value.source.to_java_string
           else
             puts "---other Ruby type, object: #{value} type: #{value.class} ---"
@@ -191,57 +191,69 @@ module DataMapper
       end
 
       def handle_comparison(con, model)
-        subject = con.subject.name.to_s #property/column name
-        # Java type of property (used in typecasting)
-        model_type = Hibernate::Model::TYPES[model.properties[subject.to_sym].type]
-        # SQL dialect for current configuration
-        dialect = Hibernate.dialect
+
+        subject = con.subject.name.to_s # property/column name
+        value = con.value # value used in comparison
+        model_type = Hibernate::Model::TYPES[model.properties[subject.to_sym].type] # Java type of property (used in typecasting)
+        dialect = Hibernate.dialect # SQL dialect for current configuration
 
         case con
           when DataMapper::Query::Conditions::EqualToComparison
             # special case handling IS NULL/ NOT (x IS NULL)
-            if con.value.class == NilClass
-              Restrictions.isNull(subject)
-            else
-              Restrictions.eq(subject, cast_to_hibernate(con.value, model_type))
-            end
+            value.class == NilClass ? Restrictions.isNull(subject) :
+                                      Restrictions.eq(subject, cast_to_hibernate(con.value, model_type))
+
           when DataMapper::Query::Conditions::GreaterThanComparison
-            Restrictions.gt(subject, cast_to_hibernate(con.value, model_type))
+            Restrictions.gt(subject, cast_to_hibernate(value, model_type))
+
           when DataMapper::Query::Conditions::LessThanComparison
-            Restrictions.lt(subject, cast_to_hibernate(con.value, model_type))
+            Restrictions.lt(subject, cast_to_hibernate(value, model_type))
+
           when DataMapper::Query::Conditions::LikeComparison
-            Restrictions.like(subject, cast_to_hibernate(con.value, model_type))
+            Restrictions.like(subject, cast_to_hibernate(value, model_type))
+
           when DataMapper::Query::Conditions::GreaterThanOrEqualToComparison
-            Restrictions.ge(subject, cast_to_hibernate(con.value, model_type))
+            Restrictions.ge(subject, cast_to_hibernate(value, model_type))
+
           when DataMapper::Query::Conditions::LessThanOrEqualToComparison
-            Restrictions.le(subject, cast_to_hibernate(con.value, model_type))
+            Restrictions.le(subject, cast_to_hibernate(value, model_type))
+
           when DataMapper::Query::Conditions::InclusionComparison
-            Restrictions.in(subject, cast_to_hibernate(con.value, model_type))
+            # special case handling :x => 1..110 / :x => [1,2,3]
+            if value.class == Array
+              Restrictions.in(subject, cast_to_hibernate(value, model_type))
+            else
+              # XXX proper ordering?
+              arr = value.to_a
+              lo = arr.first
+              hi = arr.last
+              if lo.nil? || hi.nil?
+                Restrictions.in(subject, cast_to_hibernate(value, model_type))                
+              else
+                Restrictions.between(subject, cast_to_hibernate(lo, model_type), cast_to_hibernate(hi, model_type))
+              end
+            end
+
           when DataMapper::Query::Conditions::RegexpComparison
 
             if dialect == "org.hibernate.dialect.HSQLDialect"
-              Restrictions.sqlRestriction(" ( regexp_matches ( " +subject + " ,  ?  ))",
-                           cast_to_hibernate(con.value, model_type), org::hibernate::Hibernate::STRING)
+              Restrictions.sqlRestriction("(regexp_matches (" +subject + ", ?))",
+                           cast_to_hibernate(value, model_type), org::hibernate::Hibernate::STRING)
             elsif dialect == "org.hibernate.dialect.PostgreSQLDialect"
-              Restrictions.sqlRestriction(" ( " + subject +" ~ ? )",
-                           cast_to_hibernate(con.value, model_type), org::hibernate::Hibernate::STRING)
+              Restrictions.sqlRestriction("(" + subject +" ~ ?)",
+                           cast_to_hibernate(value, model_type), org::hibernate::Hibernate::STRING)
             # elsif dialect ==  "org.hibernate.dialect.DerbyDialect"
             # TODO implement custom matching function (see README)
             else
-              Restrictions.sqlRestriction(" ( " + subject +" regexp ? )",
-                           cast_to_hibernate(con.value, model_type), org::hibernate::Hibernate::STRING)
+              Restrictions.sqlRestriction("(" + subject +" regexp ?)",
+                           cast_to_hibernate(value, model_type), org::hibernate::Hibernate::STRING)
             end
-          else
-            # TODO remove that - this case should never be reached
-            puts "-----------other comparison: #{con.to_s}--------"
+          
         end
       end
 
       def parse_all_children(children, model, operand)
-        children.each do |child|
-          operand.add(parse_conditions_tree(child, model))
-        end
-        operand
+        operand = children.inject(operand){ |op,child| op.add(parse_conditions_tree(child, model))}
       end
 
       def parse_the_only_child(child,model)
@@ -253,30 +265,29 @@ module DataMapper
 
         case con
           when DataMapper::Query::Conditions::AndOperation
-            operand = Restrictions.conjunction()
-            return parse_all_children(children, model, operand)
+            parse_all_children(children, model, Restrictions.conjunction())
+
           when DataMapper::Query::Conditions::OrOperation
-            operand = Restrictions.disjunction()
-            return parse_all_children(children, model, operand)
+            parse_all_children(children, model, Restrictions.disjunction())
+
           when DataMapper::Query::Conditions::NotOperation
             #XXX only one child may be negated in DM?
             child = children.first
             # TODO REFACTOR IT :)
             if !(child.respond_to? :children) &&
-                     (child.class == DataMapper::Query::Conditions::InclusionComparison) &&
-                      child.value.class == Array  && child.value.empty?
+                (child.class == DataMapper::Query::Conditions::InclusionComparison) &&
+                (child.value.class == Array)  && (child.value.empty?)
+
               subject = child.subject.name.to_s
               # XXX ugly workaround for Model.all(:x.not => [])
               Restrictions.sqlRestriction(" ( "+ subject +" is null or " + subject +" is not null ) ")
             else
               Restrictions.not(parse_the_only_child(child,model))
             end
-          # when DataMapper::Query::Conditions::NullOperation
-          # XXX NullOperation is not used in dm-core at the moment
 
-          else
-            # TODO remove that - this case should never be reached
-            puts "-----------other operand: #{con.to_s}--------"
+          when DataMapper::Query::Conditions::NullOperation
+            # XXX NullOperation is not used in dm-core at the moment
+            raise NotImplementedError, "#{con.class} is not not used in dm-core"
         end
       end
 
@@ -322,7 +333,6 @@ update()
      #{collection.inspect}
 EOT
 end
-
     end
   end
 end
