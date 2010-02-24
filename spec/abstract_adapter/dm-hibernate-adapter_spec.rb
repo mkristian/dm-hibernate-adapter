@@ -1,10 +1,10 @@
-require File.dirname(__FILE__) + '/spec_helper'
 
-# TODO should be:
-#require 'dm-core/spec/adapter_shared_spec'
-# TODO but for now there is modified AbstractAdapter spec:
-require 'adapter_shared_spec'
-require 'hibernate_shared_spec'
+dir = Pathname(__FILE__).dirname.expand_path.to_s
+
+require dir + '/spec_helper'
+
+require dir + '/adapter_shared_spec'
+require dir + '/hibernate_shared_spec'
 
 describe DataMapper::Adapters::HibernateAdapter do
   DB_CONFIGS = {
@@ -23,7 +23,7 @@ describe DataMapper::Adapters::HibernateAdapter do
 
   it_should_behave_like 'An Adapter'
 
-  # TODO add hibernate specyfic specs
+  # TODO add hibernate/jruby specyfic specs
   it_should_behave_like 'An Hibernate Adapter'
 
 end

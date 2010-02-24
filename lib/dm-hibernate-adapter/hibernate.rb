@@ -109,8 +109,11 @@ module Hibernate
       ::Integer => java.lang.Integer,
       ::Date => java.util.Date,
       ::DataMapper::Types::Boolean => java.lang.Boolean,
-      ::DataMapper::Types::Serial => java.lang.Long
+      ::DataMapper::Types::Serial => java.lang.Long,
+      ::DataMapper::Types::Text => java.lang.String   
     }
+
+    @logger = org.slf4j.LoggerFactory.getLogger(Hibernate::Model.to_s.gsub(/::/, '.'))
 
     def self.included(model)
 
@@ -235,6 +238,8 @@ module Hibernate
       end
 
       def hibernate!
+        # TODO move it somewhere else
+        @logger = org.slf4j.LoggerFactory.getLogger(Hibernate::Model.to_s.gsub(/::/, '.'))
         #XXX workaround
         unless mapped?
           properties.each do |prop|
@@ -249,18 +254,20 @@ module Hibernate
           # "stolen" from http://github.com/superchris/hibernate
           # TODO honor self.storage_name as table
           add_class_annotation(javax.persistence.Entity => {})
-          java_class = become_java!
-          Hibernate.add_model(java_class)
-          @mapped_class = true
-        # else
-        # puts "model fired become_java! already"
+          java_type = !java_class ? become_java! : java_class
+          Hibernate.add_model(java_type)
+          # @mapped_class = true
+          @logger.debug "become_java! #{java_class}"
+         else
+          @logger.debug "become_java! fired already #{java_class}"
         end
 
       end
 
       #helper method
       def mapped?
-        !instance_variable_get('@mapped_class').nil?
+        # !instance_variable_get('@mapped_class').nil?
+        !java_class.nil?
       end
 
       private

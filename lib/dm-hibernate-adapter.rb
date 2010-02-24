@@ -47,9 +47,9 @@ module DataMapper
         Hibernate.current_session_context_class = "thread"
         
         Hibernate.connection_driver_class = driver.to_s
-        Hibernate.connection_url = url.to_s # "jdbc:h2:jibernate"
-        Hibernate.connection_username = username.to_s # "sa"
-        Hibernate.connection_password = password.to_s # ""
+        Hibernate.connection_url = url.to_s # ie. "jdbc:h2:jibernate"
+        Hibernate.connection_username = username.to_s # ie. "sa"
+        Hibernate.connection_password = password.to_s # ie. ""
         Hibernate.connection_pool_size = pool_size.to_s
         Hibernate.properties["hbm2ddl.auto"] = "update"
         Hibernate.properties["format_sql"] = "false"
@@ -286,8 +286,8 @@ module DataMapper
             end
 
           when DataMapper::Query::Conditions::NullOperation
-            # XXX NullOperation is not used in dm-core at the moment
-            raise NotImplementedError, "#{con.class} is not not used in dm-core"
+            # XXX NullOperation is not used in dm_core at the moment
+            raise NotImplementedError, "#{con.class} is not not used in dm_core"
         end
       end
 

@@ -29,7 +29,13 @@ how to list rake tasks (please note the jruby.rake.args part(var name))
 
 how to run specs?
 
-    mvn3 ruby:rake -e -Dverbose=true -Djruby.rake.args="spec"
+  * AbstractAdapter specs:
+
+    mvn3 ruby:rake -e -Dverbose=true -Djruby.rake.args="spec:adapter"
+
+  * dm-core specs:
+
+    mvn3 ruby:rake -e -Dverbose=true -Djruby.rake.args="spec:dm"
 
 TODOs
 ---------
@@ -38,7 +44,7 @@ TODOs
   use hsqldb 2.0.0.rc8 (regexps) http://www.reverttoconsole.com/blog/java/upgrading-to-hsqldb-2rc8-part-1-maven-integration)
 - enhance queries support: (join(links), group by + having, raw queries, one row in RS, subqueries in raw queries)
 - add more specs for adapter
-- add specs for hibernate specific stuff
+- add specs for hibernate/jruby specific stuff
 - add metrics tool (test coverage etc)
 - add more supported types
 - refactor classes structure
@@ -50,3 +56,4 @@ TODOs
 - make a gem
 - obey the properties field and required constraints as well the storagename for the tablename
 - make the logger a "ruby logger" with the same API as a standard ruby logger and log only if the logger level allows it (do not rely on underlying logger, i.e. avoid unnessecary string operations)
+- remove all dirty hacks from jibernate (ie.  Resource#send can't be used )

@@ -1,5 +1,7 @@
 require 'rake'
 
+SPEC_LOCATIONS = { :abstract_adapter => "spec/abstract_adapter", :dm_core => "spec/dm_core" }
+
 def with_gem(gemname, &blk)
   begin
     require gemname
@@ -11,15 +13,25 @@ end
 
 with_gem 'spec/rake/spectask' do
 
-  desc 'Run all specs'
-  Spec::Rake::SpecTask.new(:spec) do |t|
-    t.spec_opts << '--options' << 'spec/spec.opts' if File.exists?('spec/spec.opts')
-    t.libs << 'lib'
-    t.spec_files = FileList['spec/**_spec.rb']
-  end
+  namespace :spec do
+    desc 'Run AbstractAdapter specs'
+    Spec::Rake::SpecTask.new(:adapter) do |t|
+      if File.exists?("#{SPEC_LOCATIONS[:abstract_adapter]}/spec.opts")
+        t.spec_opts << '--options' << "#{SPEC_LOCATIONS[:abstract_adapter]}/spec.opts"
+      end
+      t.libs << 'lib'
+      t.spec_files = FileList["#{SPEC_LOCATIONS[:abstract_adapter]}/**_spec.rb"]
+    end
 
-  desc 'Default: Run Specs'
-  task :default => :spec
+    desc 'Run dm_core specs'
+    Spec::Rake::SpecTask.new(:dm) do |t|
+      if File.exists?("#{SPEC_LOCATIONS[:dm_core]}/spec.opts")
+        t.spec_opts << '--options' << "#{SPEC_LOCATIONS[:dm_core]}/spec.opts"
+      end
+      t.libs << 'lib'
+      t.spec_files = FileList["#{SPEC_LOCATIONS[:dm_core]}/**/**_spec.rb"]
+    end
+  end
 
 end
 

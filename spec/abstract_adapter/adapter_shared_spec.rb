@@ -53,7 +53,7 @@ share_examples_for 'An Adapter' do
   if adapter_supports?(:read)
 
    # <added>
-    # XXX this part is added to dm-core's specs
+    # XXX this part is added to dm_core's specs
     describe '#read specific object' do
       before :all do
         @heffalump = Heffalump.create(:color => 'brownish hue')
@@ -106,7 +106,7 @@ share_examples_for 'An Adapter' do
   if adapter_supports?(:update)
 
     # <added>
-    # XXX this part is added to dm-core's specs
+    # XXX this part is added to dm_core's specs
     describe '#update called directly' do
       before do
         @heffalump = Heffalump.create(:color => 'indigo')
@@ -292,7 +292,7 @@ share_examples_for 'An Adapter' do
         end
 
         # <added>
-        # XXX this part is added to dm-core's specs
+        # XXX this part is added to dm_core's specs
         # XX ie. HSQLDB support "Java" regexps only
         describe 'Java regexp' do
           before do
