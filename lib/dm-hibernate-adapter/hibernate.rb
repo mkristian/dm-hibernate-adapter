@@ -250,6 +250,13 @@ module Hibernate
         TYPES[type] || self.to_java_type(type.primitive)
       end
 
+
+      def to_java_class_name
+        # http://jira.codehaus.org/browse/JRUBY-4601
+        # return properly full-specified class name (ie ruby.Z.X.Y)
+        "ruby."+self.to_s.gsub("::",".")
+      end
+
       def hibernate!
         # TODO move it somewhere else
         @logger = org.slf4j.LoggerFactory.getLogger(Hibernate::Model.to_s.gsub(/::/, '.'))
@@ -271,7 +278,6 @@ module Hibernate
           add_class_annotation(javax.persistence.Entity => {})
           java_type = !java_class ? become_java! : java_class
           Hibernate.add_model(java_type)
-          # @mapped_class = true
           @logger.debug "become_java! #{java_class}"
          else
           @logger.debug "become_java! fired already #{java_class}"
@@ -281,7 +287,6 @@ module Hibernate
 
       #helper method
       def mapped?
-        # !instance_variable_get('@mapped_class').nil?
         !java_class.nil?
       end
 
