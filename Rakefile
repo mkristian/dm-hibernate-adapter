@@ -1,6 +1,10 @@
 require 'rake'
 
-SPEC_LOCATIONS = { :abstract_adapter => "spec/abstract_adapter", :dm_core => "spec/dm_core" }
+SPEC_LOCATIONS = {
+  :abstract_adapter => "spec/abstract_adapter",
+  :dm_core          => "spec/dm_core",
+  :transient        => "spec/transient"
+}
 
 def with_gem(gemname, &blk)
   begin
@@ -30,6 +34,15 @@ with_gem 'spec/rake/spectask' do
       end
       t.libs << 'lib'
       t.spec_files = FileList["#{SPEC_LOCATIONS[:dm_core]}/**/**_spec.rb"]
+    end
+
+    desc 'Run transient specs'
+    Spec::Rake::SpecTask.new(:transient) do |t|
+      if File.exists?("#{SPEC_LOCATIONS[:transient]}/spec.opts")
+        t.spec_opts << '--options' << "#{SPEC_LOCATIONS[:transient]}/spec.opts"
+      end
+      t.libs << 'lib'
+      t.spec_files = FileList["#{SPEC_LOCATIONS[:transient]}/dm-hibernate-adapter_spec.rb"]
     end
   end
 

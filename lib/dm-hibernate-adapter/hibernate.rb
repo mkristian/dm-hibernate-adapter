@@ -105,12 +105,13 @@ module Hibernate
 
     # TODO enhance TYPEs list
     TYPES = {
-      ::String => java.lang.String,
-      ::Integer => java.lang.Integer,
-      ::Date => java.util.Date,
-      ::DataMapper::Types::Boolean => java.lang.Boolean,
-      ::DataMapper::Types::Serial => java.lang.Long,
-      ::DataMapper::Types::Text => java.lang.String   
+      ::String                         => java.lang.String,
+      ::Integer                        => java.lang.Integer,
+      ::Date                           => java.util.Date,
+      ::Time                           => java.sql.Time,
+      ::DataMapper::Types::Boolean     => java.lang.Boolean,
+      ::DataMapper::Types::Serial      => java.lang.Long,
+      ::DataMapper::Types::Text        => java.lang.String   
     }
 
     @logger = org.slf4j.LoggerFactory.getLogger(Hibernate::Model.to_s.gsub(/::/, '.'))

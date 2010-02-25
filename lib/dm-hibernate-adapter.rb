@@ -20,15 +20,15 @@ module DataMapper
 
       # TODO maybe more drivers (Oracle, SQLITE3)
       DRIVERS = {
-        :H2 => "org.h2.Driver",
-        :HSQL => "org.hsqldb.jdbcDriver",
-        :Derby => "org.apache.derby.jdbc.EmbeddedDriver",
-        :MySQL5 => "com.mysql.jdbc.Driver",
-        :MySQL5InnoDB => "com.mysql.jdbc.Driver",
-        :MySQL => "com.mysql.jdbc.Driver",
-        :MySQLInnoDB => "com.mysql.jdbc.Driver",
-        :MySQLMyISAM => "com.mysql.jdbc.Driver",
-        :PostgreSQL => "org.postgresql.Driver",
+        :H2             => "org.h2.Driver",
+        :HSQL           => "org.hsqldb.jdbcDriver",
+        :Derby          => "org.apache.derby.jdbc.EmbeddedDriver",
+        :MySQL5         => "com.mysql.jdbc.Driver",
+        :MySQL5InnoDB   => "com.mysql.jdbc.Driver",
+        :MySQL          => "com.mysql.jdbc.Driver",
+        :MySQLInnoDB    => "com.mysql.jdbc.Driver",
+        :MySQLMyISAM    => "com.mysql.jdbc.Driver",
+        :PostgreSQL     => "org.postgresql.Driver",
       }
 
       DataMapper::Model.append_inclusions Hibernate::Model
