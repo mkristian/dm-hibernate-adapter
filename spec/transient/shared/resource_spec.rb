@@ -63,6 +63,16 @@ share_examples_for 'An Adapter with resource_spec support' do
         property :name, String, :key => true, :default => 'a default value'
       end
 
+
+      # <addded>
+      ::Blog::User.auto_migrate!
+      ::Blog::Author.auto_migrate!
+      ::Blog::Comment.auto_migrate!
+      ::Blog::Article.auto_migrate!
+      ::Blog::Paragraph.auto_migrate!
+      # </addded>
+
+
       @user_model      = Blog::User
       @author_model    = Blog::Author
       @comment_model   = Blog::Comment

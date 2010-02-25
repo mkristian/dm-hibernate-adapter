@@ -4,6 +4,8 @@ module Hibernate
   JClass = java.lang.Class
   JVoid = java.lang.Void::TYPE
 
+  @logger = org.slf4j.LoggerFactory.getLogger(Hibernate.to_s.gsub(/::/, '.'))
+
   def self.dialect=(dialect)
     config.set_property "hibernate.dialect", dialect
   end
@@ -89,8 +91,9 @@ module Hibernate
     unless mapped?(model_java_class)
       config.add_annotated_class(model_java_class)
       @mapped_classes << model_java_class
-    # else
-    #  puts "model/class #{model_java_class} registered already"
+      @logger.debug " model/class #{model_java_class} registered successfully"
+    else
+      @logger.debug " model/class #{model_java_class} registered already"
     end
   end
 

@@ -26,6 +26,12 @@ share_examples_for 'An Adapter with property_spec support' do
         property :format,       String, :default => 'jpeg'
         property :taken_at,     Time,   :default => proc { Time.now }
       end
+
+      # TODO
+      # <added>
+      ::Track.auto_migrate!
+      ::Image.auto_migrate!
+      # </added>
     end
 
 #    supported_by :all do

@@ -31,11 +31,15 @@ how to run specs?
 
   * AbstractAdapter specs:
 
-    mvn3 ruby:rake -e -Dverbose=true -Djruby.rake.args="spec:adapter"
+        mvn3 ruby:rake -e -Dverbose=true -Djruby.rake.args="spec:adapter"
 
   * dm-core specs:
 
-    mvn3 ruby:rake -e -Dverbose=true -Djruby.rake.args="spec:dm"
+        mvn3 ruby:rake -e -Dverbose=true -Djruby.rake.args="spec:dm"
+
+  * transient specs:
+
+        mvn3 ruby:rake -e -Dverbose=true -Djruby.rake.args="spec:transient"
 
 TODOs
 ---------
