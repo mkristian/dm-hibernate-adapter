@@ -106,12 +106,17 @@ module Hibernate
     # TODO enhance TYPEs list
     TYPES = {
       ::String                         => java.lang.String,
-      ::Integer                        => java.lang.Integer,
+      ::Integer                        => java.lang.Integer
+      ::Float                          => java.lang.Double,
+      ::BigDecimal                     => java.math.BigDecimal,
       ::Date                           => java.util.Date,
+      ::DateTime                       => java.sql.Timestamp,
       ::Time                           => java.sql.Time,
+      ::Object                         => nil,
+      ::Class                          => nil,
       ::DataMapper::Types::Boolean     => java.lang.Boolean,
-      ::DataMapper::Types::Serial      => java.lang.Long,
-      ::DataMapper::Types::Text        => java.lang.String   
+     # ::DataMapper::Types::Serial      => java.lang.Long,
+     # ::DataMapper::Types::Text        => java.lang.String
     }
 
     @logger = org.slf4j.LoggerFactory.getLogger(Hibernate::Model.to_s.gsub(/::/, '.'))
@@ -129,96 +134,98 @@ module Hibernate
         # TODO or
         # TODO prepare list of methods and iterate over and generate that code dynamically ?
         # what about performance ?
-        model.instance_eval do
-          alias :wrapped_auto_migrate!   :auto_migrate!
-          alias :wrapped_create          :create
-          alias :wrapped_all             :all
-          alias :wrapped_copy            :copy
-          alias :wrapped_first           :first
-          alias :wrapped_first_or_create :first_or_create
-          alias :wrapped_first_or_new    :first_or_new
-          alias :wrapped_get             :get
-          alias :wrapped_last            :last
-          alias :wrapped_load            :load
+        unless model.respond_to? :wrapped_create
+          model.instance_eval do
+            alias :wrapped_auto_migrate!   :auto_migrate!
+            alias :wrapped_create          :create
+            alias :wrapped_all             :all
+            alias :wrapped_copy            :copy
+            alias :wrapped_first           :first
+            alias :wrapped_first_or_create :first_or_create
+            alias :wrapped_first_or_new    :first_or_new
+            alias :wrapped_get             :get
+            alias :wrapped_last            :last
+            alias :wrapped_load            :load
 
-          def self.auto_migrate!
-            hibernate!
-            wrapped_auto_migrate!
+            def self.auto_migrate!
+              hibernate!
+              wrapped_auto_migrate!
+            end
+
+            def self.create(attributes = {})
+              hibernate!
+              wrapped_create(attributes)
+            end
+
+            def self.all(query = nil)
+              hibernate!
+              wrapped_all(query)
+            end
+
+            def self.copy(source, destination, query = {})
+              hibernate!
+              wrapped_copy(source,destination,query)
+            end
+
+            def self.first(*args)
+              hibernate!
+              wrapped_first(*args)
+            end
+
+            def self.first_or_create(conditions = {}, attributes = {})
+              hibernate!
+              wrapped_first_or_create(conditions,attributes)
+            end
+
+            def self.first_or_new(conditions = {}, attributes = {})
+              hibernate!
+              wrapped_first_or_new(conditions,attributes)
+            end
+
+            def self.get(*key)
+              hibernate!
+              wrapped_get(*key)
+            end
+
+            def self.last(*args)
+              hibernate!
+              wrapped_last(*args)
+            end
+
+            def self.load(records, query)
+              hibernate!
+              wrapped_load(records,query)
+            end
           end
 
-          def self.create(attributes = {})
-            hibernate!
-            wrapped_create(attributes)
+          model.class_eval do
+            alias :wrapped_save              :save
+            alias :wrapped_update            :update
+            alias :wrapped_destroy           :destroy
+            alias :wrapped_update_attributes :update_attributes
+
+            def save
+              model.hibernate!
+              wrapped_save
+            end
+
+            def update(attributes = {})
+              model.hibernate!
+              wrapped_update(attributes)
+            end
+
+            def destroy
+              model.hibernate!
+              wrapped_destroy
+            end
+
+            def update_attributes(attributes = {}, *allowed)
+              model.hibernate!
+              wrapped_update_attributes(attributes,*allowed)
+            end
           end
 
-          def self.all(query = nil)
-            hibernate!
-            wrapped_all(query)
-          end
-
-          def self.copy(source, destination, query = {})
-            hibernate!
-            wrapped_copy(source,destination,query)
-          end
-
-          def self.first(*args)
-            hibernate!
-            wrapped_first(*args)
-          end
-
-          def self.first_or_create(conditions = {}, attributes = {})
-            hibernate!
-            wrapped_first_or_create(conditions,attributes)
-          end
-
-          def self.first_or_new(conditions = {}, attributes = {})
-            hibernate!
-            wrapped_first_or_new(conditions,attributes)
-          end
-
-          def self.get(*key)
-            hibernate!
-            wrapped_get(*key)
-          end
-
-          def self.last(*args)
-            hibernate!
-            wrapped_last(*args)
-          end
-
-          def self.load(records, query)
-            hibernate!
-            wrapped_load(records,query)
-          end
         end
-
-        model.class_eval do
-          alias :wrapped_save              :save
-          alias :wrapped_update            :update
-          alias :wrapped_destroy           :destroy
-          alias :wrapped_update_attributes :update_attributes
-
-          def save
-            model.hibernate!
-            wrapped_save
-          end
-
-          def update(attributes = {})
-            model.hibernate!
-            wrapped_update(attributes)
-          end
-
-          def destroy
-            model.hibernate!
-            wrapped_destroy
-          end
-
-          def update_attributes(attributes = {}, *allowed)
-            model.hibernate!
-            wrapped_update_attributes(attributes,*allowed)
-          end
-        end
-
       end
       # </monkey-patching>
 
@@ -246,6 +253,8 @@ module Hibernate
           properties.each do |prop|
             # TODO honor prop.field mapping and maybe more
             if prop.serial?
+              hibernate_generated_identifier(prop.name, prop.type)
+            elsif prop.key?
               hibernate_identifier(prop.name, prop.type)
             else
               add_java_property(prop.name, prop.type)
@@ -284,8 +293,11 @@ module Hibernate
       end
 
       # "stolen" from http://github.com/superchris/hibernate
-      def hibernate_identifier(name, type)
+      def hibernate_generated_identifier(name, type)
         add_java_property(name, type, javax.persistence.Id => {}, javax.persistence.GeneratedValue => {})
+      end
+      def hibernate_identifier(name, type)
+        add_java_property(name, type, javax.persistence.Id => {})
       end
       
       # "stolen" from http://github.com/superchris/hibernate
@@ -307,13 +319,18 @@ module Hibernate
           EOT
           name = :"_#{name}"
         end
+
+        mapped_type = to_java_type(type).java_class
         alias_method get_name.intern, name
-        add_method_signature get_name, [TYPES[type].java_class]
+        add_method_signature get_name, [mapped_type]
         add_method_annotation get_name, annotation if annotation
         alias_method set_name.intern, :"#{name.to_s}="
-        add_method_signature set_name, [JVoid, TYPES[type].java_class]
+        add_method_signature set_name, [JVoid, mapped_type]
       end
 
+      def to_java_type(type)
+        TYPES[type] || to_java_type(type.primitive)
+      end
     end
   end
 end
