@@ -194,7 +194,7 @@ module DataMapper
 
         subject = con.subject.name.to_s # property/column name
         value = con.value # value used in comparison
-        model_type = Hibernate::Model::TYPES[model.properties[subject.to_sym].type] # Java type of property (used in typecasting)
+        model_type = model.to_java_type(model.properties[subject.to_sym].type) # Java type of property (used in typecasting)
         dialect = Hibernate.dialect # SQL dialect for current configuration
 
         case con

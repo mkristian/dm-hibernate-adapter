@@ -106,17 +106,15 @@ module Hibernate
     # TODO enhance TYPEs list
     TYPES = {
       ::String                         => java.lang.String,
-      ::Integer                        => java.lang.Integer
+      ::Integer                        => java.lang.Integer,
       ::Float                          => java.lang.Double,
       ::BigDecimal                     => java.math.BigDecimal,
-      ::Date                           => java.util.Date,
+      ::Date                           => java.sql.Date,
       ::DateTime                       => java.sql.Timestamp,
       ::Time                           => java.sql.Time,
       ::Object                         => nil,
       ::Class                          => nil,
       ::DataMapper::Types::Boolean     => java.lang.Boolean,
-     # ::DataMapper::Types::Serial      => java.lang.Long,
-     # ::DataMapper::Types::Text        => java.lang.String
     }
 
     @logger = org.slf4j.LoggerFactory.getLogger(Hibernate::Model.to_s.gsub(/::/, '.'))
@@ -245,6 +243,10 @@ module Hibernate
         schema_export.create(false,true) # XXX here you can turn on/off logger
       end
 
+      def to_java_type(type)
+        TYPES[type] || self.to_java_type(type.primitive)
+      end
+
       def hibernate!
         # TODO move it somewhere else
         @logger = org.slf4j.LoggerFactory.getLogger(Hibernate::Model.to_s.gsub(/::/, '.'))
@@ -309,12 +311,12 @@ module Hibernate
         if(type == ::Date)
           class_eval <<-EOT
  def _#{name}=(d)
-   attribute_set(:#{name}, Date.civil(d.year + 1900, d.month + 1, d.date))
+   attribute_set(d.nil? ? nil : :#{name}, Date.civil(d.year + 1900, d.month + 1, d.date))
  end
 
  def _#{name}
    d = attribute_get(:#{name})
-   org.joda.time.DateTime.new(d.year, d.month, d.day, 0, 0, 0, 0).to_date
+   org.joda.time.DateTime.new(d.year, d.month, d.day, 0, 0, 0, 0).to_date if d
  end
           EOT
           name = :"_#{name}"
@@ -326,10 +328,6 @@ module Hibernate
         add_method_annotation get_name, annotation if annotation
         alias_method set_name.intern, :"#{name.to_s}="
         add_method_signature set_name, [JVoid, mapped_type]
-      end
-
-      def to_java_type(type)
-        TYPES[type] || to_java_type(type.primitive)
       end
     end
   end
