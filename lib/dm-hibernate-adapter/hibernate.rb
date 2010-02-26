@@ -109,12 +109,12 @@ module Hibernate
       ::Integer                        => java.lang.Integer,
       ::Float                          => java.lang.Double,
       ::BigDecimal                     => java.math.BigDecimal,
-      ::Date                           => java.sql.Date,
-      ::DateTime                       => java.sql.Timestamp,
-      ::Time                           => java.sql.Time,
-      ::Object                         => nil,
-      ::Class                          => nil,
-      ::DataMapper::Types::Boolean     => java.lang.Boolean,
+      ::Date                           => java.util.Date,
+      ::DateTime                       => java.util.Date,
+      ::Time                           => java.util.Date,
+      ::Object                         => nil, # TODO
+      ::Class                          => nil, # TODO
+      ::TrueClass                      => java.lang.Boolean,
     }
 
     @logger = org.slf4j.LoggerFactory.getLogger(Hibernate::Model.to_s.gsub(/::/, '.'))
@@ -253,19 +253,13 @@ module Hibernate
         #XXX workaround
         unless mapped?
           properties.each do |prop|
-            # TODO honor prop.field mapping and maybe more
-            if prop.serial?
-              hibernate_generated_identifier(prop.name, prop.type)
-            elsif prop.key?
-              hibernate_identifier(prop.name, prop.type)
-            else
-              add_java_property(prop.name, prop.type)
-            end
+            add_java_property(prop)
           end
 
           # "stolen" from http://github.com/superchris/hibernate
           # TODO honor self.storage_name as table
-          add_class_annotation(javax.persistence.Entity => {})
+          add_class_annotation(javax.persistence.Entity => {},
+                               javax.persistence.Table => {"name" => self.storage_name})
           java_type = !java_class ? become_java! : java_class
           Hibernate.add_model(java_type)
           # @mapped_class = true
@@ -288,22 +282,38 @@ module Hibernate
         @hibernate_sigs ||= {}
       end
 
-      def hibernate_attr(attrs)
-        attrs.each do |name, type|
-          add_java_property(name, type)
+      # "stolen" from http://github.com/superchris/hibernate
+      def add_java_property(prop)
+        name = prop.name
+        type = prop.type
+        column_name = prop.field
+        annotation = {}
+        # TODO honor prop.field mapping and maybe more
+        if prop.serial?
+          annotation[javax.persistence.Id] = {}
+          annotation[javax.persistence.GeneratedValue] = {}
+        elsif prop.key?
+          # TODO obey multi column keys
+          annotation[javax.persistence.Id] = {}
         end
-      end
 
-      # "stolen" from http://github.com/superchris/hibernate
-      def hibernate_generated_identifier(name, type)
-        add_java_property(name, type, javax.persistence.Id => {}, javax.persistence.GeneratedValue => {})
-      end
-      def hibernate_identifier(name, type)
-        add_java_property(name, type, javax.persistence.Id => {})
-      end
-      
-      # "stolen" from http://github.com/superchris/hibernate
-      def add_java_property(name, type, annotation = nil)
+        annotation[javax.persistence.Column] = {
+          "unique" => prop.unique?,
+          "name" => prop.field
+        }
+        unless prop.required?.nil?
+          annotation[javax.persistence.Column]["nullable"] = !prop.required?
+        end
+        unless prop.length.nil?
+          annotation[javax.persistence.Column]["length"] = java.lang.Integer.new(prop.length)
+        end
+        unless prop.scale.nil?
+          annotation[javax.persistence.Column]["scale"] = java.lang.Integer.new(prop.scale)
+        end
+unless prop.precision.nil?
+          annotation[javax.persistence.Column]["precision"] = java.lang.Integer.new(prop.precision)
+        end
+
         get_name = "get#{name.to_s.capitalize}"
         set_name = "set#{name.to_s.capitalize}"
 
@@ -311,12 +321,15 @@ module Hibernate
         if(type == ::Date)
           class_eval <<-EOT
  def _#{name}=(d)
-   attribute_set(d.nil? ? nil : :#{name}, Date.civil(d.year + 1900, d.month + 1, d.date))
+   attribute_set(:#{name}, d.nil? ? nil : Date.civil(d.year + 1900, d.month + 1, d.date))
  end
-
+         EOT
+         class_eval <<-EOT
  def _#{name}
    d = attribute_get(:#{name})
-   org.joda.time.DateTime.new(d.year, d.month, d.day, 0, 0, 0, 0).to_date if d
+   if d
+     org.joda.time.DateTime.new(d.year, d.month, d.day, 0, 0, 0, 0).to_date
+   end
  end
           EOT
           name = :"_#{name}"
@@ -325,7 +338,7 @@ module Hibernate
         mapped_type = to_java_type(type).java_class
         alias_method get_name.intern, name
         add_method_signature get_name, [mapped_type]
-        add_method_annotation get_name, annotation if annotation
+        add_method_annotation get_name, annotation
         alias_method set_name.intern, :"#{name.to_s}="
         add_method_signature set_name, [JVoid, mapped_type]
       end
