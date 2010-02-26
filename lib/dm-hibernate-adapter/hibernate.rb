@@ -4,6 +4,8 @@ module Hibernate
   JClass = java.lang.Class
   JVoid = java.lang.Void::TYPE
 
+  @logger = org.slf4j.LoggerFactory.getLogger(Hibernate.to_s.gsub(/::/, '.'))
+
   def self.dialect=(dialect)
     config.set_property "hibernate.dialect", dialect
   end
@@ -89,8 +91,9 @@ module Hibernate
     unless mapped?(model_java_class)
       config.add_annotated_class(model_java_class)
       @mapped_classes << model_java_class
-    # else
-    #  puts "model/class #{model_java_class} registered already"
+      @logger.debug " model/class #{model_java_class} registered successfully"
+    else
+      @logger.debug " model/class #{model_java_class} registered already"
     end
   end
 
@@ -247,6 +250,13 @@ module Hibernate
         TYPES[type] || self.to_java_type(type.primitive)
       end
 
+
+      def to_java_class_name
+        # http://jira.codehaus.org/browse/JRUBY-4601
+        # return properly full-specified class name (ie ruby.Z.X.Y)
+        "ruby."+self.to_s.gsub("::",".")
+      end
+
       def hibernate!
         # TODO move it somewhere else
         @logger = org.slf4j.LoggerFactory.getLogger(Hibernate::Model.to_s.gsub(/::/, '.'))
@@ -262,7 +272,6 @@ module Hibernate
                                javax.persistence.Table => {"name" => self.storage_name})
           java_type = !java_class ? become_java! : java_class
           Hibernate.add_model(java_type)
-          # @mapped_class = true
           @logger.debug "become_java! #{java_class}"
          else
           @logger.debug "become_java! fired already #{java_class}"
@@ -272,7 +281,6 @@ module Hibernate
 
       #helper method
       def mapped?
-        # !instance_variable_get('@mapped_class').nil?
         !java_class.nil?
       end
 

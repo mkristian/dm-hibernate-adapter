@@ -117,7 +117,9 @@ module DataMapper
         Hibernate.tx do |session|
 
           # select * from model
-          criteria = session.create_criteria(model.java_class)
+          # XXX BUG http://jira.codehaus.org/browse/JRUBY-4601
+          # criteria = session.create_criteria(model.java_class)
+          criteria = session.create_criteria(model.to_java_class_name)
           # where ...
           criteria.add(parse_conditions_tree(conditions,model))  unless conditions.nil?
           # limit ...

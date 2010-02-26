@@ -7,7 +7,7 @@ share_examples_for 'An Adapter with model_spec support' do
 
       raise '+@adapter+ should be defined in before block' unless instance_variable_get('@adapter')
 
-      module ::Blog
+#      module ::Blog
 
         class Article
           include DataMapper::Resource
@@ -22,9 +22,9 @@ share_examples_for 'An Adapter with model_spec support' do
           has n, :revisions, self, :child_key => [ :original_id ]
           has 1, :previous,  self, :child_key => [ :original_id ], :order => [ :id.desc ]
         end
-      end
+#      end
 
-      @article_model = Blog::Article
+      @article_model = Article
     end
 
 #    supported_by :all do
