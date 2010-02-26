@@ -318,7 +318,7 @@ module Hibernate
         unless prop.scale.nil?
           annotation[javax.persistence.Column]["scale"] = java.lang.Integer.new(prop.scale)
         end
-unless prop.precision.nil?
+        unless prop.precision.nil?
           annotation[javax.persistence.Column]["precision"] = java.lang.Integer.new(prop.precision)
         end
 
