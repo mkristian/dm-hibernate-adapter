@@ -18,11 +18,18 @@ share_examples_for 'An Adapter' do
     class ::Heffalump
       include DataMapper::Resource
 
-      property :id,        Serial
-      property :color,     String
-      property :num_spots, Integer
-      property :striped,   Boolean
-
+      property :id,          Serial, :field => "hid"
+      property :color,       String, :required => false, :length => 64, :unique_index => true
+      property :alpha,       String, :required => true, :length => 4, :default => "done", :index => true
+      property :num_spots,   Integer, :index => :big
+      property :number,      Integer, :unique => true
+      property :striped,     Boolean, :index => :big #[:big, :small]
+      property :weight,      Float, :precision => 12, :unique_index => :usmall
+      property :distance,    BigDecimal, :unique_index => :usamle #[:ubig, :usmall]
+      property :birthdate,   Date, :required => false, :field => "birth_date"
+      property :modified_at, DateTime, :required => false
+      property :expiration,  Time, :required => false
+      property :comment,     Text, :required => false, :length => 6, :index => :big
     end
 
     # TODO ?
@@ -35,7 +42,7 @@ share_examples_for 'An Adapter' do
     describe '#create' do
       it 'should not raise any errors' do
         lambda {
-          Heffalump.create(:color => 'peach')
+          Heffalump.create(:color => 'peach', :alpha => '1234', :weight => 1.234, :birthdate => Date.new, :comment => "123456", :expiration => Time.new, :modified_at => DateTime.new, :distance => BigDecimal.new("432423424"))
         }.should_not raise_error
       end
 
@@ -44,6 +51,33 @@ share_examples_for 'An Adapter' do
         heffalump.id.should be_nil
         heffalump.save
         heffalump.id.should_not be_nil
+      end
+
+      describe "property constraints set via annotations" do
+        it 'should obey required == true' do
+          lambda {
+            Heffalump.create(:color => 'peach', :alpha => nil)
+          }.should raise_error(NativeException)
+        end
+
+        it 'should obey length on not required' do
+          lambda {
+            Heffalump.create(:color => 'peach', :comment => '1234567')
+          }.should raise_error(NativeException)
+        end
+
+        it 'should obey length on required' do
+          lambda {
+            Heffalump.create(:color => 'peach', :alpha => '12345')
+          }.should raise_error(NativeException)
+        end
+
+        it 'should obey unique' do
+          lambda {
+            Heffalump.create(:color => 'peach', :number => 12345)
+            Heffalump.create(:color => 'peach', :number => 12345)
+          }.should raise_error(NativeException)
+        end
       end
     end
   else

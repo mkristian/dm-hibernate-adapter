@@ -115,8 +115,6 @@ module Hibernate
       ::Date                           => java.util.Date,
       ::DateTime                       => java.util.Date,
       ::Time                           => java.util.Date,
-      ::Object                         => nil, # TODO
-      ::Class                          => nil, # TODO
       ::TrueClass                      => java.lang.Boolean,
     }
 
@@ -258,18 +256,23 @@ module Hibernate
       end
 
       def hibernate!
-        # TODO move it somewhere else
         @logger = org.slf4j.LoggerFactory.getLogger(Hibernate::Model.to_s.gsub(/::/, '.'))
-        #XXX workaround
         unless mapped?
+          discriminator = nil
           properties.each do |prop|
-            add_java_property(prop)
+            discriminator = add_java_property(prop) || discriminator
           end
 
           # "stolen" from http://github.com/superchris/hibernate
-          # TODO honor self.storage_name as table
-          add_class_annotation(javax.persistence.Entity => {},
-                               javax.persistence.Table => {"name" => self.storage_name})
+          annotation = {
+            javax.persistence.Entity => {},
+            javax.persistence.Table => {"name" => self.storage_name}
+          }
+          if discriminator
+            annotation[javax.persistence.Inheritance] = {"strategy" => javax.persistence.InheritanceType.SINGLE_TABLE }
+            annotation[javax.persistence.DiscriminatorColumn] = {"name" => discriminator}
+          end
+          add_class_annotation(annotation)
           java_type = !java_class ? become_java! : java_class
           Hibernate.add_model(java_type)
           @logger.debug "become_java! #{java_class}"
@@ -294,6 +297,8 @@ module Hibernate
       def add_java_property(prop)
         name = prop.name
         type = prop.type
+        return name if(type == DataMapper::Types::Discriminator)
+
         column_name = prop.field
         annotation = {}
         # TODO honor prop.field mapping and maybe more
@@ -309,6 +314,19 @@ module Hibernate
           "unique" => prop.unique?,
           "name" => prop.field
         }
+        unless prop.index.nil?
+          if(prop.index == true)
+            annotation[org.hibernate.annotations.Index]
+          elsif(prop.index.type == Symbol)
+            annotation[org.hibernate.annotations.Index] = { "name" => prop.index.to_s }
+          else
+            # TODO arrays !!
+            #annotation[org.hibernate.annotations.Index] = {"name" => []}
+            #prop.index.each do|index|
+            #  annotation[org.hibernate.annotations.Index]["name"] << index.to_s
+            #end
+          end
+        end
         unless prop.required?.nil?
           annotation[javax.persistence.Column]["nullable"] = !prop.required?
         end
@@ -349,6 +367,7 @@ module Hibernate
         add_method_annotation get_name, annotation
         alias_method set_name.intern, :"#{name.to_s}="
         add_method_signature set_name, [JVoid, mapped_type]
+        nil
       end
     end
   end

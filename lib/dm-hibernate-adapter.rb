@@ -68,9 +68,15 @@ module DataMapper
         @logger.debug("create #{resources.inspect}")
         count = 0
         Hibernate.tx do |session|
-          resources.each do |resource|
-            session.save(resource)
-            count += 1
+           resources.each do |resource|
+            begin
+              session.persist(resource)
+              count += 1
+            rescue NativeException => e
+              @logger.debug("error creating #{resource.inspect}", e.cause)
+              session.clear
+              raise e
+            end
           end
         end
         count
