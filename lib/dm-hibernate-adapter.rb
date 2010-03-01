@@ -1,7 +1,11 @@
-require 'dm-core'
+require 'java_logger'
+
+if require 'dm-core'
+  DataMapper.logger = Slf4r::LoggerFacade.new(DataMapper)
+end
+
 require 'dm-core/adapters/abstract_adapter'
 
-require 'java'
 require 'jruby/core_ext'
 require 'stringio'
 
@@ -17,6 +21,8 @@ module DataMapper
     java_import org.hibernate.criterion.Order # ie. Order.asc
 
     class HibernateAdapter < AbstractAdapter
+
+      @@logger = org.slf4j.LoggerFactory.getLogger(HibernateAdapter.to_s.gsub(/::/, '.'))
 
       # TODO maybe more drivers (Oracle, SQLITE3)
       DRIVERS = {
@@ -34,7 +40,6 @@ module DataMapper
       DataMapper::Model.append_inclusions Hibernate::Model
 
       def initialize(name, options = {})
-        @logger = org.slf4j.LoggerFactory.getLogger(HibernateAdapter.to_s.gsub(/::/, '.'))
         dialect = options.delete(:dialect)
         username = options.delete(:username)
         password = options.delete(:password)
@@ -65,7 +70,7 @@ module DataMapper
       #
       # @api semipublic
       def create(resources)
-        @logger.debug("create #{resources.inspect}")
+        @@logger.debug("create #{resources.inspect}")
         count = 0
         Hibernate.tx do |session|
            resources.each do |resource|
@@ -73,7 +78,7 @@ module DataMapper
               session.persist(resource)
               count += 1
             rescue NativeException => e
-              @logger.debug("error creating #{resource.inspect}", e.cause)
+              @@logger.debug("error creating #{resource.inspect}", e.cause)
               session.clear
               raise e
             end
@@ -145,7 +150,7 @@ module DataMapper
             end
           end
 
-          @logger.debug(criteria.to_s)
+          @@logger.debug(criteria.to_s)
 
           # TODO handle exceptions
           result = criteria.list
@@ -163,7 +168,7 @@ module DataMapper
       # @api semipublic
       def delete(resources)
         resources.each do |resource|
-          @logger.debug("deleting #{resource.inspect}")
+          @@logger.debug("deleting #{resource.inspect}")
           Hibernate.tx do |session|
             session.delete(resource)
           end
@@ -315,7 +320,7 @@ module DataMapper
 #
 # @api private
 def log_read(query)
-@logger.debug <<EOT
+@@logger.debug <<EOT
 read()
     query:
       #{query.inspect}
@@ -333,7 +338,7 @@ end
 #
 # @api private
 def log_update(attributes,collection)
-@logger.debug <<EOT
+@@logger.debug <<EOT
 update()
    attributes:
      #{attributes.inspect}

@@ -4,7 +4,7 @@ module Hibernate
   JClass = java.lang.Class
   JVoid = java.lang.Void::TYPE
 
-  @logger = org.slf4j.LoggerFactory.getLogger(Hibernate.to_s.gsub(/::/, '.'))
+  @@logger = Slf4r::LoggerFacade.new(Hibernate)
 
   def self.dialect=(dialect)
     config.set_property "hibernate.dialect", dialect
@@ -91,9 +91,9 @@ module Hibernate
     unless mapped?(model_java_class)
       config.add_annotated_class(model_java_class)
       @mapped_classes << model_java_class
-      @logger.debug " model/class #{model_java_class} registered successfully"
+      @@logger.debug " model/class #{model_java_class} registered successfully"
     else
-      @logger.debug " model/class #{model_java_class} registered already"
+      @@logger.debug " model/class #{model_java_class} registered already"
     end
   end
 
@@ -117,8 +117,6 @@ module Hibernate
       ::Time                           => java.util.Date,
       ::TrueClass                      => java.lang.Boolean,
     }
-
-    @logger = org.slf4j.LoggerFactory.getLogger(Hibernate::Model.to_s.gsub(/::/, '.'))
 
     def self.included(model)
 
@@ -235,6 +233,8 @@ module Hibernate
       java_import org.hibernate.tool.hbm2ddl.SchemaExport
       java_import org.hibernate.tool.hbm2ddl.SchemaUpdate
 
+      @@logger = Slf4r::LoggerFacade.new(Hibernate::Model)
+
       def auto_migrate!
         config = Hibernate::config
 
@@ -256,7 +256,6 @@ module Hibernate
       end
 
       def hibernate!
-        @logger = org.slf4j.LoggerFactory.getLogger(Hibernate::Model.to_s.gsub(/::/, '.'))
         unless mapped?
           discriminator = nil
           properties.each do |prop|
@@ -275,9 +274,9 @@ module Hibernate
           add_class_annotation(annotation)
           java_type = !java_class ? become_java! : java_class
           Hibernate.add_model(java_type)
-          @logger.debug "become_java! #{java_class}"
+          @@logger.debug "become_java! #{java_class}"
          else
-          @logger.debug "become_java! fired already #{java_class}"
+          @@logger.debug "become_java! fired already #{java_class}"
         end
 
       end
@@ -317,7 +316,7 @@ module Hibernate
         unless prop.index.nil?
           if(prop.index == true)
             annotation[org.hibernate.annotations.Index]
-          elsif(prop.index.type == Symbol)
+          elsif(prop.index.class == Symbol)
             annotation[org.hibernate.annotations.Index] = { "name" => prop.index.to_s }
           else
             # TODO arrays !!
