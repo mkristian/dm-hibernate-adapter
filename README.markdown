@@ -51,6 +51,16 @@ you can switch the jruby version by adding to the above commands
 
         -Djruby.version=1.4.1
 
+Rails 2.3.5 demo
+----------------
+
+start the server with
+        mvn3 rails2:server
+and point your browser to
+        http://localhost:3000/users
+or
+        http://localhost:3000/maven.html
+
 TODOs
 ---------
 
@@ -71,3 +81,4 @@ TODOs
 - obey the properties field and required constraints as well the storagename for the tablename
 - make sure logger logs with a block to avoid unnessecary string operations, i.e @@logger.debug { "some " + exception + " something" }
 - remove all dirty hacks from jibernate (ie.  Resource#send can't be used )
+- transactions for the adapter
