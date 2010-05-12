@@ -28,12 +28,12 @@ HAS_DO = DataMapper::Adapters.const_defined?('DataObjectsAdapter')
 ADAPTERS = []
 
 PRIMARY = {
-  'default'    => { :adapter => "hibernate", :dialect => "H2", :username => "sa", :url => "jdbc:h2:jibernate" },
+  'default'    => { :adapter => "hibernate", :dialect => "H2", :username => "sa", :url => "jdbc:h2:target/jibernate" },
   # 'in_memory'  => { :adapter => :in_memory },
 }
 
 ALTERNATE = {
-  'default'    => { :adapter => "hibernate", :dialect => "H2", :username => "sa", :url => "jdbc:h2:jibernate" },
+  'default'    => { :adapter => "hibernate", :dialect => "H2", :username => "sa", :url => "jdbc:h2:target/jibernate" },
   # 'in_memory'  => { :adapter => :in_memory },
 }
 
