@@ -4,7 +4,7 @@ require 'rubygems'
 require 'addressable/uri'
 require 'spec'
 
-org.apache.log4j.PropertyConfigurator.configure(File.dirname(__FILE__) + '/log4j.properties')
+org.apache.log4j.PropertyConfigurator.configure(File.dirname(__FILE__) + '/../log4j.properties')
 
 require 'dm-hibernate-adapter'
 

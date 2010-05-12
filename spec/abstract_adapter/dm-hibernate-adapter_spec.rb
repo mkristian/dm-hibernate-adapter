@@ -17,7 +17,7 @@ describe DataMapper::Adapters::HibernateAdapter do
   }
 
   before :all do
-    @adapter = DataMapper.setup(:default,DB_CONFIGS[(ENV['DIALECT'] || :H2_EMB]).to_sym)
+    @adapter = DataMapper.setup(:default,DB_CONFIGS[(ENV['DIALECT'] || :H2_EMB).to_sym])
   end
 
   it_should_behave_like 'An Adapter'

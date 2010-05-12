@@ -1,4 +1,4 @@
-require 'java_logger'
+require 'slf4r'
 
 if require 'dm-core'
   DataMapper.logger = Slf4r::LoggerFacade.new(DataMapper)
@@ -22,7 +22,7 @@ module DataMapper
 
     class HibernateAdapter < AbstractAdapter
 
-      @@logger = org.slf4j.LoggerFactory.getLogger(HibernateAdapter.to_s.gsub(/::/, '.'))
+      @@logger = Slf4r::LoggerFacade.new(HibernateAdapter)
 
       # TODO maybe more drivers (Oracle, SQLITE3)
       DRIVERS = {
