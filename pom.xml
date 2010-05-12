@@ -1,22 +1,26 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>rubygems</groupId>
+  <parent>
+    <groupId>rubygems</groupId>
+    <artifactId>jibernate-parent</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <relativePath>pom-parent.xml</relativePath>
+  </parent>
   <artifactId>jibernate</artifactId>
   <packaging>gem</packaging>
-  <version>0.1-SNAPSHOT</version>
 
   <dependencies>
     <dependency>
       <groupId>rubygems</groupId>
-      <artifactId>dm-core</artifactId>
-      <version>0.10.2</version>
+      <artifactId>yard</artifactId>
+      <version>0.5.3</version>
       <type>gem</type>
     </dependency>
     <dependency>
       <groupId>rubygems</groupId>
-      <artifactId>yard</artifactId>
-      <version>0.5.3</version>
+      <artifactId>rake</artifactId>
+      <version>0.8.7</version>
       <type>gem</type>
     </dependency>
     <dependency>
@@ -60,34 +64,6 @@
        <version>8.4-701.jdbc4</version>
     </dependency>
     <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-core</artifactId>
-      <version>3.3.2.GA</version>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-annotations</artifactId>
-      <version>3.4.0.GA</version>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-tools</artifactId>
-      <version>3.2.4.GA</version>
-    </dependency>
-
-    <!-- L2 cache for Hibernate -->
-    <!--<dependency>-->
-    <!--<groupId>org.hibernate</groupId>-->
-    <!--<artifactId>hibernate-ehcache</artifactId>-->
-    <!--<version>3.3.2.GA</version>-->
-    <!--</dependency>-->
-    <!-- choose this version which can be downloaded publicly -->
-    <dependency>
-      <groupId>javax.transaction</groupId>
-      <artifactId>jta</artifactId>
-      <version>1.1</version>
-    </dependency>
-    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <version>1.5.2</version>
@@ -97,104 +73,64 @@
       <artifactId>log4j</artifactId>
       <version>1.2.14</version>
     </dependency>
-    <dependency>
-      <groupId>javassist</groupId>
-      <artifactId>javassist</artifactId>
-      <version>3.8.0.GA</version>
-    </dependency>
   </dependencies>
-  <repositories>
-    <repository>
-      <id>jboss</id>
-      <url>http://repository.jboss.com/maven2</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>central</id>
-      <url>http://repo1.maven.org/maven2</url>
-    </repository>
-    <repository>
-      <id>gemcutter</id>
-      <releases>
-        <updatePolicy>never</updatePolicy>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <url>http://www.gemcutter.org/gems</url>
-      <layout>gem</layout>
-    </repository>
-  </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>saumya</id>
-      <name>Saumya's Plugins</name>
-      <url>http://mojo.saumya.de</url>
-      <layout>default</layout>
-    </pluginRepository>
-  </pluginRepositories>
+
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.1</version>
-      </plugin>
-      <plugin>
         <groupId>de.saumya.mojo</groupId>
-        <artifactId>jruby-maven-plugin</artifactId>
+        <artifactId>rspec-maven-plugin</artifactId>
         <version>${jruby.plugins.version}</version>
-      </plugin>
-      <plugin>
-        <groupId>de.saumya.mojo</groupId>
-        <artifactId>gem-maven-plugin</artifactId>
-        <version>${jruby.plugins.version}</version>
-        <extensions>true</extensions>
-        <executions>
-          <execution>
-            <phase>initialize</phase>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>shitty-maven-plugin</artifactId>
-        <version>1.0-alpha-3</version>
-        <executions>
-          <execution>
-            <id>it-clean</id>
-            <phase>clean</phase>
-            <goals>
-              <goal>clean</goal>
-            </goals>
-          </execution>
-          <execution>
-            <goals>
-              <goal>clean</goal>
-              <goal>install</goal>
-              <goal>test</goal>
-            </goals>
-            <configuration>
-              <parallel>true</parallel>
-              <threadCount>2</threadCount>
-            </configuration>
-          </execution>
-        </executions>
+	<executions>
+	  <execution>
+	    <goals><goal>test</goal></goals>
+	  </execution>
+	</executions>
       </plugin>
     </plugins>
   </build>
-  <properties>
-    <jruby.plugins.version>0.9.0</jruby.plugins.version>
-    <!-- this allows to configure it for rails-maven-plugin as well jruby-maven-plugin and gem-maven-plugin -->
-    <jruby.gem.home>${project.build.directory}/rubygems</jruby.gem.home>
-    <jruby.gem.path>${project.build.directory}/rubygems</jruby.gem.path>
-    <jruby.fork>true</jruby.fork>
-  </properties>
-
+  <profiles>
+    <profile>
+      <id>transient</id>
+      <build>
+	<plugins>
+	  <plugin>
+	    <groupId>de.saumya.mojo</groupId>
+	    <artifactId>rspec-maven-plugin</artifactId>
+	    <configuration>
+	      <specSourceDirectory>spec/transient</specSourceDirectory>
+	    </configuration>
+	  </plugin>
+	</plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>adapter</id>
+      <build>
+	<plugins>
+	  <plugin>
+	    <groupId>de.saumya.mojo</groupId>
+	    <artifactId>rspec-maven-plugin</artifactId>
+	    <configuration>
+	      <specSourceDirectory>spec/abstract_adapter</specSourceDirectory>
+	    </configuration>
+	  </plugin>
+	</plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>dm</id>
+      <build>
+	<plugins>
+	  <plugin>
+	    <groupId>de.saumya.mojo</groupId>
+	    <artifactId>rspec-maven-plugin</artifactId>
+	    <configuration>
+	      <specSourceDirectory>spec/dm_core</specSourceDirectory>
+	    </configuration>
+	  </plugin>
+	</plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

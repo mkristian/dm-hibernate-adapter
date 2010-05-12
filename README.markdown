@@ -13,7 +13,7 @@ need to install maven3 (just grab it from http://www.maven.apache.org/download.h
 
 setup the gems
 
-    mvn3 gem:initialize
+    mvn3 clean gem:initialize
 
 run the eventlog - list
 
@@ -31,15 +31,25 @@ how to run specs?
 
   * AbstractAdapter specs:
 
-        mvn3 ruby:rake -e -Dverbose=true -Djruby.rake.args="spec:adapter"
+        mvn3 ruby:rake -e -Djruby.verbose=true -Djruby.rake.args="spec:adapter"
+	or
+        mvn3 test -e -Djruby.verbose=true -Padapter
 
   * dm-core specs:
 
-        mvn3 ruby:rake -e -Dverbose=true -Djruby.rake.args="spec:dm"
+        mvn3 ruby:rake -e -Djruby.verbose=true -Djruby.rake.args="spec:dm"
+	or
+        mvn3 test -e -Djruby.verbose=true -Pdm
 
   * transient specs:
 
-        mvn3 ruby:rake -e -Dverbose=true -Djruby.rake.args="spec:transient"
+        mvn3 ruby:rake -e -Djruby.verbose=true -Djruby.rake.args="spec:transient"
+	or
+        mvn3 test -e -Djruby.verbose=true -Ptransient
+
+you can switch the jruby version by adding to the above commands
+
+        -Djruby.version=1.4.1
 
 TODOs
 ---------
@@ -52,12 +62,12 @@ TODOs
 - add metrics tool (test coverage etc)
 - add more supported types
 - refactor classes structure
-- make adapter 'automagic' (ie. remove #hibernate!)
-- add support for auto_migrate! (https://www.hibernate.org/hib_docs/v3/api/org/hibernate/tool/hbm2ddl/SchemaUpdate.html)
-- add ability to configure adapter (other dbs, hibernate specific configuration)
+- improve adapter 'automagic' (ie. remove #hibernate! or all the helper methods)
+- add support for auto_migrate! (https://www.hibernate.org/hib_docs/v3/api/org/hibernate/tool/hbm2ddl/SchemaUpdate.html) on the adapter and better support on the model
+- add more ability to configure adapter (other dbs, hibernate specific configuration)
 - add docs
 - add examples
-- make a gem
+- make a gem (wait until there are maven gems of jar artifacts available)
 - obey the properties field and required constraints as well the storagename for the tablename
-- make the logger a "ruby logger" with the same API as a standard ruby logger and log only if the logger level allows it (do not rely on underlying logger, i.e. avoid unnessecary string operations)
+- make sure logger logs with a block to avoid unnessecary string operations, i.e @@logger.debug { "some " + exception + " something" }
 - remove all dirty hacks from jibernate (ie.  Resource#send can't be used )
