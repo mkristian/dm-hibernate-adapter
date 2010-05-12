@@ -357,6 +357,37 @@ module Hibernate
  end
           EOT
           name = :"_#{name}"
+        elsif(type == ::DateTime)
+#TODO use DateTime
+          class_eval <<-EOT
+ def _#{name}=(d)
+   attribute_set(:#{name}, d.nil? ? nil : DateTime.civil(d.year + 1900, d.month + 1, d.date, d.hour, d.min, d.sec))
+ end
+         EOT
+         class_eval <<-EOT
+ def _#{name}
+   d = attribute_get(:#{name})
+   if d
+     org.joda.time.DateTime.new(d.year, d.month, d.day, d.hour, d.min, d.sec, 0).to_date
+   end
+ end
+          EOT
+          name = :"_#{name}"
+        elsif(type == ::BigDecimal)
+           class_eval <<-EOT
+ def _#{name}=(d)
+   attribute_set(:#{name}, d.nil? ? nil : BigDecimal.new(d.to_s))
+ end
+         EOT
+         class_eval <<-EOT
+ def _#{name}
+   d = attribute_get(:#{name})
+   if d
+     java.math.BigDecimal.new(d.to_i)
+   end
+ end
+          EOT
+          name = :"_#{name}"
         end
 
         mapped_type = to_java_type(type).java_class
