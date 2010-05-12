@@ -272,8 +272,7 @@ module Hibernate
             annotation[javax.persistence.DiscriminatorColumn] = {"name" => discriminator}
           end
           add_class_annotation(annotation)
-          java_type = !java_class ? become_java! : java_class
-          Hibernate.add_model(java_type)
+          Hibernate.add_model(become_java!)
           @@logger.debug "become_java! #{java_class}"
          else
           @@logger.debug "become_java! fired already #{java_class}"
@@ -283,7 +282,7 @@ module Hibernate
 
       #helper method
       def mapped?
-        !java_class.nil?
+        Hibernate.mapped? java_class
       end
 
       private
