@@ -54,11 +54,13 @@
        <artifactId>derby</artifactId>
        <version>10.5.3.0_1</version>
     </dependency>
+<!--
     <dependency>
        <groupId>hsqldb</groupId>
        <artifactId>hsqldb</artifactId>
        <version>2.0.0</version>
     </dependency>
+-->
     <dependency>
        <groupId>mysql</groupId>
        <artifactId>mysql-connector-java</artifactId>
