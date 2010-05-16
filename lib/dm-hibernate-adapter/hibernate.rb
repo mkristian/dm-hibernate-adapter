@@ -134,6 +134,7 @@ module Hibernate
         unless model.respond_to? :wrapped_create
           model.instance_eval do
             alias :wrapped_auto_migrate!   :auto_migrate!
+            alias :wrapped_auto_upgrade!   :auto_upgrade!
             alias :wrapped_create          :create
             alias :wrapped_all             :all
             alias :wrapped_copy            :copy
@@ -147,6 +148,11 @@ module Hibernate
             def self.auto_migrate!
               hibernate!
               wrapped_auto_migrate!
+            end
+
+            def self.auto_upgrade!
+              hibernate!
+              wrapped_auto_upgrade!
             end
 
             def self.create(attributes = {})
@@ -242,6 +248,10 @@ module Hibernate
         schema_export = SchemaExport.new(config)
         schema_export.drop(false,true) # XXX here you can turn on/off logger
         schema_export.create(false,true) # XXX here you can turn on/off logger
+      end
+
+      def auto_upgrade!
+        #TODO
       end
 
       def to_java_type(type)
@@ -341,74 +351,65 @@ module Hibernate
         get_name = "get#{name.to_s.capitalize}"
         set_name = "set#{name.to_s.capitalize}"
 
-puts "-"* 80
-p type
-        # TODO DateTime and Time
+        # TODO Time
         if(type == ::Date)
           class_eval <<-EOT
- def _#{name}=(d)
+ def #{set_name.intern}(d)
    attribute_set(:#{name}, d.nil? ? nil : Date.civil(d.year + 1900, d.month + 1, d.date))
  end
          EOT
          class_eval <<-EOT
- def _#{name}
+ def #{get_name.intern}
    d = attribute_get(:#{name})
    if d
      org.joda.time.DateTime.new(d.year, d.month, d.day, 0, 0, 0, 0).to_date
    end
  end
           EOT
-          name = :"_#{name}"
         elsif(type == ::DateTime)
-#TODO use DateTime
           class_eval <<-EOT
- def _#{name}=(d)
+ def #{set_name.intern}(d)
    attribute_set(:#{name}, d.nil? ? nil : DateTime.civil(d.year + 1900, d.month + 1, d.date, d.hours, d.minutes, d.seconds))
  end
          EOT
          class_eval <<-EOT
- def _#{name}
+ def #{get_name.intern}
    d = attribute_get(:#{name})
    if d
      org.joda.time.DateTime.new(d.year, d.month, d.day, d.hour, d.min, d.sec, 0).to_date
    end
  end
           EOT
-          name = :"_#{name}"
         elsif(type == ::BigDecimal)
            class_eval <<-EOT
- def _#{name}=(d)
+ def #{set_name.intern}(d)
    attribute_set(:#{name}, d.nil? ? nil : BigDecimal.new(d.to_s))
  end
          EOT
          class_eval <<-EOT
- def _#{name}
+ def #{get_name.intern}
    d = attribute_get(:#{name})
    if d
      java.math.BigDecimal.new(d.to_i)
    end
  end
           EOT
-          name = :"_#{name}"
         else
            class_eval <<-EOT
- def _#{name}=(d)
+ def #{set_name.intern}(d)
    attribute_set(:#{name}, d)
  end
          EOT
          class_eval <<-EOT
- def _#{name}
+ def #{get_name.intern}
    attribute_get(:#{name})
  end
           EOT
-          name = :"_#{name}"
         end
 
         mapped_type = to_java_type(type).java_class
-        alias_method get_name.intern, name
         add_method_signature get_name, [mapped_type]
         add_method_annotation get_name, annotation
-        alias_method set_name.intern, :"#{name.to_s}="
         add_method_signature set_name, [JVoid, mapped_type]
         nil
       end
