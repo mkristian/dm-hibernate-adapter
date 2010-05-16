@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'lib/dm-hibernate-adapter.rb'
 
-DataMapper.setup(:default, :adapter => "hibernate", :dialect => "H2", :username => "sa", :url => "jdbc:h2:jibernate")
+DataMapper.setup(:default, :adapter => "hibernate", :dialect => "H2", :username => "sa", :url => "jdbc:h2:target/eventlog")
 
 class Event
   include DataMapper::Resource
@@ -10,6 +10,11 @@ class Event
   property :title, String
   property :date, Date
 
+end
+if File.exists?("target/eventlog.h2.db")
+  Event.auto_upgrade!
+else
+  Event.auto_migrate!
 end
 
 case ARGV[0]
@@ -37,7 +42,7 @@ when /update/
    puts "Updated!"
 when /list/
   list = Event.all
-  puts "Listing all events:"
+  puts "Listing all events #{list.size}:"
   list.each do |evt|
     puts <<EOS
   id: #{evt.id}

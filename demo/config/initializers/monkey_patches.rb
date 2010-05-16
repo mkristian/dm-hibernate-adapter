@@ -10,6 +10,6 @@ end
 require 'dm-timestamps'
 require 'jibernate'
 
-TODO remove that hack
+#TODO remove that hack
 User.auto_migrate!
 DataMapper::Session::Abstract::Session.auto_migrate!

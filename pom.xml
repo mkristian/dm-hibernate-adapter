@@ -132,7 +132,7 @@
 	    <groupId>de.saumya.mojo</groupId>
 	    <artifactId>rspec-maven-plugin</artifactId>
 	    <configuration>
-	      <specSourceDirectory>spec/dm_core</specSourceDirectory>
+	      <specSourceDirectory>spec/dm_core/public/types</specSourceDirectory>
 	    </configuration>
 	  </plugin>
 	</plugins>

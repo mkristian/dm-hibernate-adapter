@@ -268,7 +268,7 @@ module Hibernate
             javax.persistence.Table => {"name" => self.storage_name}
           }
           if discriminator
-            annotation[javax.persistence.Inheritance] = {"strategy" => javax.persistence.InheritanceType.SINGLE_TABLE }
+            annotation[javax.persistence.Inheritance] = {"strategy" => javax.persistence.InheritanceType::SINGLE_TABLE.to_s }
             annotation[javax.persistence.DiscriminatorColumn] = {"name" => discriminator}
           end
           add_class_annotation(annotation)
@@ -341,6 +341,8 @@ module Hibernate
         get_name = "get#{name.to_s.capitalize}"
         set_name = "set#{name.to_s.capitalize}"
 
+puts "-"* 80
+p type
         # TODO DateTime and Time
         if(type == ::Date)
           class_eval <<-EOT
@@ -361,7 +363,7 @@ module Hibernate
 #TODO use DateTime
           class_eval <<-EOT
  def _#{name}=(d)
-   attribute_set(:#{name}, d.nil? ? nil : DateTime.civil(d.year + 1900, d.month + 1, d.date, d.hour, d.min, d.sec))
+   attribute_set(:#{name}, d.nil? ? nil : DateTime.civil(d.year + 1900, d.month + 1, d.date, d.hours, d.minutes, d.seconds))
  end
          EOT
          class_eval <<-EOT
@@ -385,6 +387,18 @@ module Hibernate
    if d
      java.math.BigDecimal.new(d.to_i)
    end
+ end
+          EOT
+          name = :"_#{name}"
+        else
+           class_eval <<-EOT
+ def _#{name}=(d)
+   attribute_set(:#{name}, d)
+ end
+         EOT
+         class_eval <<-EOT
+ def _#{name}
+   attribute_get(:#{name})
  end
           EOT
           name = :"_#{name}"
