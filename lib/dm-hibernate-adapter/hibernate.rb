@@ -246,8 +246,9 @@ module Hibernate
 
         # TODO drop only one table, not all of them !
         schema_export = SchemaExport.new(config)
-        schema_export.drop(false,true) # XXX here you can turn on/off logger
-        schema_export.create(false,true) # XXX here you can turn on/off logger
+        console=false # XXX here you can turn on/off logger
+        schema_export.drop(console,true)
+        schema_export.create(console,true)
       end
 
       def auto_upgrade!
@@ -303,6 +304,7 @@ module Hibernate
 
       # "stolen" from http://github.com/superchris/hibernate
       def add_java_property(prop)
+        @@logger.info("#{prop.model.name} gets property added #{prop.name}")
         name = prop.name
         type = prop.type
         return name if(type == DataMapper::Types::Discriminator)
