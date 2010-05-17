@@ -439,4 +439,34 @@ share_examples_for 'An Adapter' do
   else
     it 'needs to support #read and #create to test query matching'
   end
+  describe 'One to Many Associations' do
+    before :all do
+      class User
+        include DataMapper::Resource
+
+        property :id, Serial
+        property :name, String, :required => true
+        property :login, String, :required => true
+        property :password, String, :required => true
+
+        has n, :groups
+      end
+
+      class Group
+        include DataMapper::Resource
+
+        property :id, Serial
+        property :name, String
+
+        belongs_to :user
+      end
+
+       @user = User.create(:name => 'UserName', :login => 'user', :password => 'pwd')
+       @groups = @user.groups.create(:name => 'admin')
+     end
+
+    it 'should have find elements through association' do
+       admin_users = User.all(:groups => { :name => 'admin'})
+    end
+  end
 end
