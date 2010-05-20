@@ -458,6 +458,10 @@ share_examples_for 'An Adapter' do
       property :id, Serial
       property :name, String
 
+      # TODO hack to force hibernate to generate that column
+      # TODO should be done transparently
+      property :user_id, Integer
+
       belongs_to :user
     end
 
@@ -472,14 +476,13 @@ share_examples_for 'An Adapter' do
       @group = @user.groups.create(:name => 'admin')
     end
     
+    it 'should have load children' do
+      User.first.groups.should == [@group]
+    end
+
     it 'should have find elements through association' do
-p User.all
-p Group.all
-p @group
-p @group.reload.user_id
-p User.first.groups
       admin_users = User.all(:groups => { :name => 'admin'})
-p admin_users
+      admin_users.should == [@user]
     end
   end
 end

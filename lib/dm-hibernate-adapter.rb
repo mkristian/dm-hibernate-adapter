@@ -204,9 +204,21 @@ module DataMapper
       end
 
       def handle_comparison(con, model)
-
-        subject = con.subject.name.to_s # property/column name
-        value = con.value # value used in comparison
+        case con.subject
+        when DataMapper::Property
+          subject = con.subject.name.to_s # property/column name
+          value = con.value # value used in comparison
+        when DataMapper::Associations::ManyToOne::Relationship
+          # TODO allow multicolumn keys !!!
+          subject = con.subject.parent_key.first.name.to_s
+          value = con.subject.parent_key.get(con.value).first # value used in comparison
+        when DataMapper::Associations::OneToMany::Relationship
+          # TODO allow multicolumn keys !!!
+          # TODO why the break in symetry ?
+          subject = con.subject.parent_key.first.name.to_s
+          # why does is not work: con.subject.child_key.get(con.value).first ???
+          value = con.subject.child_key.first.get(con.value.first) # value used in comparison
+        end
         model_type = model.to_java_type(model.properties[subject.to_sym].type) # Java type of property (used in typecasting)
         dialect = Hibernate.dialect # SQL dialect for current configuration
 
@@ -214,7 +226,7 @@ module DataMapper
           when DataMapper::Query::Conditions::EqualToComparison
             # special case handling IS NULL/ NOT (x IS NULL)
             value.class == NilClass ? Restrictions.isNull(subject) :
-                                      Restrictions.eq(subject, cast_to_hibernate(con.value, model_type))
+                                      Restrictions.eq(subject, cast_to_hibernate(value, model_type))
 
           when DataMapper::Query::Conditions::GreaterThanComparison
             Restrictions.gt(subject, cast_to_hibernate(value, model_type))
