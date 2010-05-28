@@ -458,10 +458,6 @@ share_examples_for 'An Adapter' do
       property :id, Serial
       property :name, String
 
-      # TODO hack to force hibernate to generate that column
-      # TODO should be done transparently
-      property :user_id, Integer
-
       belongs_to :user
     end
 

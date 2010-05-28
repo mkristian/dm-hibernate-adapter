@@ -269,6 +269,12 @@ module Hibernate
       def hibernate!
         unless mapped?
           discriminator = nil
+
+          relationships.each do |property, relationship|
+            #load lazy child_keys properties
+            relationship.child_key if relationship.class == DataMapper::Associations::ManyToOne::Relationship
+          end
+
           properties.each do |prop|
             discriminator = add_java_property(prop) || discriminator
           end
