@@ -15,15 +15,13 @@
   <packaging>war</packaging>
   <version>1.0-SNAPSHOT</version>
   <name>rails2 skeleton demo</name>
- 
-  <!-- 
-	 needed for jruby-rack artifact
-  -->
-  <repositories>
+   <repositories>
+    <!--
+  the source for the gem artifacts
+    -->
     <repository>
-      <id>saumya</id>
-      <name>Saumya's Plugins</name>
-      <url>http://mojo.saumya.de</url>
+      <id>rubygems-releases</id>
+      <url>http://gems.saumya.de/releases</url>
     </repository>
   </repositories>
 
@@ -35,7 +33,7 @@
     <dependency>
       <groupId>org.jruby.rack</groupId>
       <artifactId>jruby-rack</artifactId>
-      <version>0.9.7-SNAPSHOT</version>
+      <version>1.0.0</version>
     </dependency>
     <dependency>
       <groupId>org.jruby</groupId>
@@ -60,25 +58,25 @@
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>dm-serializer</artifactId>
-      <version>0.10.2</version>
+      <version>${dm.version}</version>
       <type>gem</type>
     </dependency>
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>dm-migrations</artifactId>
-      <version>0.10.2</version>
+      <version>${dm.version}</version>
       <type>gem</type>
     </dependency>
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>dm-timestamps</artifactId>
-      <version>0.10.2</version>
+      <version>${dm.version}</version>
       <type>gem</type>
     </dependency>
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>dm-validations</artifactId>
-      <version>0.10.2</version>
+      <version>${dm.version}</version>
       <type>gem</type>
     </dependency>
     <dependency>

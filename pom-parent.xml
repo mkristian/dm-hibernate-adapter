@@ -10,7 +10,7 @@
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>dm-core</artifactId>
-      <version>0.10.2</version>
+      <version>${dm.version}</version>
       <type>gem</type>
     </dependency>
     <dependency>
@@ -106,5 +106,6 @@
   <properties>
     <jruby.plugins.version>0.12.0</jruby.plugins.version>
     <jruby.version>1.5.0</jruby.version>
+    <dm.version>0.10.2</dm.version>
   </properties>
 </project>
