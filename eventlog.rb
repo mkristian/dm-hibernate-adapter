@@ -7,7 +7,7 @@ class Event
   include DataMapper::Resource
   
   property :id, Serial
-  property :title, String
+  property :title, String, :required => true, :length => 10
   property :date, Date
 
 end
