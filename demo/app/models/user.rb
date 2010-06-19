@@ -3,7 +3,7 @@ class User
 
   property :id, Serial
 
-  property :name, String, :nullable => false , :format => /^[^<'&">]*$/, :length => 255
+  property :name, String, :required => true , :format => /^[^<'&">]*$/, :length => 255
 
   timestamps :at
 
