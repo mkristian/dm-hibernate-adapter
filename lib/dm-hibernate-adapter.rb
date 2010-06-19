@@ -1,3 +1,10 @@
+require 'java'
+begin
+  require 'dm-hibernate-adapter_ext.jar'
+rescue LoadError
+  warn "missing extension jar, may it is already in the parent classloader"
+end
+import 'de.saumya.jibernate.UpdateWork'
 require 'slf4r'
 
 if require 'dm-core'
@@ -176,6 +183,13 @@ module DataMapper
         resources.size
       end
 
+      # extension to the adapter API
+
+      def execute_update(sql)
+        Hibernate.tx do |session|
+          session.do_work(UpdateWork.new(sql))
+        end
+      end
 
       private
 
@@ -219,7 +233,7 @@ module DataMapper
           # why does is not work: con.subject.child_key.get(con.value).first ???
           value = con.subject.child_key.first.get(con.value.first) # value used in comparison
         end
-        model_type = model.to_java_type(model.properties[subject.to_sym].type) # Java type of property (used in typecasting)
+        model_type = model.to_java_type(model.properties[subject.to_sym].class) # Java type of property (used in typecasting)
         dialect = Hibernate.dialect # SQL dialect for current configuration
 
         case con
@@ -249,7 +263,7 @@ module DataMapper
               Restrictions.in(subject, cast_to_hibernate(value, model_type))
             else
               # XXX proper ordering?
-              arr = value.to_a
+              arr = value.is_a? Array ? value : value.to_a
               lo = arr.first
               hi = arr.last
               if lo.nil? || hi.nil?

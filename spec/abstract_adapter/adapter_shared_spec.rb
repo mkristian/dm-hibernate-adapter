@@ -25,7 +25,7 @@ share_examples_for 'An Adapter' do
       property :number,      Integer, :unique => true
       property :striped,     Boolean, :index => :big #[:big, :small]
       property :weight,      Float, :precision => 12, :unique_index => :usmall
-      property :distance,    BigDecimal, :unique_index => :usamle #[:ubig, :usmall]
+      property :distance,    Decimal, :unique_index => :usamle #[:ubig, :usmall]
       property :birthdate,   Date, :required => false, :field => "birth_date"
       property :modified_at, DateTime, :required => false
       property :expiration,  Time, :required => false
@@ -55,9 +55,8 @@ share_examples_for 'An Adapter' do
 
       describe "property constraints set via annotations" do
         it 'should obey required == true' do
-          lambda {
-            Heffalump.create(:color => 'peach', :alpha => nil)
-          }.should raise_error(NativeException)
+          h = Heffalump.create(:color => 'peach', :alpha => nil)
+          h.saved?.should be_false
         end
 
         it 'should obey length on not required' do
@@ -203,6 +202,10 @@ share_examples_for 'An Adapter' do
         @heffalump.save
         Heffalump.get(*@heffalump.key).color.should == color
       end
+
+      it 'should obey required == true' do
+        @heffalump.update(:alpha => nil).should be_false
+      end
     end
   else
     it 'needs to support #update'
@@ -216,7 +219,7 @@ share_examples_for 'An Adapter' do
 
       it 'should not raise any errors' do
         lambda {
-          @heffalump.destroy
+           @heffalump.destroy
         }.should_not raise_error
       end
 
@@ -479,6 +482,33 @@ share_examples_for 'An Adapter' do
     it 'should have find elements through association' do
       admin_users = User.all(:groups => { :name => 'admin'})
       admin_users.should == [@user]
+    end
+  end
+
+  before :all do
+    class ::Friend
+      include DataMapper::Resource
+
+      property :id, Serial
+      property :name, String
+
+      belongs_to :creator, "Friend"
+    end
+    Friend.auto_migrate!
+  end
+
+  describe "self referecing and direct sql" do
+
+    it 'should needs repository with execute method' do
+      repository.adapter.respond_to?( :execute_update).should be_true
+    end
+
+    it 'should create a self referencing enitity' do
+      repository.adapter.execute_update("insert into friends (id, name, creator_id) values(1, 'god', 1)")
+      Friend.all.size.should == 1
+      f = Friend.first
+      f.name.should == 'god'
+      f.creator.should == f
     end
   end
 end

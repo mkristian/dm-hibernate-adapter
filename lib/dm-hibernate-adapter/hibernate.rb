@@ -67,10 +67,19 @@ module Hibernate
   end
 
   def self.tx
-    session.begin_transaction
     if block_given?
-      yield session
-      session.transaction.commit
+      s = nil
+      begin
+        s = session
+        s.begin_transaction
+        yield s
+        s.transaction.commit
+      rescue => e
+        s.transaction.rollback if s
+        raise e
+      end
+    else
+      raise "not supported"
     end
   end
 
@@ -79,7 +88,7 @@ module Hibernate
   end
 
   def self.session
-    factory.current_session
+    factory.open_session
   end
 
   def self.config
@@ -267,13 +276,16 @@ module Hibernate
       end
 
       def hibernate!
+        # just make sure all the properties are there
+        # initialize join models and target keys
+        relationships.each do |property, relationship|
+          relationship.child_key
+          relationship.parent_key
+          relationship.through if relationship.respond_to?(:through)
+          relationship.via     if relationship.respond_to?(:via)
+        end
         unless mapped?
           discriminator = nil
-
-          relationships.each do |property, relationship|
-            #load lazy child_keys properties
-            relationship.child_key if relationship.class == DataMapper::Associations::ManyToOne::Relationship
-          end
 
           properties.each do |prop|
             discriminator = add_java_property(prop) || discriminator
@@ -312,7 +324,7 @@ module Hibernate
       def add_java_property(prop)
         @@logger.info("#{prop.model.name} gets property added #{prop.name}")
         name = prop.name
-        type = prop.type
+        type = prop.class
         return name if(type == DataMapper::Types::Discriminator)
 
         column_name = prop.field
@@ -343,16 +355,16 @@ module Hibernate
             #end
           end
         end
-        unless prop.required?.nil?
+        if prop.required?
           annotation[javax.persistence.Column]["nullable"] = !prop.required?
         end
-        unless prop.length.nil?
+        if (prop.respond_to?(:length) && !prop.length.nil?)
           annotation[javax.persistence.Column]["length"] = java.lang.Integer.new(prop.length)
         end
-        unless prop.scale.nil?
+        if (prop.respond_to?(:scale) && !prop.scale.nil?)
           annotation[javax.persistence.Column]["scale"] = java.lang.Integer.new(prop.scale)
         end
-        unless prop.precision.nil?
+        if (prop.respond_to?(:precision) && !prop.precision.nil?)
           annotation[javax.persistence.Column]["precision"] = java.lang.Integer.new(prop.precision)
         end
 
@@ -360,7 +372,7 @@ module Hibernate
         set_name = "set#{name.to_s.capitalize}"
 
         # TODO Time
-        if(type == ::Date)
+        if(type == DataMapper::Property::Date)
           class_eval <<-EOT
  def #{set_name.intern}(d)
    attribute_set(:#{name}, d.nil? ? nil : Date.civil(d.year + 1900, d.month + 1, d.date))
@@ -374,7 +386,7 @@ module Hibernate
    end
  end
           EOT
-        elsif(type == ::DateTime)
+        elsif(type == DataMapper::Property::DateTime)
           class_eval <<-EOT
  def #{set_name.intern}(d)
    attribute_set(:#{name}, d.nil? ? nil : DateTime.civil(d.year + 1900, d.month + 1, d.date, d.hours, d.minutes, d.seconds))
@@ -388,10 +400,10 @@ module Hibernate
    end
  end
           EOT
-        elsif(type == ::BigDecimal)
+        elsif(type.to_s == BigDecimal || type == DataMapper::Property::Decimal)
            class_eval <<-EOT
  def #{set_name.intern}(d)
-   attribute_set(:#{name}, d.nil? ? nil : BigDecimal.new(d.to_s))
+   attribute_set(:#{name}, d.nil? ? nil : #{type}.new(d.to_s))
  end
          EOT
          class_eval <<-EOT
