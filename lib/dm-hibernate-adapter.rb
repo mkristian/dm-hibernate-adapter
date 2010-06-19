@@ -263,10 +263,12 @@ module DataMapper
               Restrictions.in(subject, cast_to_hibernate(value, model_type))
             else
               # XXX proper ordering?
-              arr = value.is_a? Array ? value : value.to_a
+              arr = value.is_a?(Fixnum) ? [value] : value.to_a
               lo = arr.first
               hi = arr.last
               if lo.nil? || hi.nil?
+                # TODO
+                # XXX can this code be reached ???
                 Restrictions.in(subject, cast_to_hibernate(value, model_type))                
               else
                 Restrictions.between(subject, cast_to_hibernate(lo, model_type), cast_to_hibernate(hi, model_type))
