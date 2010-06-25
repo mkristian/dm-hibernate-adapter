@@ -154,14 +154,14 @@ module Hibernate
             alias :wrapped_last            :last
             alias :wrapped_load            :load
 
-            def self.auto_migrate!
+            def self.auto_migrate!(repo = nil)
               hibernate!
-              wrapped_auto_migrate!
+              wrapped_auto_migrate!(repo)
             end
 
-            def self.auto_upgrade!
+            def self.auto_upgrade!(repo = nil)
               hibernate!
-              wrapped_auto_upgrade!
+              wrapped_auto_upgrade!(repo)
             end
 
             def self.create(attributes = {})
@@ -250,7 +250,7 @@ module Hibernate
 
       @@logger = Slf4r::LoggerFacade.new(Hibernate::Model)
 
-      def auto_migrate!
+      def auto_migrate!(repo = nil)
         config = Hibernate::config
 
         # TODO drop only one table, not all of them !
@@ -260,7 +260,7 @@ module Hibernate
         schema_export.create(console,true)
       end
 
-      def auto_upgrade!
+      def auto_upgrade!(repo = nil)
         #TODO
       end
 
