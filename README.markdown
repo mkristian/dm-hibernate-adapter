@@ -25,25 +25,25 @@ run the eventlog - store
 
 how to list rake tasks (please note the jruby.rake.args part(var name))
 
-    mvn3 ruby:rake -Djruby.rake.args="-T"
+    mvn3 ruby:jruby -Djruby.args="-S rake -T"
 
 how to run specs?
 
   * AbstractAdapter specs:
 
-        mvn3 ruby:rake -e -Djruby.verbose=true -Djruby.rake.args="spec:adapter"
+        mvn3 ruby:jruby -e -Djruby.verbose=true -Djruby.args="-S rake spec:adapter"
 	or
         mvn3 test -e -Djruby.verbose=true -Padapter
 
   * dm-core specs:
 
-        mvn3 ruby:rake -e -Djruby.verbose=true -Djruby.rake.args="spec:dm"
+        mvn3 ruby:jruby -e -Djruby.verbose=true -Djruby.args="-S rake spec:dm"
 	or
         mvn3 test -e -Djruby.verbose=true -Pdm
 
   * transient specs:
 
-        mvn3 ruby:rake -e -Djruby.verbose=true -Djruby.rake.args="spec:transient"
+        mvn3 ruby:jruby -e -Djruby.verbose=true -Djruby.args="-S rake spec:transient"
 	or
         mvn3 test -e -Djruby.verbose=true -Ptransient
 

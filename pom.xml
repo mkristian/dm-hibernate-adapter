@@ -138,6 +138,7 @@
       <url>http://gems.saumya.de/releases</url>
     </repository>
   </repositories>
+
   <pluginRepositories>
     <pluginRepository>
       <id>sonatype-nexus-snapshots</id>
@@ -145,10 +146,12 @@
       <url>http://oss.sonatype.org/content/repositories/snapshots</url>
     </pluginRepository>
   </pluginRepositories>
+
   <properties>
     <jruby.plugins.version>0.20.0-SNAPSHOT</jruby.plugins.version>
     <dm.version>1.0.0</dm.version>
   </properties>
+
   <build>
     <finalName>${project.artifactId}_ext</finalName>
     <extensions>
@@ -161,13 +164,24 @@
     <plugins>
       <plugin>
         <groupId>de.saumya.mojo</groupId>
+        <artifactId>gem-maven-plugin</artifactId>
+	    <version>${jruby.plugins.version}</version>
+	    <extensions>true</extensions>
+      </plugin>
+      <plugin>
+        <groupId>de.saumya.mojo</groupId>
+        <artifactId>jruby-maven-plugin</artifactId>
+        <version>${jruby.plugins.version}</version>
+      </plugin>
+      <plugin>
+        <groupId>de.saumya.mojo</groupId>
         <artifactId>rspec-maven-plugin</artifactId>
         <version>${jruby.plugins.version}</version>
-	<executions>
-	  <execution>
-	    <goals><goal>test</goal></goals>
-	  </execution>
-	</executions>
+        <executions>
+          <execution>
+            <goals><goal>test</goal></goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>de.saumya.mojo</groupId>
