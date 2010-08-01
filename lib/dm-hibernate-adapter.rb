@@ -20,6 +20,8 @@ dir = Pathname(__FILE__).dirname.expand_path / 'dm-hibernate-adapter'
 
 require dir / 'dialects'
 require dir / 'hibernate'
+require dir / 'transaction'
+
 
 module DataMapper
   module Adapters
@@ -46,6 +48,8 @@ module DataMapper
 
       DataMapper::Model.append_inclusions Hibernate::Model
 
+      extend Chainable
+
       def initialize(name, options = {})
         dialect = options.delete(:dialect)
         username = options.delete(:username)
@@ -64,12 +68,11 @@ module DataMapper
         Hibernate.connection_password     = password.to_s # ie. ""
         Hibernate.connection_pool_size    = pool_size.to_s
 
-        # http://community.jboss.org/wiki/Non-transactionaldataaccessandtheauto-commitmode
-        Hibernate.properties["connection.autocommit"] = "true"
+        Hibernate.properties["current_session_context_class "] = "thread"
         Hibernate.properties["cache.provider_class"]  = "org.hibernate.cache.NoCacheProvider"
         Hibernate.properties["hbm2ddl.auto"]          = "update"
         Hibernate.properties["format_sql"]            = "false"
-        Hibernate.properties["show_sql"]              = "false"
+        Hibernate.properties["show_sql"]              = "true"
 
       end
 
@@ -83,7 +86,8 @@ module DataMapper
       def create(resources)
         @@logger.debug("create #{resources.inspect}")
         count = 0
-        Hibernate.no_tx do |session|
+        unit_of_work do |session|
+
            resources.each do |resource|
             begin
               session.persist(resource)
@@ -108,9 +112,10 @@ module DataMapper
       #
       # @api semipublic
       def update(attributes, collection)
+        
         log_update(attributes, collection)
         count = 0
-        Hibernate.no_tx do |session|
+        unit_of_work do |session|
           collection.each do |resource|
             session.update(resource)
             count += 1
@@ -127,6 +132,7 @@ module DataMapper
       #
       # @api semipublic
       def read(query)
+
         log_read(query)
         conditions = query.conditions
         model = query.model
@@ -136,7 +142,7 @@ module DataMapper
 
         result = []
 
-        Hibernate.no_tx do |session|
+        unit_of_work do |session|
 
           # select * from model
           # XXX BUG http://jira.codehaus.org/browse/JRUBY-4601
@@ -178,9 +184,10 @@ module DataMapper
       #
       # @api semipublic
       def delete(resources)
+
         resources.each do |resource|
           @@logger.debug("deleting #{resource.inspect}")
-          Hibernate.no_tx do |session|
+          unit_of_work do |session|
             session.delete(resource)
           end
         end
@@ -190,12 +197,101 @@ module DataMapper
       # extension to the adapter API
 
       def execute_update(sql)
-        Hibernate.no_tx do |session|
+
+        unit_of_work do |session|
           session.do_work(UpdateWork.new(sql))
         end
       end
 
+      # <dm-transactions>
+  
+      # Produces a fresh transaction primitive for this Adapter
+      #
+      # Used by Transaction to perform its various tasks.
+      #
+      # @return [Object]
+      #   a new Object that responds to :close, :begin, :commit,
+      #   and :rollback,
+      #
+      # @api private
+      def transaction_primitive()
+        # DataObjects::Transaction.create_for_uri(normalized_uri)
+        transaction_primitive = Hibernate::Transaction.new()
+
+        transaction_primitive
+      end
+
+      # Pushes the given Transaction onto the per thread Transaction stack so
+      # that everything done by this Adapter is done within the context of said
+      # Transaction.
+      #
+      # @param [Transaction] transaction
+      #   a Transaction to be the 'current' transaction until popped.
+      #
+      # @return [Array(Transaction)]
+      #   the stack of active transactions for the current thread
+      #
+      # @api private
+      #
+      def push_transaction(transaction)
+        transactions() << transaction
+      end
+
+      # Pop the 'current' Transaction from the per thread Transaction stack so
+      # that everything done by this Adapter is no longer necessarily within the
+      # context of said Transaction.
+      #
+      # @return [Transaction]
+      #   the former 'current' transaction.
+      #
+      # @api private
+      def pop_transaction
+        transactions().pop()
+      end
+
+
+      # Retrieve the current transaction for this Adapter.
+      #
+      # Everything done by this Adapter is done within the context of this
+      # Transaction.
+      #
+      # @return [Transaction]
+      #   the 'current' transaction for this Adapter.
+      #
+      # @api private
+      def current_transaction
+        transactions().last()
+      end
+
+      #      private
+      #
+      #      # @api private
+      #      def transactions
+      #        Thread.current[:dm_transactions]            ||= {}
+      #        Thread.current[:dm_transactions][object_id] ||= []
+      #      end
+
+      # </dm-transactions>
+
       private
+
+      # @api private
+      def transactions()
+        Thread.current[:dm_transactions]            ||= {}
+        Thread.current[:dm_transactions][object_id] ||= []
+      end
+
+      def unit_of_work( &block )
+        # XXX is it ok?
+        # TODO state of the session should be also checked!
+        current_tx = current_transaction()
+
+        if current_tx
+          block.call( current_tx.primitive_for( self ).session() )
+        else
+          Hibernate.tx( &block )
+        end
+      end
 
       def cast_to_hibernate (value, model_type)
         #TODO ADD MORE TYPES!!!

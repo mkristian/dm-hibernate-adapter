@@ -37,7 +37,7 @@ module Hibernate
   def self.connection_pool_size=(size)
     config.set_property "hibernate.connection.pool_size", size
   end
-
+  
   class PropertyShim
     def initialize(config)
       @config = config
@@ -67,31 +67,35 @@ module Hibernate
   end
 
   # "nontransactional" session (autocommit turned on)
-  def self.no_tx()
-    # http://community.jboss.org/wiki/sessionsandtransactions
-    if block_given?()
-      s = nil
-      begin
-        s = session()
-        yield( s )
-      rescue => e
-        raise( e )
-      ensure
-        s.close() if s
-      end
-    else
-      raise( "not supported" )
-    end
-  end
+  # in fact...it doesn't work as expected
+  # http://community.jboss.org/wiki/sessionsandtransactions
+  # http://community.jboss.org/wiki/Non-transactionaldataaccessandtheauto-commitmode
+  # Hibernate.properties["connection.autocommit"] = "true"
+  #  def self.no_tx()
+  #    if block_given?()
+  #      s = nil
+  #      begin
+  #        s = session()
+  #        yield( s )
+  #      rescue => e
+  #        raise( e )
+  #      ensure
+  #        s.close() if s
+  #      end
+  #    else
+  #      raise( "not supported" )
+  #    end
+  #  end
 
-  def self.tx()
+  def self.tx( &block )
     # http://community.jboss.org/wiki/sessionsandtransactions
     if block_given?()
       s = nil
       begin
         s = session()
         s.begin_transaction()
-        yield( s )
+        block.call(s)
+        #yield( s )
         s.transaction().commit()
       rescue => e
         s.transaction().rollback() if s
@@ -103,7 +107,7 @@ module Hibernate
       raise( "not supported" )
     end
   end
-
+  
   def self.factory()
     @factory ||= config.build_session_factory()
   end
@@ -157,9 +161,6 @@ module Hibernate
       # if class wasn't mapped before
       unless model.mapped?
 
-        # TODO implement that using method_missing ?
-        # TODO or
-        # TODO prepare list of methods and iterate over and generate that code dynamically ?
         # what about performance ?
         unless model.respond_to? :wrapped_create
           model.instance_eval do
