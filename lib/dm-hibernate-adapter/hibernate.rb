@@ -2,7 +2,7 @@ module Hibernate
   # XXX java_import: http://jira.codehaus.org/browse/JRUBY-3538
   java_import org.hibernate.cfg.AnnotationConfiguration
   JClass = java.lang.Class
-  JVoid = java.lang.Void::TYPE
+  JVoid   = java.lang.Void::TYPE
 
   @@logger = Slf4r::LoggerFacade.new(Hibernate)
 
@@ -66,33 +66,54 @@ module Hibernate
     PropertyShim.new(@config)
   end
 
-  def self.tx
-    if block_given?
+  # "nontransactional" session (autocommit turned on)
+  def self.no_tx()
+    # http://community.jboss.org/wiki/sessionsandtransactions
+    if block_given?()
       s = nil
       begin
-        s = session
-        s.begin_transaction
-        yield s
-        s.transaction.commit
+        s = session()
+        yield( s )
       rescue => e
-        s.transaction.rollback if s
-        raise e
+        raise( e )
+      ensure
+        s.close() if s
       end
     else
-      raise "not supported"
+      raise( "not supported" )
     end
   end
 
-  def self.factory
-    @factory ||= config.build_session_factory
+  def self.tx()
+    # http://community.jboss.org/wiki/sessionsandtransactions
+    if block_given?()
+      s = nil
+      begin
+        s = session()
+        s.begin_transaction()
+        yield( s )
+        s.transaction().commit()
+      rescue => e
+        s.transaction().rollback() if s
+        raise( e )
+      ensure
+        s.close() if s
+      end
+    else
+      raise( "not supported" )
+    end
   end
 
-  def self.session
-    factory.open_session
+  def self.factory()
+    @factory ||= config.build_session_factory()
+  end
+
+  def self.session()
+    factory().open_session()
   end
 
   def self.config
-    @config ||= AnnotationConfiguration.new
+    @config ||= AnnotationConfiguration.new()
   end
 
   def self.add_model(model_java_class)

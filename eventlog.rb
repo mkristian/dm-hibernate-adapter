@@ -1,16 +1,18 @@
 require 'rubygems'
 require 'lib/dm-hibernate-adapter.rb'
+#require 'dm-transactions'
 
 DataMapper.setup(:default, :adapter => "hibernate", :dialect => "H2", :username => "sa", :url => "jdbc:h2:target/eventlog")
 
 class Event
   include DataMapper::Resource
   
-  property :id, Serial
+  property :id,    Serial
   property :title, String, :required => true, :length => 10
-  property :date, Date
+  property :date,  Date
 
 end
+
 if File.exists?("target/eventlog.h2.db")
   Event.auto_upgrade!
 else
@@ -29,10 +31,16 @@ when /store_update/
   puts "Updated!"
 when /store/
   # Create event and store it
-  event = Event.new
-  event.title = ARGV[1]
-  event.date = Date.today
-  event.save
+
+  #DataMapper::Transaction.new(DataMapper.repository(:default)).commit do
+    #raise "rollack it!"
+
+    event = Event.new
+    event.title = ARGV[1]
+    event.date = Date.today
+    event.save
+
+  #end
   puts "Stored!"
 when /update/
    # Update event and store it

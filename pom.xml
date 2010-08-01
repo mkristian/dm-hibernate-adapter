@@ -19,6 +19,14 @@
       <version>${dm.version}</version>
       <type>gem</type>
     </dependency>
+<!--
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>dm-transactions</artifactId>
+      <version>${dm.version}</version>
+      <type>gem</type>
+    </dependency>
+-->
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-core</artifactId>

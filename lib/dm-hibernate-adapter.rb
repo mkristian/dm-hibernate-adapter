@@ -59,14 +59,18 @@ module DataMapper
         Hibernate.current_session_context_class = "thread"
         
         Hibernate.connection_driver_class = driver.to_s
-        Hibernate.connection_url = url.to_s # ie. "jdbc:h2:jibernate"
-        Hibernate.connection_username = username.to_s # ie. "sa"
-        Hibernate.connection_password = password.to_s # ie. ""
-        Hibernate.connection_pool_size = pool_size.to_s
-        Hibernate.properties["hbm2ddl.auto"] = "update"
-        Hibernate.properties["format_sql"] = "false"
-        Hibernate.properties["show_sql"] = "false"
-        Hibernate.properties["cache.provider_class"] = "org.hibernate.cache.NoCacheProvider"
+        Hibernate.connection_url          = url.to_s # ie. "jdbc:h2:jibernate"
+        Hibernate.connection_username     = username.to_s # ie. "sa"
+        Hibernate.connection_password     = password.to_s # ie. ""
+        Hibernate.connection_pool_size    = pool_size.to_s
+
+        # http://community.jboss.org/wiki/Non-transactionaldataaccessandtheauto-commitmode
+        Hibernate.properties["connection.autocommit"] = "true"
+        Hibernate.properties["cache.provider_class"]  = "org.hibernate.cache.NoCacheProvider"
+        Hibernate.properties["hbm2ddl.auto"]          = "update"
+        Hibernate.properties["format_sql"]            = "false"
+        Hibernate.properties["show_sql"]              = "false"
+
       end
 
       # @param [Enumerable<Resource>] resources
@@ -79,7 +83,7 @@ module DataMapper
       def create(resources)
         @@logger.debug("create #{resources.inspect}")
         count = 0
-        Hibernate.tx do |session|
+        Hibernate.no_tx do |session|
            resources.each do |resource|
             begin
               session.persist(resource)
@@ -106,7 +110,7 @@ module DataMapper
       def update(attributes, collection)
         log_update(attributes, collection)
         count = 0
-        Hibernate.tx do |session|
+        Hibernate.no_tx do |session|
           collection.each do |resource|
             session.update(resource)
             count += 1
@@ -132,7 +136,7 @@ module DataMapper
 
         result = []
 
-        Hibernate.tx do |session|
+        Hibernate.no_tx do |session|
 
           # select * from model
           # XXX BUG http://jira.codehaus.org/browse/JRUBY-4601
@@ -176,7 +180,7 @@ module DataMapper
       def delete(resources)
         resources.each do |resource|
           @@logger.debug("deleting #{resource.inspect}")
-          Hibernate.tx do |session|
+          Hibernate.no_tx do |session|
             session.delete(resource)
           end
         end
@@ -186,7 +190,7 @@ module DataMapper
       # extension to the adapter API
 
       def execute_update(sql)
-        Hibernate.tx do |session|
+        Hibernate.no_tx do |session|
           session.do_work(UpdateWork.new(sql))
         end
       end
