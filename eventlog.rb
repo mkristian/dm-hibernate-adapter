@@ -1,6 +1,6 @@
 require 'rubygems'
 require 'lib/dm-hibernate-adapter.rb'
-#require 'dm-transactions'
+require 'dm-transactions'
 
 DataMapper.setup(:default, :adapter => "hibernate", :dialect => "H2", :username => "sa", :url => "jdbc:h2:target/eventlog")
 
@@ -29,19 +29,26 @@ when /store_update/
   puts "Stored!"
   event.update(:title =>ARGV[2])
   puts "Updated!"
-when /store/
-  # Create event and store it
+when /store_rollback/
+  # ...almost.. creates event and stores it
 
-  #DataMapper::Transaction.new(DataMapper.repository(:default)).commit do
-    #raise "rollack it!"
+  Event.transaction do |tx|
 
     event = Event.new
     event.title = ARGV[1]
     event.date = Date.today
     event.save
 
-  #end
-  puts "Stored!"
+    tx.rollback()  
+  end
+    
+when /store/
+
+  event = Event.new
+  event.title = ARGV[1]
+  event.date = Date.today
+  event.save
+
 when /update/
    # Update event and store it
    event = Event.get(ARGV[1])
