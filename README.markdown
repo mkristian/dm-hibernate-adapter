@@ -22,6 +22,10 @@ run the eventlog - list
 run the eventlog - store
 
     mvn3 ruby:jruby -Djruby.args="eventlog.rb store something"
+    
+run the eventlog - store with rollback
+
+    mvn3 ruby:jruby -Djruby.args="eventlog.rb store_rollback something"
 
 how to list rake tasks (please note the jruby.rake.args part(var name))
 
