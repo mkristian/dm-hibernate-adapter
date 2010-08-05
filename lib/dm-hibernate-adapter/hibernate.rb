@@ -1,7 +1,7 @@
 module Hibernate
   # XXX java_import: http://jira.codehaus.org/browse/JRUBY-3538
   java_import org.hibernate.cfg.AnnotationConfiguration
-  JClass = java.lang.Class
+  JClass  = java.lang.Class
   JVoid   = java.lang.Void::TYPE
 
   @@logger = Slf4r::LoggerFacade.new(Hibernate)
@@ -62,30 +62,9 @@ module Hibernate
     end
   end
 
-  def self.properties
+  def self.properties()
     PropertyShim.new(@config)
   end
-
-  # "nontransactional" session (autocommit turned on)
-  # in fact...it doesn't work as expected
-  # http://community.jboss.org/wiki/sessionsandtransactions
-  # http://community.jboss.org/wiki/Non-transactionaldataaccessandtheauto-commitmode
-  # Hibernate.properties["connection.autocommit"] = "true"
-  #  def self.no_tx()
-  #    if block_given?()
-  #      s = nil
-  #      begin
-  #        s = session()
-  #        yield( s )
-  #      rescue => e
-  #        raise( e )
-  #      ensure
-  #        s.close() if s
-  #      end
-  #    else
-  #      raise( "not supported" )
-  #    end
-  #  end
 
   def self.tx( &block )
     # http://community.jboss.org/wiki/sessionsandtransactions
@@ -116,12 +95,11 @@ module Hibernate
     factory().open_session()
   end
 
-  def self.config
+  def self.config()
     @config ||= AnnotationConfiguration.new()
   end
 
   def self.add_model(model_java_class)
-    #TODO workaround
     unless mapped?(model_java_class)
       config.add_annotated_class(model_java_class)
       @mapped_classes << model_java_class
@@ -277,13 +255,13 @@ module Hibernate
 
         # TODO drop only one table, not all of them !
         schema_export = SchemaExport.new(config)
-        console=false # XXX here you can turn on/off logger
+        console       = true # XXX here you can turn on/off logger
         schema_export.drop(console,true)
         schema_export.create(console,true)
       end
 
       def auto_upgrade!(repo = nil)
-        #TODO
+        raise "NYI" #TODO
       end
 
       def to_java_type(type)
@@ -332,13 +310,13 @@ module Hibernate
       end
 
       #helper method
-      def mapped?
-        Hibernate.mapped? java_class
+      def mapped?()
+        Hibernate.mapped?(java_class())
       end
 
       private
 
-      def hibernate_sigs
+      def hibernate_sigs()
         @hibernate_sigs ||= {}
       end
 

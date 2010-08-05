@@ -33,7 +33,6 @@ module DataMapper
 
       @@logger = Slf4r::LoggerFacade.new(HibernateAdapter)
 
-      # TODO maybe more drivers (Oracle, SQLITE3)
       DRIVERS = {
         :H2             => "org.h2.Driver",
         :HSQL           => "org.hsqldb.jdbcDriver",
@@ -46,19 +45,21 @@ module DataMapper
         :PostgreSQL     => "org.postgresql.Driver",
       }
 
-      DataMapper::Model.append_inclusions Hibernate::Model
+      DataMapper::Model.append_inclusions( Hibernate::Model )
 
-      extend Chainable
+      extend( Chainable )
 
       def initialize(name, options = {})
-        dialect = options.delete(:dialect)
-        username = options.delete(:username)
-        password = options.delete(:password)
-        url = options.delete(:url)
-        url += "jdbc:" unless url =~ /^jdbc:/
-        driver = options.delete(:driver) || DRIVERS[dialect.to_sym]
+        dialect   = options.delete(:dialect)
+        username  = options.delete(:username)
+        password  = options.delete(:password)
+        url       = options.delete(:url)
+        url      += "jdbc:" unless url =~ /^jdbc:/
+        driver    = options.delete(:driver) || DRIVERS[dialect.to_sym]
         pool_size = options.delete(:pool_size) || "1"
-        super
+
+        super()
+
         Hibernate.dialect = Hibernate::Dialects.const_get(dialect.to_s)
         Hibernate.current_session_context_class = "thread"
         
@@ -68,7 +69,6 @@ module DataMapper
         Hibernate.connection_password     = password.to_s # ie. ""
         Hibernate.connection_pool_size    = pool_size.to_s
 
-        Hibernate.properties["current_session_context_class "] = "thread"
         Hibernate.properties["cache.provider_class"]  = "org.hibernate.cache.NoCacheProvider"
         Hibernate.properties["hbm2ddl.auto"]          = "update"
         Hibernate.properties["format_sql"]            = "false"
@@ -135,18 +135,15 @@ module DataMapper
 
         log_read(query)
         conditions = query.conditions
-        model = query.model
-        limit = query.limit
-        offset = query.offset
-        order = query.order
+        model      = query.model
+        limit      = query.limit
+        offset     = query.offset
+        order      = query.order
 
         result = []
 
         unit_of_work do |session|
 
-          # select * from model
-          # XXX BUG http://jira.codehaus.org/browse/JRUBY-4601
-          # criteria = session.create_criteria(model.java_class)
           criteria = session.create_criteria(model.to_java_class_name)
           # where ...
           criteria.add(parse_conditions_tree(conditions,model))  unless conditions.nil?
@@ -159,12 +156,13 @@ module DataMapper
             operator = direction.operator
             # TODO column name may differ from property name
             column = direction.target.name
-
             if operator == :desc
-              criteria.add_order(Order.desc(column.to_s.to_java_string))
+              order  = Order.desc(column.to_s.to_java_string)
             else
-              criteria.add_order(Order.asc(column.to_s.to_java_string))
+              order  = Order.asc(column.to_s.to_java_string)
             end
+
+            criteria.add_order(order)
           end
 
           @@logger.debug(criteria.to_s)
@@ -185,10 +183,10 @@ module DataMapper
       # @api semipublic
       def delete(resources)
 
-        resources.each do |resource|
-          @@logger.debug("deleting #{resource.inspect}")
-          unit_of_work do |session|
-            session.delete(resource)
+        unit_of_work do |session|
+          resources.each do |resource|
+            @@logger.debug("deleting #{resource.inspect}")
+              session.delete(resource)
           end
         end
         resources.size
@@ -216,9 +214,7 @@ module DataMapper
       # @api private
       def transaction_primitive()
         # DataObjects::Transaction.create_for_uri(normalized_uri)
-        transaction_primitive = Hibernate::Transaction.new()
-
-        transaction_primitive
+        Hibernate::Transaction.new()
       end
 
       # Pushes the given Transaction onto the per thread Transaction stack so
@@ -245,7 +241,7 @@ module DataMapper
       #   the former 'current' transaction.
       #
       # @api private
-      def pop_transaction
+      def pop_transaction()
         transactions().pop()
       end
 
@@ -259,18 +255,10 @@ module DataMapper
       #   the 'current' transaction for this Adapter.
       #
       # @api private
-      def current_transaction
+      def current_transaction()
         transactions().last()
       end
-
-      #      private
-      #
-      #      # @api private
-      #      def transactions
-      #        Thread.current[:dm_transactions]            ||= {}
-      #        Thread.current[:dm_transactions][object_id] ||= []
-      #      end
-
+      
       # </dm-transactions>
 
       private
@@ -367,7 +355,6 @@ module DataMapper
               lo = arr.first
               hi = arr.last
               if lo.nil? || hi.nil?
-                # TODO
                 # XXX can this code be reached ???
                 Restrictions.in(subject, cast_to_hibernate(value, model_type))                
               else
@@ -432,7 +419,7 @@ module DataMapper
         end
       end
 
-      def parse_conditions_tree (conditions, model)
+      def parse_conditions_tree(conditions, model)
         #conditions has children ? (in fact -> "is it comparison or operand?")
         unless conditions.respond_to?(:children)
           handle_comparison(conditions, model)
