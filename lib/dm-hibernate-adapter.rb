@@ -58,7 +58,7 @@ module DataMapper
         driver    = options.delete(:driver) || DRIVERS[dialect.to_sym]
         pool_size = options.delete(:pool_size) || "1"
 
-        super()
+        super( name, options )
 
         Hibernate.dialect = Hibernate::Dialects.const_get(dialect.to_s)
         Hibernate.current_session_context_class = "thread"
