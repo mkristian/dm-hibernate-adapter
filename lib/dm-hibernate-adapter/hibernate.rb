@@ -381,6 +381,7 @@ module Hibernate
           set_name = "set#{name.to_s.capitalize}"
 
           # TODO Time
+          # to consider: in mu opinion those methods should set from/get to java objects...
           if (type == DataMapper::Property::Date)
             class_eval <<-EOT
               def  #{set_name.intern} (d)

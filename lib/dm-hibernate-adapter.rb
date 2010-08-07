@@ -261,208 +261,211 @@ module DataMapper
       
       # </dm-transactions>
 
-      private
+      
+      
+        private
 
-      # @api private
-      def transactions()
-        Thread.current[:dm_transactions]            ||= {}
-        Thread.current[:dm_transactions][object_id] ||= []
-      end
-
-      def unit_of_work( &block )
-        # XXX is it ok?
-        # TODO state of the session should be also checked!
-        current_tx = current_transaction()
-
-        if current_tx
-          block.call( current_tx.primitive_for( self ).session() )
-        else
-          Hibernate.tx( &block )
+        # @api private
+        def transactions()
+          Thread.current[:dm_transactions]            ||= {}
+          Thread.current[:dm_transactions][object_id] ||= []
         end
-      end
 
-      def cast_to_hibernate (value, model_type)
-        #TODO ADD MORE TYPES!!!
-        case value
-          when Fixnum
-            # XXX Warning. ie Integer.value_of(value) returns cached objects already converted to Ruby objects!
-            if    model_type == Java::JavaLang::Integer then java.lang.Integer.new(value)
-            elsif model_type == Java::JavaLang::Long    then java.lang.Long.new(value)
-            else  puts "---other Hibernate type, object: #{value} type: #{value.class} Hibernate type: #{model_type} ---"
-            end
-          when Float    then java.lang.Float.new(value)
-          when String   then value.to_java_string
-          when Array
-            # if there is WHERE x IN ( ) -> WHERE x IN ( null ) should be used 
-            value = [nil] if value.empty?
-            (value.map{|object| cast_to_hibernate(object, model_type)}).to_java
-          when Range    then (value.to_a.map{|object| cast_to_hibernate(object, model_type)}).to_java
-          when NilClass then nil
-          when Regexp   then value.source.to_java_string
+        def unit_of_work( &block )
+          # XXX is it ok?
+          # TODO state of the session should be also checked!
+          current_tx = current_transaction()
+
+          if current_tx
+            block.call( current_tx.primitive_for( self ).session() )
           else
-            puts "---other Ruby type, object: #{value} type: #{value.class} ---"
-            value.to_s.to_java_string
+            Hibernate.tx( &block )
+          end
         end
-      end
 
-      def handle_comparison(con, model)
-        subject = nil
-        value   = nil
-
-        case con.subject
-        when DataMapper::Property
-          subject = con.subject.name.to_s # property/column name
-          value = con.value # value used in comparison
-        when DataMapper::Associations::ManyToOne::Relationship
-          # TODO allow multicolumn keys !!!
-          subject = con.subject.parent_key.first.name.to_s
-          value = con.subject.parent_key.get(con.value).first # value used in comparison
-        when DataMapper::Associations::OneToMany::Relationship
-          # TODO allow multicolumn keys !!!
-          # TODO why the break in symetry ?
-          subject = con.subject.parent_key.first.name.to_s
-          # why does is not work: con.subject.child_key.get(con.value).first ???
-          value = con.subject.child_key.first.get(con.value.first) # value used in comparison
-        end
-        model_type = model.to_java_type(model.properties[subject.to_sym].class) # Java type of property (used in typecasting)
-        dialect = Hibernate.dialect # SQL dialect for current configuration
-
-        case con
-          when DataMapper::Query::Conditions::EqualToComparison
-            # special case handling IS NULL/ NOT (x IS NULL)
-            value.class == NilClass ? Restrictions.isNull(subject) :
-                                      Restrictions.eq(subject, cast_to_hibernate(value, model_type))
-
-          when DataMapper::Query::Conditions::GreaterThanComparison
-            Restrictions.gt(subject, cast_to_hibernate(value, model_type))
-
-          when DataMapper::Query::Conditions::LessThanComparison
-            Restrictions.lt(subject, cast_to_hibernate(value, model_type))
-
-          when DataMapper::Query::Conditions::LikeComparison
-            Restrictions.like(subject, cast_to_hibernate(value, model_type))
-
-          when DataMapper::Query::Conditions::GreaterThanOrEqualToComparison
-            Restrictions.ge(subject, cast_to_hibernate(value, model_type))
-
-          when DataMapper::Query::Conditions::LessThanOrEqualToComparison
-            Restrictions.le(subject, cast_to_hibernate(value, model_type))
-
-          when DataMapper::Query::Conditions::InclusionComparison
-            if value.class == Array
-              # special case handling :x => 1..110 / :x => [1,2,3]
-              Restrictions.in(subject, cast_to_hibernate(value, model_type))
-            else
-              # XXX proper ordering?
-              arr = value.is_a?(Fixnum) ? [value] : value.to_a
-              lo = arr.first
-              hi = arr.last
-              if lo.nil? || hi.nil?
-                Restrictions.in(subject, cast_to_hibernate(value, model_type))                
-              else
-                Restrictions.between(subject, cast_to_hibernate(lo, model_type), cast_to_hibernate(hi, model_type))
+        def cast_to_hibernate (value, model_type)
+          #TODO ADD MORE TYPES!!!
+          case value
+            when Fixnum
+              # XXX Warning. ie Integer.value_of(value) returns cached objects already converted to Ruby objects!
+              if    model_type == Java::JavaLang::Integer then java.lang.Integer.new(value)
+              elsif model_type == Java::JavaLang::Long    then java.lang.Long.new(value)
+              else  puts "---other Hibernate type, object: #{value} type: #{value.class} Hibernate type: #{model_type} ---"
               end
-            end
-
-          when DataMapper::Query::Conditions::RegexpComparison
-
-            if dialect == "org.hibernate.dialect.HSQLDialect"
-              Restrictions.sqlRestriction("(regexp_matches (" +subject + ", ?))",
-                           cast_to_hibernate(value, model_type), org::hibernate::Hibernate::STRING)
-            elsif dialect == "org.hibernate.dialect.PostgreSQLDialect"
-              Restrictions.sqlRestriction("(" + subject +" ~ ?)",
-                           cast_to_hibernate(value, model_type), org::hibernate::Hibernate::STRING)
-            # elsif dialect ==  "org.hibernate.dialect.DerbyDialect"
-            # TODO implement custom matching function (see README)
+            when Float    then java.lang.Float.new(value)
+            when String   then value.to_java_string
+            when Array
+              # if there is WHERE x IN ( ) -> WHERE x IN ( null ) should be used
+              value = [nil] if value.empty?
+              (value.map{|object| cast_to_hibernate(object, model_type)}).to_java
+            when Range    then (value.to_a.map{|object| cast_to_hibernate(object, model_type)}).to_java
+            when NilClass then nil
+            when Regexp   then value.source.to_java_string
             else
-              Restrictions.sqlRestriction("(" + subject +" regexp ?)",
-                           cast_to_hibernate(value, model_type), org::hibernate::Hibernate::STRING)
-            end
-          
+              puts "---other Ruby type, object: #{value} type: #{value.class} ---"
+              value.to_s.to_java_string
+          end
         end
-      end
 
-      def parse_all_children(children, model, operand)
-        operand = children.inject(operand){ |op,child| op.add(parse_conditions_tree(child, model))}
-      end
+        def handle_comparison(con, model)
+          subject = nil
+          value   = nil
 
-      def parse_the_only_child(child,model)
-        parse_conditions_tree(child, model)
-      end
+          case con.subject
+          when DataMapper::Property
+            subject = con.subject.name.to_s # property/column name
+            value = con.value # value used in comparison
+          when DataMapper::Associations::ManyToOne::Relationship
+            # TODO allow multicolumn keys !!!
+            subject = con.subject.parent_key.first.name.to_s
+            value = con.subject.parent_key.get(con.value).first # value used in comparison
+          when DataMapper::Associations::OneToMany::Relationship
+            # TODO allow multicolumn keys !!!
+            # TODO why the break in symetry ?
+            subject = con.subject.parent_key.first.name.to_s
+            # why does is not work: con.subject.child_key.get(con.value).first ???
+            value = con.subject.child_key.first.get(con.value.first) # value used in comparison
+          end
+          model_type = model.to_java_type(model.properties[subject.to_sym].class) # Java type of property (used in typecasting)
+          dialect = Hibernate.dialect # SQL dialect for current configuration
 
-      def handle_operation(con, model)
-        children = con.children
+          case con
+            when DataMapper::Query::Conditions::EqualToComparison
+              # special case handling IS NULL/ NOT (x IS NULL)
+              value.class == NilClass ? Restrictions.isNull(subject) :
+                                        Restrictions.eq(subject, cast_to_hibernate(value, model_type))
 
-        case con
-          when DataMapper::Query::Conditions::AndOperation
-            parse_all_children(children, model, Restrictions.conjunction())
+            when DataMapper::Query::Conditions::GreaterThanComparison
+              Restrictions.gt(subject, cast_to_hibernate(value, model_type))
 
-          when DataMapper::Query::Conditions::OrOperation
-            parse_all_children(children, model, Restrictions.disjunction())
+            when DataMapper::Query::Conditions::LessThanComparison
+              Restrictions.lt(subject, cast_to_hibernate(value, model_type))
 
-          when DataMapper::Query::Conditions::NotOperation
-            #XXX only one child may be negated in DM?
-            child = children.first
-            # TODO REFACTOR IT :)
-            if !(child.respond_to? :children) &&
-                (child.class == DataMapper::Query::Conditions::InclusionComparison) &&
-                (child.value.class == Array)  && (child.value.empty?)
+            when DataMapper::Query::Conditions::LikeComparison
+              Restrictions.like(subject, cast_to_hibernate(value, model_type))
 
-              subject = child.subject.name.to_s
-              # XXX ugly workaround for Model.all(:x.not => [])
-              Restrictions.sqlRestriction(" ( "+ subject +" is null or " + subject +" is not null ) ")
-            else
-              Restrictions.not(parse_the_only_child(child,model))
-            end
+            when DataMapper::Query::Conditions::GreaterThanOrEqualToComparison
+              Restrictions.ge(subject, cast_to_hibernate(value, model_type))
 
-          when DataMapper::Query::Conditions::NullOperation
-            # XXX NullOperation is not used in dm_core at the moment
-            raise NotImplementedError, "#{con.class} is not not used in dm_core"
+            when DataMapper::Query::Conditions::LessThanOrEqualToComparison
+              Restrictions.le(subject, cast_to_hibernate(value, model_type))
+
+            when DataMapper::Query::Conditions::InclusionComparison
+              if value.class == Array
+                # special case handling :x => 1..110 / :x => [1,2,3]
+                Restrictions.in(subject, cast_to_hibernate(value, model_type))
+              else
+                # XXX proper ordering?
+                arr = value.is_a?(Fixnum) ? [value] : value.to_a
+                lo = arr.first
+                hi = arr.last
+                if lo.nil? || hi.nil?
+                  Restrictions.in(subject, cast_to_hibernate(value, model_type))
+                else
+                  Restrictions.between(subject, cast_to_hibernate(lo, model_type), cast_to_hibernate(hi, model_type))
+                end
+              end
+
+            when DataMapper::Query::Conditions::RegexpComparison
+
+              if dialect == "org.hibernate.dialect.HSQLDialect"
+                Restrictions.sqlRestriction("(regexp_matches (" +subject + ", ?))",
+                             cast_to_hibernate(value, model_type), org::hibernate::Hibernate::STRING)
+              elsif dialect == "org.hibernate.dialect.PostgreSQLDialect"
+                Restrictions.sqlRestriction("(" + subject +" ~ ?)",
+                             cast_to_hibernate(value, model_type), org::hibernate::Hibernate::STRING)
+              # elsif dialect ==  "org.hibernate.dialect.DerbyDialect"
+              # TODO implement custom matching function for some dbs (see README on Wiki)
+              else
+                Restrictions.sqlRestriction("(" + subject +" regexp ?)",
+                             cast_to_hibernate(value, model_type), org::hibernate::Hibernate::STRING)
+              end
+
+          end
         end
-      end
 
-      def parse_conditions_tree(conditions, model)
-        #conditions has children ? (in fact -> "is it comparison or operand?")
-        unless conditions.respond_to?(:children)
-          handle_comparison(conditions, model)
-        else
-          handle_operation(conditions, model)
+        def parse_all_children(children, model, operand)
+          operand = children.inject(operand){ |op,child| op.add(parse_conditions_tree(child, model))}
         end
-      end
 
-# -----  helper methods - printers -----
+        def parse_the_only_child(child,model)
+          parse_conditions_tree(child, model)
+        end
 
-# @param [Query] query
-#   the query to print it out formatted
-#
-# @api private
-def log_read(query)
-@@logger.debug <<EOT
-read()
-    query:
-      #{query.inspect}
-    model:
-      #{query.model}
-    conditions:
-      #{query.conditions}
-EOT
-end
+        def handle_operation(con, model)
+          children = con.children
 
-# @param [Hash(Property => Object)] attributes
-#   hash of attribute values to print it out formatted, keyed by Property
-# @param [Collection] collection
-#   collection of records to print it out formatted
-#
-# @api private
-def log_update(attributes,collection)
-@@logger.debug <<EOT
-update()
-   attributes:
-     #{attributes.inspect}
-   collection:
-     #{collection.inspect}
-EOT
-end
+          case con
+            when DataMapper::Query::Conditions::AndOperation
+              parse_all_children(children, model, Restrictions.conjunction())
+
+            when DataMapper::Query::Conditions::OrOperation
+              parse_all_children(children, model, Restrictions.disjunction())
+
+            when DataMapper::Query::Conditions::NotOperation
+              #XXX only one child may be negated in DM?
+              child = children.first
+
+              if !(child.respond_to? :children) &&
+                  (child.class == DataMapper::Query::Conditions::InclusionComparison) &&
+                  (child.value.class == Array)  && (child.value.empty?)
+
+                subject = child.subject.name.to_s
+                # XXX ugly workaround for Model.all(:x.not => [])
+                Restrictions.sqlRestriction(" ( "+ subject +" is null or " + subject +" is not null ) ")
+              else
+                Restrictions.not(parse_the_only_child(child,model))
+              end
+
+            when DataMapper::Query::Conditions::NullOperation
+              # XXX NullOperation is not used in dm_core at the moment
+              raise NotImplementedError, "#{con.class} is not not used in dm_core"
+          end
+        end
+
+        def parse_conditions_tree(conditions, model)
+          #conditions has children ? (in fact -> "is it comparison or operand?")
+          unless conditions.respond_to?(:children)
+            handle_comparison(conditions, model)
+          else
+            handle_operation(conditions, model)
+          end
+        end
+
+        # -----  helper methods - printers -----
+
+        # @param [Query] query
+        #   the query to print it out formatted
+        #
+        # @api private
+        def log_read(query)
+          @@logger.debug <<-EOT
+          read()
+              query:
+                #{query.inspect}
+              model:
+                #{query.model}
+              conditions:
+                #{query.conditions}
+          EOT
+        end
+
+        # @param [Hash(Property => Object)] attributes
+        #   hash of attribute values to print it out formatted, keyed by Property
+        # @param [Collection] collection
+        #   collection of records to print it out formatted
+        #
+        # @api private
+        def log_update(attributes,collection)
+          @@logger.debug <<-EOT
+          update()
+             attributes:
+               #{attributes.inspect}
+             collection:
+               #{collection.inspect}
+          EOT
+        end
+
     end
   end
 end
