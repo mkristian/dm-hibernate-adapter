@@ -11,7 +11,7 @@ class Event
   property :title, String, :required => true, :length => 10
   property :date,  Date
 
-  has n    :people
+  has n,    :people
 end
 
 class Person

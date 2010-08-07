@@ -260,7 +260,7 @@ module Hibernate
       end
 
       def auto_upgrade!(repo = nil)
-        raise "NYI" #TODO
+        # raise "NYI" #TODO
       end
 
       def to_java_type(type)
@@ -287,10 +287,11 @@ module Hibernate
           discriminator = nil
 
           relationships().each do |rel|
-            puts '---------------relationships: #{rel}'
+            puts "---------------relationship: #{rel.inspect()}"
           end
 
           properties().each do |prop|
+            puts "---------------property: #{prop.inspect()}"
             discriminator = add_java_property(prop) || discriminator
           end
 
