@@ -306,6 +306,9 @@ module DataMapper
       end
 
       def handle_comparison(con, model)
+        subject = nil
+        value   = nil
+
         case con.subject
         when DataMapper::Property
           subject = con.subject.name.to_s # property/column name
@@ -346,8 +349,8 @@ module DataMapper
             Restrictions.le(subject, cast_to_hibernate(value, model_type))
 
           when DataMapper::Query::Conditions::InclusionComparison
-            # special case handling :x => 1..110 / :x => [1,2,3]
             if value.class == Array
+              # special case handling :x => 1..110 / :x => [1,2,3]
               Restrictions.in(subject, cast_to_hibernate(value, model_type))
             else
               # XXX proper ordering?
@@ -355,7 +358,6 @@ module DataMapper
               lo = arr.first
               hi = arr.last
               if lo.nil? || hi.nil?
-                # XXX can this code be reached ???
                 Restrictions.in(subject, cast_to_hibernate(value, model_type))                
               else
                 Restrictions.between(subject, cast_to_hibernate(lo, model_type), cast_to_hibernate(hi, model_type))

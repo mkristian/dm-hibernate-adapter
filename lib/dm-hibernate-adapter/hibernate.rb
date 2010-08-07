@@ -74,7 +74,6 @@ module Hibernate
         s = session()
         s.begin_transaction()
         block.call(s)
-        #yield( s )
         s.transaction().commit()
       rescue => e
         s.transaction().rollback() if s
@@ -287,21 +286,28 @@ module Hibernate
         unless mapped?
           discriminator = nil
 
-          properties.each do |prop|
+          relationships().each do |rel|
+            puts '---------------relationships: #{rel}'
+          end
+
+          properties().each do |prop|
             discriminator = add_java_property(prop) || discriminator
           end
 
           # "stolen" from http://github.com/superchris/hibernate
           annotation = {
-            javax.persistence.Entity => {},
-            javax.persistence.Table => {"name" => self.storage_name}
+            javax.persistence.Entity => { },
+            javax.persistence.Table  => { "name" => self.storage_name }
           }
+
           if discriminator
-            annotation[javax.persistence.Inheritance] = {"strategy" => javax.persistence.InheritanceType::SINGLE_TABLE.to_s }
-            annotation[javax.persistence.DiscriminatorColumn] = {"name" => discriminator}
+            annotation[javax.persistence.Inheritance]         = { "strategy" => javax.persistence.InheritanceType::SINGLE_TABLE.to_s }
+            annotation[javax.persistence.DiscriminatorColumn] = { "name" => discriminator }
           end
+
           add_class_annotation(annotation)
           Hibernate.add_model(become_java!)
+
           @@logger.debug "become_java! #{java_class}"
          else
           @@logger.debug "become_java! fired already #{java_class}"
@@ -314,125 +320,122 @@ module Hibernate
         Hibernate.mapped?(java_class())
       end
 
-      private
 
-      def hibernate_sigs()
-        @hibernate_sigs ||= {}
-      end
+        private
 
-      # "stolen" from http://github.com/superchris/hibernate
-      def add_java_property(prop)
-        @@logger.info("#{prop.model.name} gets property added #{prop.name}")
-        name = prop.name
-        type = prop.class
-        return name if(type == DataMapper::Types::Discriminator)
-
-        column_name = prop.field
-        annotation = {}
-        # TODO honor prop.field mapping and maybe more
-        if prop.serial?
-          annotation[javax.persistence.Id] = {}
-          annotation[javax.persistence.GeneratedValue] = {}
-        elsif prop.key?
-          # TODO obey multi column keys
-          annotation[javax.persistence.Id] = {}
+        def hibernate_sigs()
+          @hibernate_sigs ||= {}
         end
 
-        annotation[javax.persistence.Column] = {
-          "unique" => prop.unique?,
-          "name" => prop.field
-        }
-        unless prop.index.nil?
-          if(prop.index == true)
-            annotation[org.hibernate.annotations.Index]
-          elsif(prop.index.class == Symbol)
-            annotation[org.hibernate.annotations.Index] = { "name" => prop.index.to_s }
-          else
-            # TODO arrays !!
-            #annotation[org.hibernate.annotations.Index] = {"name" => []}
-            #prop.index.each do|index|
-            #  annotation[org.hibernate.annotations.Index]["name"] << index.to_s
-            #end
+        # "stolen" from http://github.com/superchris/hibernate
+        def add_java_property(prop)
+          @@logger.info("#{prop.model.name} gets property added #{prop.name}")
+          name = prop.name
+          type = prop.class
+          return name if (type == DataMapper::Types::Discriminator)
+
+          column_name = prop.field
+          annotation = {}
+          # TODO honor prop.field mapping and maybe more
+          if prop.serial?
+            annotation[javax.persistence.Id] = {}
+            annotation[javax.persistence.GeneratedValue] = {}
+          elsif prop.key?
+            # TODO obey multi column keys
+            annotation[javax.persistence.Id] = {}
           end
-        end
-        if prop.required?
-          annotation[javax.persistence.Column]["nullable"] = !prop.required?
-        end
-        if (prop.respond_to?(:length) && !prop.length.nil?)
-          annotation[javax.persistence.Column]["length"] = java.lang.Integer.new(prop.length)
-        end
-        if (prop.respond_to?(:scale) && !prop.scale.nil?)
-          annotation[javax.persistence.Column]["scale"] = java.lang.Integer.new(prop.scale)
-        end
-        if (prop.respond_to?(:precision) && !prop.precision.nil?)
-          annotation[javax.persistence.Column]["precision"] = java.lang.Integer.new(prop.precision)
-        end
 
-        get_name = "get#{name.to_s.capitalize}"
-        set_name = "set#{name.to_s.capitalize}"
+          annotation[javax.persistence.Column] = {
+                  "unique" => prop.unique?,
+                  "name"   => prop.field
+          }
 
-        # TODO Time
-        if(type == DataMapper::Property::Date)
-          class_eval <<-EOT
- def #{set_name.intern}(d)
-   attribute_set(:#{name}, d.nil? ? nil : Date.civil(d.year + 1900, d.month + 1, d.date))
- end
-         EOT
-         class_eval <<-EOT
- def #{get_name.intern}
-   d = attribute_get(:#{name})
-   if d
-     org.joda.time.DateTime.new(d.year, d.month, d.day, 0, 0, 0, 0).to_date
-   end
- end
-          EOT
-        elsif(type == DataMapper::Property::DateTime)
-          class_eval <<-EOT
- def #{set_name.intern}(d)
-   attribute_set(:#{name}, d.nil? ? nil : DateTime.civil(d.year + 1900, d.month + 1, d.date, d.hours, d.minutes, d.seconds))
- end
-         EOT
-         class_eval <<-EOT
- def #{get_name.intern}
-   d = attribute_get(:#{name})
-   if d
-     org.joda.time.DateTime.new(d.year, d.month, d.day, d.hour, d.min, d.sec, 0).to_date
-   end
- end
-          EOT
-        elsif(type.to_s == BigDecimal || type == DataMapper::Property::Decimal)
-           class_eval <<-EOT
- def #{set_name.intern}(d)
-   attribute_set(:#{name}, d.nil? ? nil : #{type}.new(d.to_s))
- end
-         EOT
-         class_eval <<-EOT
- def #{get_name.intern}
-   d = attribute_get(:#{name})
-   if d
-     java.math.BigDecimal.new(d.to_i)
-   end
- end
-          EOT
-        else
-           class_eval <<-EOT
- def #{set_name.intern}(d)
-   attribute_set(:#{name}, d)
- end
-         EOT
-         class_eval <<-EOT
- def #{get_name.intern}
-   attribute_get(:#{name})
- end
-          EOT
+          unless prop.index.nil?
+            if (prop.index == true)
+              annotation[org.hibernate.annotations.Index]
+            elsif (prop.index.class == Symbol)
+              annotation[org.hibernate.annotations.Index] = {"name" => prop.index.to_s}
+            else
+              # TODO arrays !!
+              #annotation[org.hibernate.annotations.Index] = {"name" => []}
+              #prop.index.each do|index|
+              #  annotation[org.hibernate.annotations.Index]["name"] << index.to_s
+              #end
+            end
+          end
+          if prop.required?
+            annotation[javax.persistence.Column]["nullable"] = !prop.required?
+          end
+          if (prop.respond_to?(:length) && !prop.length.nil?)
+            annotation[javax.persistence.Column]["length"] = java.lang.Integer.new(prop.length)
+          end
+          if (prop.respond_to?(:scale) && !prop.scale.nil?)
+            annotation[javax.persistence.Column]["scale"] = java.lang.Integer.new(prop.scale)
+          end
+          if (prop.respond_to?(:precision) && !prop.precision.nil?)
+            annotation[javax.persistence.Column]["precision"] = java.lang.Integer.new(prop.precision)
+          end
+
+          get_name = "get#{name.to_s.capitalize}"
+          set_name = "set#{name.to_s.capitalize}"
+
+          # TODO Time
+          if (type == DataMapper::Property::Date)
+            class_eval <<-EOT
+              def  #{set_name.intern} (d)
+                attribute_set(:#{name} , d.nil? ? nil : Date.civil(d.year + 1900, d.month + 1, d.date))
+              end
+            EOT
+            class_eval <<-EOT
+              def  #{get_name.intern}
+                d = attribute_get(:#{name} )
+                org.joda.time.DateTime.new(d.year, d.month, d.day, 0, 0, 0, 0).to_date if d
+              end
+            EOT
+          elsif (type == DataMapper::Property::DateTime)
+            class_eval <<-EOT
+              def  #{set_name.intern} (d)
+                attribute_set(:#{name} , d.nil? ? nil : DateTime.civil(d.year + 1900, d.month + 1, d.date, d.hours, d.minutes, d.seconds))
+              end
+            EOT
+            class_eval <<-EOT
+              def  #{get_name.intern}
+                d = attribute_get(:#{name} )
+                org.joda.time.DateTime.new(d.year, d.month, d.day, d.hour, d.min, d.sec, 0).to_date if d
+              end
+            EOT
+          elsif (type.to_s == BigDecimal || type == DataMapper::Property::Decimal)
+            class_eval <<-EOT
+              def  #{set_name.intern} (d)
+                attribute_set(:#{name} , d.nil? ? nil :#{type}.new(d.to_s))
+              end
+            EOT
+            class_eval <<-EOT
+              def  #{get_name.intern}
+                d = attribute_get(:#{name} )
+                java.math.BigDecimal.new(d.to_i) if d
+              end
+            EOT
+          else
+            class_eval <<-EOT
+              def  #{set_name.intern} (d)
+                attribute_set(:#{name} , d)
+              end
+            EOT
+            class_eval <<-EOT
+              def  #{get_name.intern}                                     
+                d = attribute_get(:#{name} )
+                d
+              end
+            EOT
+          end
+
+          mapped_type = to_java_type(type).java_class
+          add_method_signature get_name, [mapped_type]
+          add_method_annotation get_name, annotation
+          add_method_signature set_name, [JVoid, mapped_type]
+          nil
         end
-
-        mapped_type = to_java_type(type).java_class
-        add_method_signature get_name, [mapped_type]
-        add_method_annotation get_name, annotation
-        add_method_signature set_name, [JVoid, mapped_type]
-        nil
-      end
     end
   end
 end

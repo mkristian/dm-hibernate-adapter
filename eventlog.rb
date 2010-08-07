@@ -11,12 +11,24 @@ class Event
   property :title, String, :required => true, :length => 10
   property :date,  Date
 
+  has n    :people
+end
+
+class Person
+  include DataMapper::Resource
+
+  property :id,    Serial
+  property :name,  String, :required => true
+
+  belongs_to :event
 end
 
 if File.exists?("target/eventlog.h2.db")
-  Event.auto_upgrade!
+  Event.auto_upgrade!()
+  Person.auto_upgrade!()
 else
-  Event.auto_migrate!
+  Event.auto_migrate!()
+  Person.auto_migrate!()
 end
 
 case ARGV[0]
