@@ -27,7 +27,7 @@ module DataMapper
   module Adapters
 
     java_import org.hibernate.criterion.Restrictions # ie. Restriction.eq
-    java_import org.hibernate.criterion.Order # ie. Order.asc
+    java_import org.hibernate.criterion.Order        # ie. Order.asc
 
     class HibernateAdapter < AbstractAdapter
 
@@ -53,10 +53,10 @@ module DataMapper
         dialect   = options.delete(:dialect)
         username  = options.delete(:username)
         password  = options.delete(:password)
+        driver    = options.delete(:driver)    || DRIVERS[dialect.to_sym]
+        pool_size = options.delete(:pool_size) || "1"
         url       = options.delete(:url)
         url      += "jdbc:" unless url =~ /^jdbc:/
-        driver    = options.delete(:driver) || DRIVERS[dialect.to_sym]
-        pool_size = options.delete(:pool_size) || "1"
 
         super( name, options )
 
@@ -93,8 +93,8 @@ module DataMapper
               session.persist(resource)
               count += 1
             rescue NativeException => e
-              @@logger.debug("error creating #{resource.inspect}", e.cause)
-              session.clear
+              @@logger.debug("error creating #{resource.inspect()}", e.cause())
+              session.clear()
               raise e
             end
           end
@@ -272,7 +272,6 @@ module DataMapper
         end
 
         def unit_of_work( &block )
-          # XXX is it ok?
           # TODO state of the session should be also checked!
           current_tx = current_transaction()
 

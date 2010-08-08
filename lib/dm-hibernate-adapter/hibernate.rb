@@ -280,8 +280,8 @@ module Hibernate
         relationships.each do |property, relationship|
           relationship.child_key
           relationship.parent_key
-          relationship.through if relationship.respond_to?(:through)
-          relationship.via     if relationship.respond_to?(:via)
+          relationship.through    if relationship.respond_to?(:through)
+          relationship.via        if relationship.respond_to?(:via)
         end
         unless mapped?
           discriminator = nil
@@ -380,7 +380,7 @@ module Hibernate
           get_name = "get#{name.to_s.capitalize}"
           set_name = "set#{name.to_s.capitalize}"
 
-          # TODO Time
+          # TODO Time, Discriminator, EmbededValue
           # to consider: in mu opinion those methods should set from/get to java objects...
           if (type == DataMapper::Property::Date)
             class_eval <<-EOT
