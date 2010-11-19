@@ -154,7 +154,7 @@
   </pluginRepositories>
 
   <properties>
-    <jruby.plugins.version>0.23.0-SNAPSHOT</jruby.plugins.version>
+    <jruby.plugins.version>0.20.0-SNAPSHOT</jruby.plugins.version>
     <dm.version>1.0.0</dm.version>
   </properties>
 
@@ -168,6 +168,12 @@
       </extension>
     </extensions>
     <plugins>
+      <plugin>
+        <groupId>de.saumya.mojo</groupId>
+        <artifactId>gem-maven-plugin</artifactId>
+	    <version>${jruby.plugins.version}</version>
+	    <extensions>true</extensions>
+      </plugin>
       <plugin>
         <groupId>de.saumya.mojo</groupId>
         <artifactId>jruby-maven-plugin</artifactId>
