@@ -155,7 +155,7 @@
 
   <properties>
     <jruby.plugins.version>0.23.0-SNAPSHOT</jruby.plugins.version>
-    <dm.version>1.0.0</dm.version>
+    <dm.version>1.0.2</dm.version>
   </properties>
 
   <build>
