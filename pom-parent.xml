@@ -64,16 +64,8 @@
       <url>http://repo1.maven.org/maven2</url>
     </repository>
     <repository>
-      <id>rubygems</id>
-      <releases>
-        <updatePolicy>never</updatePolicy>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <url>http://rubygems.org/gems</url>
-      <layout>gem</layout>
+      <id>rubygems-releases</id>
+      <url>http://gems.saumya.de/releases</url>
     </repository>
   </repositories>
   <pluginRepositories>
@@ -104,7 +96,7 @@
     </plugins>
   </build>
   <properties>
-    <jruby.plugins.version>0.20.0-SNAPSHOT</jruby.plugins.version>
+    <jruby.plugins.version>0.23.0-SNAPSHOT</jruby.plugins.version>
     <jruby.version>1.5.0</jruby.version>
     <dm.version>1.0.0</dm.version>
   </properties>
