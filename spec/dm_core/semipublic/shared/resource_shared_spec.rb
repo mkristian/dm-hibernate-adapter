@@ -9,19 +9,19 @@ share_examples_for 'A semipublic Resource' do
 
   describe '#attribute_dirty?' do
     describe 'on a non-dirty record' do
-      it { @user.attribute_dirty?(:age).should be_false }
+      it { @user.attribute_dirty?(:age).should be(false) }
     end
 
     describe 'on a dirty record' do
       before { @user.age = 100 }
 
-      it { @user.attribute_dirty?(:age).should be_true }
+      it { @user.attribute_dirty?(:age).should be(true) }
     end
 
     describe 'on a new record' do
       before { @user = @user_model.new }
 
-      it { @user.attribute_dirty?(:age).should be_false }
+      it { @user.attribute_dirty?(:age).should be(false) }
     end
   end
 
@@ -160,30 +160,32 @@ share_examples_for 'A semipublic Resource' do
         property :name,  String
         property :value, Integer
       end
+      DataMapper.finalize
     end
 
     with_alternate_adapter do
-      it 'should return the default adapter when nothing is specified' do
-        @user_model.create(:name => 'carl').repository.should == @repository
-        @user_model.new.repository.should                     == @repository
-        @user_model.get('carl').repository.should             == @repository
+      it 'should return the default repository when nothing is specified' do
+        default_repository = DataMapper.repository(:default)
+        @user_model.create(:name => 'carl').repository.should == default_repository
+        @user_model.new.repository.should                     == default_repository
+        @user_model.get('carl').repository.should             == default_repository
       end
 
       it 'should return the default repository for the model' do
         statistic = Statistic.create(:name => 'visits', :value => 2)
-        statistic.repository.should        == @alternate_repository
-        Statistic.new.repository.should    == @alternate_repository
-        Statistic.get(statistic.id).repository.should == @alternate_repository
+        statistic.repository.should        == @repository
+        Statistic.new.repository.should    == @repository
+        Statistic.get(statistic.id).repository.should == @repository
       end
 
       it 'should return the repository defined by the current context' do
-        @alternate_repository.scope do
-          @user_model.new.repository.should                     == @alternate_repository
-          @user_model.create(:name => 'carl').repository.should == @alternate_repository
-          @user_model.get('carl').repository.should             == @alternate_repository
+        @repository.scope do
+          @user_model.new.repository.should                     == @repository
+          @user_model.create(:name => 'carl').repository.should == @repository
+          @user_model.get('carl').repository.should             == @repository
         end
 
-        @alternate_repository.scope { @user_model.get('carl') }.repository.should == @alternate_repository
+        @repository.scope { @user_model.get('carl') }.repository.should == @repository
       end
     end
 

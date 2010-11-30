@@ -25,6 +25,7 @@ describe DataMapper::Property do
       property :format,       String, :default => 'jpeg'
       property :taken_at,     Time,   :default => proc { Time.now }
     end
+    DataMapper.finalize
   end
 
   supported_by :all do
@@ -39,9 +40,9 @@ describe DataMapper::Property do
     end
 
     describe '#custom?' do
-      it 'is true for custom type fields (not provided by dm_core)'
+      it 'is true for custom type fields (not provided by dm-core)'
 
-      it 'is false for core type fields (provided by dm_core)'
+      it 'is false for core type fields (provided by dm-core)'
     end
 
     describe '#default_for' do
@@ -69,36 +70,6 @@ describe DataMapper::Property do
       end
     end
 
-    describe '#get' do
-      before :all do
-        @image = Image.create(:md5hash     => '5268f0f3f452844c79843e820f998869',
-                              :title       => 'Rome at the sunset',
-                              :description => 'Just wow')
-
-        @image.should be_saved
-
-        @image = Image.first(:fields => [ :md5hash, :title ], :md5hash => @image.md5hash)
-      end
-
-      it 'triggers loading for lazy loaded properties' do
-        Image.properties[:description].get(@image)
-        Image.properties[:description].loaded?(@image).should be(true)
-      end
-
-      it 'assigns loaded value to @ivar' do
-        Image.properties[:description].get(@image)
-        @image.instance_variable_get(:@description).should == 'Just wow'
-      end
-
-      it 'sets default value for new records with nil value' do
-        Image.properties[:format].get(@image).should == 'jpeg'
-      end
-
-      it 'returns property value' do
-        Image.properties[:description].get(@image).should == 'Just wow'
-      end
-    end
-
     describe '#get!' do
       before :all do
         @image = Image.new
@@ -116,15 +87,15 @@ describe DataMapper::Property do
 
     describe '#index' do
       it 'returns true when property has an index' do
-        Track.properties[:title].index.should be_true
+        Track.properties[:title].index.should be(true)
       end
 
       it 'returns index name when property has a named index' do
         Track.properties[:album].index.should eql(:artist_album)
       end
 
-      it 'returns nil when property has no index' do
-        Track.properties[:musicbrainz_hash].index.should be_nil
+      it 'returns false when property has no index' do
+        Track.properties[:musicbrainz_hash].index.should be(false)
       end
     end
 
@@ -155,27 +126,27 @@ describe DataMapper::Property do
     describe '#key?' do
       describe 'returns true when property is a ' do
         it 'serial key' do
-          Track.properties[:id].key?.should be_true
+          Track.properties[:id].key?.should be(true)
         end
         it 'natural key' do
-          Image.properties[:md5hash].key?.should be_true
+          Image.properties[:md5hash].key?.should be(true)
         end
       end
 
       it 'returns true when property is a part of composite key'
 
       it 'returns false when property does not relate to a key' do
-        Track.properties[:title].key?.should be_false
+        Track.properties[:title].key?.should be(false)
       end
     end
 
     describe '#lazy?' do
       it 'returns true when property is lazy loaded' do
-        Image.properties[:description].lazy?.should be_true
+        Image.properties[:description].lazy?.should be(true)
       end
 
       it 'returns false when property is not lazy loaded' do
-        Track.properties[:artist].lazy?.should be_false
+        Track.properties[:artist].lazy?.should be(false)
       end
     end
 
@@ -257,59 +228,21 @@ describe DataMapper::Property do
 
     describe '#allow_nil?' do
       it 'returns true when property can accept nil as its value' do
-        Track.properties[:artist].allow_nil?.should be_true
+        Track.properties[:artist].allow_nil?.should be(true)
       end
 
       it 'returns false when property nil value is prohibited for this property' do
-        Image.properties[:title].allow_nil?.should be_false
+        Image.properties[:title].allow_nil?.should be(false)
       end
     end
 
     describe '#serial?' do
       it 'returns true when property is serial (auto incrementing)' do
-        Track.properties[:id].serial?.should be_true
+        Track.properties[:id].serial?.should be(true)
       end
 
       it 'returns false when property is NOT serial (auto incrementing)' do
-        Image.properties[:md5hash].serial?.should be_false
-      end
-    end
-
-    # What's going on here:
-    #
-    # we first set original value and make an assertion on it
-    # then we try to set it again, which clears original value
-    # (since original value is set, property is no longer dirty)
-    describe '#set_original_value' do
-      before :all do
-        @image = Image.create(
-          :md5hash     => '5268f0f3f452844c79843e820f998869',
-          :title       => 'Rome at the sunset',
-          :description => 'Just wow'
-        )
-
-        @property = Image.properties[:title]
-      end
-
-      describe 'when value changes' do
-        before :all do
-          @property.set_original_value(@image, 'New title')
-        end
-
-        it 'sets original value of the property' do
-          @image.original_attributes[@property].should == 'Rome at the sunset'
-        end
-      end
-
-      describe 'when value stays the same' do
-        before :all do
-          @property.set_original_value(@image, 'Rome at the sunset')
-        end
-
-        it 'only sets original value when it has changed' do
-          @property.set_original_value(@image, 'Rome at the sunset')
-          @image.original_attributes.should_not have_key(@property)
-        end
+        Image.properties[:md5hash].serial?.should be(false)
       end
     end
 
@@ -332,11 +265,6 @@ describe DataMapper::Property do
         @property.set(@image, Addressable::URI.parse('http://test.example/'))
         # get a string that has been typecasted using #to_str
         @image.title.should == 'http://test.example/'
-      end
-
-      it 'stores original value' do
-        @property.set(@image, 'Updated value')
-        @image.original_attributes[@property].should == 'Rome at the sunset'
       end
 
       it 'sets new property value' do
@@ -362,27 +290,35 @@ describe DataMapper::Property do
 
     describe '#unique?' do
       it 'is true for fields that explicitly given uniq index' do
-        Track.properties[:musicbrainz_hash].unique?.should be_true
+        Track.properties[:musicbrainz_hash].unique?.should be(true)
       end
 
       it 'is true for serial fields' do
         pending do
-          Track.properties[:title].unique?.should be_true
+          Track.properties[:title].unique?.should be(true)
         end
       end
 
       it 'is true for keys' do
-        Image.properties[:md5hash].unique?.should be_true
+        Image.properties[:md5hash].unique?.should be(true)
       end
     end
 
     describe '#unique_index' do
       it 'returns true when property has unique index' do
-        Track.properties[:musicbrainz_hash].unique_index.should be_true
+        Track.properties[:musicbrainz_hash].unique_index.should be(true)
       end
 
-      it 'returns nil when property has no unique index' do
-        Image.properties[:title].unique_index.should be_nil
+      it 'returns false when property has no unique index' do
+        Track.properties[:title].unique_index.should be(false)
+      end
+
+      it 'returns true when property is unique' do
+        Image.properties[:title].unique_index.should be(true)
+      end
+
+      it 'returns :key when property is a key' do
+        Track.properties[:id].unique_index.should == :key
       end
     end
 

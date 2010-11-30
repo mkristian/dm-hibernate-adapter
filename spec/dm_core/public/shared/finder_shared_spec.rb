@@ -21,6 +21,10 @@ share_examples_for 'Finder Interface' do
     pending if @skip
   end
 
+  it 'should be Enumerable' do
+    @articles.should be_kind_of(Enumerable)
+  end
+
   [ :[], :slice ].each do |method|
     it { @articles.should respond_to(method) }
 
@@ -880,6 +884,71 @@ share_examples_for 'Finder Interface' do
     end
   end
 
+  it { @articles.should respond_to(:each) }
+
+  describe '#each' do
+    subject { @articles.each(&block) }
+
+    let(:yields) { []                                       }
+    let(:block)  { lambda { |resource| yields << resource } }
+
+    before do
+      @copy = @articles.kind_of?(Class) ? @articles : @articles.dup
+      @copy.to_a
+    end
+
+    it { should equal(@articles) }
+
+    it { method(:subject).should change { yields.dup }.from([]).to(@copy.to_a) }
+  end
+
+  it { @articles.should respond_to(:fetch) }
+
+  describe '#fetch' do
+    subject { @articles.fetch(*args, &block) }
+
+    let(:block) { nil }
+
+    context 'with a valid index and no default' do
+      let(:args) { [ 0 ] }
+
+      before do
+        @copy = @articles.kind_of?(Class) ? @articles : @articles.dup
+        @copy.to_a
+      end
+
+      should_not_be_a_kicker
+
+      it { should be_kind_of(DataMapper::Resource) }
+
+      it { should == @copy.entries.fetch(*args) }
+    end
+
+    context 'with an invalid index and no default' do
+      let(:args) { [ 42 ] }
+
+      it { method(:subject).should raise_error(IndexError) }
+    end
+
+    context 'with an invalid index and a default' do
+      let(:default) { mock('Default') }
+      let(:args)    { [ 42, default ] }
+
+      it { should equal(default) }
+    end
+
+    context 'with an invalid index and a block default' do
+      let(:yields)  { []                                          }
+      let(:default) { mock('Default')                             }
+      let(:block)   { lambda { |index| yields << index; default } }
+      let(:args)    { [ 42 ]                                      }
+
+      it { should equal(default) }
+
+      it { method(:subject).should change { yields.dup }.from([]).to([ 42 ]) }
+    end
+  end
+
   it { @articles.should respond_to(:first) }
 
   describe '#first' do
@@ -1200,6 +1269,16 @@ share_examples_for 'Finder Interface' do
       it 'should should be the last Resource in the Collection matching the query' do
         @resource.should == @article
       end
+
+      it 'should not update the original query order' do
+        collection     = @articles.all(:order => [ :title ])
+        original_order = collection.query.order[0].dup
+        last           = collection.last(:content => 'Sample')
+
+        last.should == @resource
+
+        collection.query.order[0].should == original_order
+      end
     end
 
     describe 'with a limit specified' do
@@ -1269,6 +1348,37 @@ share_examples_for 'Finder Interface' do
     end
   end
 
+  it { @articles.should respond_to(:values_at) }
+
+  describe '#values_at' do
+    subject { @articles.values_at(*args) }
+
+    before :all do
+      @copy = @articles.kind_of?(Class) ? @articles : @articles.dup
+      @copy.to_a
+    end
+
+    context 'with positive offset' do
+      let(:args) { [ 0 ] }
+
+      should_not_be_a_kicker
+
+      it { should be_kind_of(Array) }
+
+      it { should == @copy.entries.values_at(*args) }
+    end
+
+    describe 'with negative offset' do
+      let(:args) { [ -1 ] }
+
+      should_not_be_a_kicker
+
+      it { should be_kind_of(Array) }
+
+      it { should == @copy.entries.values_at(*args) }
+    end
+  end
+
   it 'should respond to a belongs_to relationship method with #method_missing' do
     pending_if 'Model#method_missing should delegate to relationships', @articles.kind_of?(Class) do
       @articles.should respond_to(:original)
@@ -1325,8 +1435,7 @@ share_examples_for 'Finder Interface' do
         @article.previous = @new
         @new.previous     = @other
 
-        @article.save
-        @new.save
+        @article.save.should be(true)
       end
 
       describe 'with no arguments' do
@@ -1388,8 +1497,7 @@ share_examples_for 'Finder Interface' do
         @article.revisions << @new
         @new.revisions     << @other
 
-        @article.save
-        @new.save
+        @article.save.should be(true)
       end
 
       describe 'with no arguments' do

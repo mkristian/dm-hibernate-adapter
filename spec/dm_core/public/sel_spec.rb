@@ -26,6 +26,8 @@ describe 'SEL', 'with STI subclasses' do
       class Comment < Message; end
     end
 
+    DataMapper.finalize
+
     @author_model  = Blog::Author
     @message_model = Blog::Message
     @article_model = Blog::Article
@@ -34,22 +36,12 @@ describe 'SEL', 'with STI subclasses' do
 
   supported_by :all do
     before :all do
-      @skip = defined?(DataMapper::Adapters::YamlAdapter) && @adapter.kind_of?(DataMapper::Adapters::YamlAdapter)
-    end
+      author1 = @author_model.create(:name => 'Dan Kubb')
+      author2 = @author_model.create(:name => 'Sindre Aarsaether')
 
-    before :all do
-      rescue_if 'TODO: fix YAML serialization/deserialization', @skip do
-        author1 = @author_model.create(:name => 'Dan Kubb')
-        author2 = @author_model.create(:name => 'Sindre Aarsaether')
-
-        @article_model.create(:title => 'SEL',               :author => author1)
-        @article_model.create(:title => 'STI',               :author => author1)
-        @comment_model.create(:title => 'SEL and STI error', :author => author2)
-      end
-    end
-
-    before do
-      pending if @skip
+      @article_model.create(:title => 'SEL',               :author => author1)
+      @article_model.create(:title => 'STI',               :author => author1)
+      @comment_model.create(:title => 'SEL and STI error', :author => author2)
     end
 
     it 'should allow STI loading of mixed relationships' do

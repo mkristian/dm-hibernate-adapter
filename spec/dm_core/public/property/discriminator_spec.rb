@@ -1,6 +1,6 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'spec_helper'))
 
-describe DataMapper::Types::Discriminator do
+describe DataMapper::Property::Discriminator do
   before :all do
     module ::Blog
       class Article
@@ -14,6 +14,7 @@ describe DataMapper::Types::Discriminator do
       class Announcement < Article; end
       class Release < Announcement; end
     end
+    DataMapper.finalize
 
     @article_model      = Blog::Article
     @announcement_model = Blog::Announcement
@@ -70,45 +71,35 @@ describe DataMapper::Types::Discriminator do
 
   describe 'Model#descendants' do
     it 'should set the descendants for the grandparent model' do
-      @article_model.descendants.to_a.should == [ @article_model, @announcement_model, @release_model ]
+      @article_model.descendants.to_a.should =~ [ @announcement_model, @release_model ]
     end
 
     it 'should set the descendants for the parent model' do
-      @announcement_model.descendants.to_a.should == [ @announcement_model, @release_model ]
+      @announcement_model.descendants.to_a.should == [ @release_model ]
     end
 
     it 'should set the descendants for the child model' do
-      @release_model.descendants.to_a.should == [ @release_model ]
+      @release_model.descendants.to_a.should == []
     end
   end
 
   describe 'Model#default_scope' do
     it 'should set the default scope for the grandparent model' do
-      @article_model.default_scope[:type].should equal(@article_model.descendants)
+      @article_model.default_scope[:type].to_a.should =~ [ @article_model, @announcement_model, @release_model ]
     end
 
     it 'should set the default scope for the parent model' do
-      @announcement_model.default_scope[:type].should equal(@announcement_model.descendants)
+      @announcement_model.default_scope[:type].to_a.should =~ [ @announcement_model, @release_model ]
     end
 
     it 'should set the default scope for the child model' do
-      @release_model.default_scope[:type].should equal(@release_model.descendants)
+      @release_model.default_scope[:type].to_a.should == [ @release_model ]
     end
   end
 
   supported_by :all do
     before :all do
-      @skip = defined?(DataMapper::Adapters::YamlAdapter) && @adapter.kind_of?(DataMapper::Adapters::YamlAdapter)
-    end
-
-    before do
-      pending if @skip
-    end
-
-    before :all do
-      rescue_if 'TODO: fix YAML serialization/deserialization', @skip do
-        @announcement = @announcement_model.create(:title => 'Announcement')
-      end
+      @announcement = @announcement_model.create(:title => 'Announcement')
     end
 
     it 'should persist the type' do

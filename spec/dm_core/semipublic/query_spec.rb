@@ -9,8 +9,7 @@ require 'ostruct'
 # class methods
 describe DataMapper::Query do
   before :all do
-    class ::Password < DataMapper::Type
-      primitive String
+    class ::Password < DataMapper::Property::String
       length    40
     end
 
@@ -19,7 +18,7 @@ describe DataMapper::Query do
 
       property :name,     String,   :key => true
       property :password, Password
-      property :balance,  BigDecimal
+      property :balance,  Decimal
 
       belongs_to :referrer, self, :required => false
       has n, :referrals, self, :inverse => :referrer
@@ -202,7 +201,7 @@ describe DataMapper::Query do
       describe 'that is an Array containing an unknown Property' do
         it 'should raise an exception' do
           lambda {
-            DataMapper::Query.new(@repository, @model, @options.update(:fields => [ DataMapper::Property.new(@model, :unknown, String) ]))
+            DataMapper::Query.new(@repository, @model, @options.update(:fields => [ DataMapper::Property::String.new(@model, :unknown) ]))
           }.should raise_error(ArgumentError, "+options[:field]+ entry :unknown does not map to a property in #{@model}")
         end
       end
@@ -688,7 +687,7 @@ describe DataMapper::Query do
           end
         end
 
-        describe 'with a Float for a BigDecimal property' do
+        describe 'with a Float for a Decimal property' do
           before :all do
             @options[:conditions] = { :balance => 50.5 }
             @return = DataMapper::Query.new(@repository, @model, @options.freeze)
@@ -1082,7 +1081,7 @@ describe DataMapper::Query do
 
       describe 'that contains a Query::Direction with a property that is not part of the model' do
         before :all do
-          @property = DataMapper::Property.new(@model, :unknown, String)
+          @property = DataMapper::Property::String.new(@model, :unknown)
           @direction = DataMapper::Query::Direction.new(@property, :desc)
         end
 
@@ -1111,7 +1110,7 @@ describe DataMapper::Query do
 
       describe 'that contains a Property that is not part of the model' do
         before :all do
-          @property = DataMapper::Property.new(@model, :unknown, String)
+          @property = DataMapper::Property::String.new(@model, :unknown)
         end
 
         it 'should raise an exception' do
@@ -1307,9 +1306,8 @@ describe DataMapper::Query do
       property :id, Serial
     end
 
-    # TODO: figure out how to remove these
-    User.send(:assert_valid)
-    Other.send(:assert_valid)
+    # finalize the models
+    DataMapper.finalize
 
     @repository = DataMapper::Repository.new(:default)
     @model      = User
@@ -1342,7 +1340,7 @@ describe DataMapper::Query do
         @return = @query == @query
       end
 
-      it { @return.should be_true }
+      it { @return.should be(true) }
     end
 
     describe 'when other is equivalent' do
@@ -1350,7 +1348,7 @@ describe DataMapper::Query do
         @return = @query == @query.dup
       end
 
-      it { @return.should be_true }
+      it { @return.should be(true) }
     end
 
     DataMapper::Query::OPTIONS.each do |name|
@@ -1359,7 +1357,7 @@ describe DataMapper::Query do
           @return = @query == @query.merge(name => @other_options[name])
         end
 
-        it { @return.should be_false }
+        it { @return.should be(false) }
       end
     end
 
@@ -1382,7 +1380,7 @@ describe DataMapper::Query do
         @return = @query == @other
       end
 
-      it { @return.should be_true }
+      it { @return.should be(false) }
     end
 
     describe 'when other is a different type of object that can be compared, and is not equivalent' do
@@ -1404,7 +1402,7 @@ describe DataMapper::Query do
         @return = @query == @other
       end
 
-      it { @return.should be_false }
+      it { @return.should be(false) }
     end
 
     describe 'when other is a different type of object that cannot be compared' do
@@ -1412,7 +1410,7 @@ describe DataMapper::Query do
         @return = @query == 'invalid'
       end
 
-      it { @return.should be_false }
+      it { @return.should be(false) }
     end
   end
 
@@ -1825,7 +1823,7 @@ describe DataMapper::Query do
         @return = @query.eql?(@query)
       end
 
-      it { @return.should be_true }
+      it { @return.should be(true) }
     end
 
     describe 'when other is eql' do
@@ -1833,7 +1831,7 @@ describe DataMapper::Query do
         @return = @query.eql?(@query.dup)
       end
 
-      it { @return.should be_true }
+      it { @return.should be(true) }
     end
 
     DataMapper::Query::OPTIONS.each do |name|
@@ -1842,7 +1840,7 @@ describe DataMapper::Query do
           @return = @query.eql?(@query.merge(name => @other_options[name]))
         end
 
-        it { @return.should be_false }
+        it { @return.should be(false) }
       end
     end
 
@@ -1865,7 +1863,7 @@ describe DataMapper::Query do
         @return = @query.eql?(@other)
       end
 
-      it { @return.should be_false }
+      it { @return.should be(false) }
     end
   end
 
@@ -1925,10 +1923,10 @@ describe DataMapper::Query do
         #<DataMapper::Query
           @repository=:default
           @model=User
-          @fields=[#<DataMapper::Property @model=User @name=:name>, #<DataMapper::Property @model=User @name=:citizenship>, #<DataMapper::Property @model=User @name=:referrer_name>]
+          @fields=[#<DataMapper::Property::String @model=User @name=:name>, #<DataMapper::Property::String @model=User @name=:citizenship>, #<DataMapper::Property::String @model=User @name=:referrer_name>]
           @links=[]
           @conditions=nil
-          @order=[#<DataMapper::Query::Direction @target=#<DataMapper::Property @model=User @name=:name> @operator=:asc>]
+          @order=[#<DataMapper::Query::Direction @target=#<DataMapper::Property::String @model=User @name=:name> @operator=:asc>]
           @limit=3
           @offset=0
           @reload=false

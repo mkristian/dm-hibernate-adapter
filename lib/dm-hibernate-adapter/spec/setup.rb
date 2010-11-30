@@ -5,10 +5,11 @@ module DataMapper
   module Spec
     module Adapters
 
-      class HibernateAdapter < AbstractAdapter
+      class HibernateAdapter < Adapter
       end
 
       use HibernateAdapter
+
 
     end
   end

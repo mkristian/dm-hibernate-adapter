@@ -6,8 +6,6 @@ describe DataMapper::Resource do
       class User
         include DataMapper::Resource
 
-        property :id,   Serial
-
         property :name,        String, :key => true
         property :age,         Integer
         property :summary,     Text
@@ -61,6 +59,7 @@ describe DataMapper::Resource do
 
       property :name, String, :key => true, :default => 'a default value'
     end
+    DataMapper.finalize
 
     @user_model      = Blog::User
     @author_model    = Blog::Author
@@ -71,7 +70,6 @@ describe DataMapper::Resource do
 
   supported_by :all do
     before :all do
-
       user = @user_model.create(:name => 'dbussink', :age => 25, :description => 'Test')
 
       @user = @user_model.get(*user.key)
@@ -79,5 +77,108 @@ describe DataMapper::Resource do
 
     it_should_behave_like 'A public Resource'
     it_should_behave_like 'A Resource supporting Strategic Eager Loading'
+
+    it 'A resource should respond to raise_on_save_failure' do
+      @user.should respond_to(:raise_on_save_failure)
+    end
+
+    describe '#raise_on_save_failure' do
+      after do
+        # reset to the default value
+        reset_raise_on_save_failure(@user_model)
+        reset_raise_on_save_failure(@user)
+      end
+
+      subject { @user.raise_on_save_failure }
+
+      describe 'when model.raise_on_save_failure has not been set' do
+        it { should be(false) }
+      end
+
+      describe 'when model.raise_on_save_failure has been set to true' do
+        before do
+          @user_model.raise_on_save_failure = true
+        end
+
+        it { should be(true) }
+      end
+
+      describe 'when resource.raise_on_save_failure has been set to true' do
+        before do
+          @user.raise_on_save_failure = true
+        end
+
+        it { should be(true) }
+      end
+    end
+
+    it 'A model should respond to raise_on_save_failure=' do
+      @user_model.should respond_to(:raise_on_save_failure=)
+    end
+
+    describe '#raise_on_save_failure=' do
+      after do
+        # reset to the default value
+        @user_model.raise_on_save_failure = false
+      end
+
+      subject { @user_model.raise_on_save_failure = @value }
+
+      describe 'with a true value' do
+        before do
+          @value = true
+        end
+
+        it { should be(true) }
+
+        it 'should set raise_on_save_failure' do
+          method(:subject).should change {
+            @user_model.raise_on_save_failure
+          }.from(false).to(true)
+        end
+      end
+
+      describe 'with a false value' do
+        before do
+          @value = false
+        end
+
+        it { should be(false) }
+
+        it 'should set raise_on_save_failure' do
+          method(:subject).should_not change {
+            @user_model.raise_on_save_failure
+          }
+        end
+      end
+    end
+
+    [ :save, :save! ].each do |method|
+      describe "##{method}" do
+        subject { @user.__send__(method) }
+
+        describe 'when raise_on_save_failure is true' do
+          before do
+            @user.raise_on_save_failure = true
+          end
+
+          describe 'and it is a savable resource' do
+            it { should be(true) }
+          end
+
+          describe 'and it is an invalid resource' do
+            before do
+              @user.name = nil  # name is required
+            end
+
+            it 'should raise an exception' do
+              method(:subject).should raise_error(DataMapper::SaveFailureError, "Blog::User##{method} returned false, Blog::User was not saved") { |error|
+                error.resource.should equal(@user)
+              }
+            end
+          end
+        end
+      end
+    end
   end
 end

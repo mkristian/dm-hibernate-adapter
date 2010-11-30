@@ -1,22 +1,17 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'spec_helper'))
 
 describe DataMapper::Model::Property do
-  before :all do
-    Object.const_remove(:ModelPropertySpecs) if defined?(ModelPropertySpecs)
+  before :each do
+    Object.send(:remove_const, :ModelPropertySpecs) if defined?(ModelPropertySpecs)
     class ::ModelPropertySpecs
       include DataMapper::Resource
 
       property :id, Serial
     end
+    DataMapper.finalize
   end
 
   describe '#property' do
-    after do
-      [ :name, :name= ].each do |method|
-        next unless ModelPropertySpecs.method_defined?(method)
-        ModelPropertySpecs.send(:undef_method, method)
-      end
-    end
 
     subject { ModelPropertySpecs.property(:name, String) }
 

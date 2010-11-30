@@ -47,6 +47,7 @@ shared_examples_for 'DataMapper::Query::Conditions::AbstractOperation' do
         property :title, String, :required => true
       end
     end
+    DataMapper.finalize
 
     @model = Blog::Article
   end
@@ -105,19 +106,19 @@ shared_examples_for 'DataMapper::Query::Conditions::AbstractOperation' do
 
   describe '#==' do
     describe 'when the other AbstractOperation is equal' do
-      # artifically modify the object so #eql? will throw an
+      # artificially modify the object so #== will throw an
       # exception if the equal? branch is not followed when heckling
-      before { @operation.meta_class.send(:undef_method, :slug) }
+      before { @operation.singleton_class.send(:undef_method, :slug) }
 
       subject { @operation == @operation }
 
-      it { should be_true }
+      it { should be(true) }
     end
 
     describe 'when the other AbstractOperation is the same class' do
       subject { @operation == DataMapper::Query::Conditions::Operation.new(@slug) }
 
-      it { should be_true }
+      it { should be(true) }
     end
 
     describe 'when the other AbstractOperation is a different class, with the same slug' do
@@ -125,7 +126,7 @@ shared_examples_for 'DataMapper::Query::Conditions::AbstractOperation' do
 
       subject { @operation == @other }
 
-      it { should be_true }
+      it { should be(false) }
 
       # reset the OtherOperation slug
       after { @other.class.slug(:other) }
@@ -134,7 +135,7 @@ shared_examples_for 'DataMapper::Query::Conditions::AbstractOperation' do
     describe 'when the other AbstractOperation is the same class, with different operands' do
       subject { @operation == DataMapper::Query::Conditions::Operation.new(@slug, @comparison) }
 
-      it { should be_false }
+      it { should be(false) }
     end
   end
 
@@ -245,31 +246,31 @@ shared_examples_for 'DataMapper::Query::Conditions::AbstractOperation' do
 
   describe '#eql?' do
     describe 'when the other AbstractOperation is equal' do
-      # artifically modify the object so #eql? will throw an
+      # artificially modify the object so #eql? will throw an
       # exception if the equal? branch is not followed when heckling
-      before { @operation.meta_class.send(:undef_method, :slug) }
+      before { @operation.singleton_class.send(:undef_method, :slug) }
 
       subject { @operation.eql?(@operation) }
 
-      it { should be_true }
+      it { should be(true) }
     end
 
     describe 'when the other AbstractOperation is the same class' do
       subject { @operation.eql?(DataMapper::Query::Conditions::Operation.new(@slug)) }
 
-      it { should be_true }
+      it { should be(true) }
     end
 
     describe 'when the other AbstractOperation is a different class' do
       subject { @operation.eql?(DataMapper::Query::Conditions::Operation.new(:other)) }
 
-      it { should be_false }
+      it { should be(false) }
     end
 
     describe 'when the other AbstractOperation is the same class, with different operands' do
       subject { @operation.eql?(DataMapper::Query::Conditions::Operation.new(@slug, @comparison)) }
 
-      it { should be_false }
+      it { should be(false) }
     end
 
     describe 'when operations contain more than one operand' do
@@ -278,7 +279,9 @@ shared_examples_for 'DataMapper::Query::Conditions::AbstractOperation' do
         @other = @operation.dup
       end
 
-      it { should be_true }
+      subject { @operation.eql?(@other) }
+
+      it { should be(true) }
     end
   end
 
@@ -416,7 +419,7 @@ shared_examples_for 'DataMapper::Query::Conditions::AbstractOperation' do
     subject { @operation.valid? }
 
     describe 'with no operands' do
-      it { should be_false }
+      it { should be(false) }
     end
 
     describe 'with an operand that responds to #valid?' do
@@ -425,7 +428,7 @@ shared_examples_for 'DataMapper::Query::Conditions::AbstractOperation' do
           @operation << @comparison
         end
 
-        it { should be_true }
+        it { should be(true) }
       end
 
       describe 'and is not valid' do
@@ -433,7 +436,7 @@ shared_examples_for 'DataMapper::Query::Conditions::AbstractOperation' do
           @operation << @or_operation.dup
         end
 
-        it { should be_false }
+        it { should be(false) }
       end
     end
 
@@ -442,7 +445,7 @@ shared_examples_for 'DataMapper::Query::Conditions::AbstractOperation' do
         @operation << [ 'raw = 1' ]
       end
 
-      it { should be_true }
+      it { should be(true) }
     end
   end
 end
@@ -538,7 +541,7 @@ describe DataMapper::Query::Conditions::AndOperation do
 
       subject { @operation.negated? }
 
-      it { should be_true }
+      it { should be(true) }
     end
 
     describe 'with a not negated parent' do
@@ -548,7 +551,7 @@ describe DataMapper::Query::Conditions::AndOperation do
 
       subject { @operation.negated? }
 
-      it { should be_false }
+      it { should be(false) }
     end
 
     describe 'after memoizing the negation, and switching parents' do
@@ -560,7 +563,7 @@ describe DataMapper::Query::Conditions::AndOperation do
 
       subject { @operation.negated? }
 
-      it { should be_true }
+      it { should be(true) }
     end
   end
 
@@ -575,25 +578,25 @@ describe DataMapper::Query::Conditions::AndOperation do
       describe 'with a matching Hash' do
         subject { @operation.matches?('title' => 'A title', 'id' => 1) }
 
-        it { should be_true }
+        it { should be(true) }
       end
 
       describe 'with a not matching Hash' do
         subject { @operation.matches?('title' => 'Not matching', 'id' => 1) }
 
-        it { should be_false }
+        it { should be(false) }
       end
 
       describe 'with a matching Resource' do
         subject { @operation.matches?(@model.new(:title => 'A title', :id => 1)) }
 
-        it { should be_true }
+        it { should be(true) }
       end
 
       describe 'with a not matching Resource' do
         subject { @operation.matches?(@model.new(:title => 'Not matching', :id => 1)) }
 
-        it { should be_false }
+        it { should be(false) }
       end
 
       describe 'with a raw condition' do
@@ -603,7 +606,7 @@ describe DataMapper::Query::Conditions::AndOperation do
 
         subject { @operation.matches?('title' => 'A title', 'id' => 1) }
 
-        it { should be_true }
+        it { should be(true) }
       end
     end
   end
@@ -722,7 +725,7 @@ describe DataMapper::Query::Conditions::AndOperation do
 
       subject { @operation.valid? }
 
-      it { should be_false }
+      it { should be(false) }
     end
 
     describe 'with one invalid operand' do
@@ -732,7 +735,7 @@ describe DataMapper::Query::Conditions::AndOperation do
 
       subject { @operation.valid? }
 
-      it { should be_false }
+      it { should be(false) }
     end
   end
 end
@@ -789,7 +792,7 @@ describe DataMapper::Query::Conditions::OrOperation do
 
       subject { @operation.negated? }
 
-      it { should be_true }
+      it { should be(true) }
     end
 
     describe 'with a not negated parent' do
@@ -799,7 +802,7 @@ describe DataMapper::Query::Conditions::OrOperation do
 
       subject { @operation.negated? }
 
-      it { should be_false }
+      it { should be(false) }
     end
 
     describe 'after memoizing the negation, and switching parents' do
@@ -811,7 +814,7 @@ describe DataMapper::Query::Conditions::OrOperation do
 
       subject { @operation.negated? }
 
-      it { should be_true }
+      it { should be(true) }
     end
   end
 
@@ -826,25 +829,25 @@ describe DataMapper::Query::Conditions::OrOperation do
       describe 'with a matching Hash' do
         subject { @operation.matches?('title' => 'A title', 'id' => 2) }
 
-        it { should be_true }
+        it { should be(true) }
       end
 
       describe 'with a not matching Hash' do
         subject { @operation.matches?('title' => 'Not matching', 'id' => 2) }
 
-        it { should be_false }
+        it { should be(false) }
       end
 
       describe 'with a matching Resource' do
         subject { @operation.matches?(@model.new(:title => 'A title', :id => 2)) }
 
-        it { should be_true }
+        it { should be(true) }
       end
 
       describe 'with a not matching Resource' do
         subject { @operation.matches?(@model.new(:title => 'Not matching', :id => 2)) }
 
-        it { should be_false }
+        it { should be(false) }
       end
 
       describe 'with a raw condition' do
@@ -854,7 +857,7 @@ describe DataMapper::Query::Conditions::OrOperation do
 
         subject { @operation.matches?('title' => 'A title', 'id' => 2) }
 
-        it { should be_true }
+        it { should be(true) }
       end
     end
   end
@@ -944,7 +947,7 @@ describe DataMapper::Query::Conditions::OrOperation do
 
       subject { @operation.valid? }
 
-      it { should be_true }
+      it { should be(true) }
     end
 
     describe 'with one invalid operand' do
@@ -954,7 +957,7 @@ describe DataMapper::Query::Conditions::OrOperation do
 
       subject { @operation.valid? }
 
-      it { should be_false }
+      it { should be(false) }
     end
   end
 end
@@ -1017,7 +1020,7 @@ describe DataMapper::Query::Conditions::NotOperation do
 
       subject { @operation.negated? }
 
-      it { should be_false }
+      it { should be(false) }
     end
 
     describe 'with a not negated parent' do
@@ -1027,7 +1030,7 @@ describe DataMapper::Query::Conditions::NotOperation do
 
       subject { @operation.negated? }
 
-      it { should be_true }
+      it { should be(true) }
     end
 
     describe 'after memoizing the negation, and switching parents' do
@@ -1039,7 +1042,7 @@ describe DataMapper::Query::Conditions::NotOperation do
 
       subject { @operation.negated? }
 
-      it { should be_false }
+      it { should be(false) }
     end
   end
 
@@ -1054,25 +1057,25 @@ describe DataMapper::Query::Conditions::NotOperation do
       describe 'with a matching Hash' do
         subject { @operation.matches?('id' => 2) }
 
-        it { should be_true }
+        it { should be(true) }
       end
 
       describe 'with a not matching Hash' do
         subject { @operation.matches?('id' => 1) }
 
-        it { should be_false }
+        it { should be(false) }
       end
 
       describe 'with a matching Resource' do
         subject { @operation.matches?(@model.new(:id => 2)) }
 
-        it { should be_true }
+        it { should be(true) }
       end
 
       describe 'with a not matching Hash' do
         subject { @operation.matches?(@model.new(:id => 1)) }
 
-        it { should be_false }
+        it { should be(false) }
       end
 
       describe 'with a raw condition' do
@@ -1082,7 +1085,7 @@ describe DataMapper::Query::Conditions::NotOperation do
 
         subject { @operation.matches?('id' => 2) }
 
-        it { should be_true }
+        it { should be(true) }
       end
     end
   end
@@ -1201,7 +1204,7 @@ describe DataMapper::Query::Conditions::NotOperation do
 
       subject { @operation.valid? }
 
-      it { should be_false }
+      it { should be(false) }
     end
   end
 end
@@ -1242,19 +1245,19 @@ describe DataMapper::Query::Conditions::NullOperation do
     describe 'with a Hash' do
       subject { @operation.matches?({}) }
 
-      it { should be_true }
+      it { should be(true) }
     end
 
     describe 'with a Resource' do
       subject { @operation.matches?(Blog::Article.new) }
 
-      it { should be_true }
+      it { should be(true) }
     end
 
     describe 'with any other Object' do
       subject { @operation.matches?(Object.new) }
 
-      it { should be_false }
+      it { should be(false) }
     end
   end
 
@@ -1271,7 +1274,7 @@ describe DataMapper::Query::Conditions::NullOperation do
   describe '#valid?' do
     subject { @operation.valid? }
 
-    it { should be_true }
+    it { should be(true) }
   end
 
   it { should respond_to(:nil?) }
@@ -1279,7 +1282,7 @@ describe DataMapper::Query::Conditions::NullOperation do
   describe '#nil?' do
     subject { @operation.nil? }
 
-    it { should be_true }
+    it { should be(true) }
   end
 
   it { should respond_to(:inspect) }
