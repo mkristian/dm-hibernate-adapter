@@ -1,5 +1,17 @@
 require 'java'
 begin
+  # This is only temporary solution
+  require "maven/org.slf4j/slf4j-api"
+  require "maven/log4j/log4j"
+  require "maven/javassist/javassist"
+  require "maven/javax.transaction/jta"
+  require "maven/com.h2database/h2"
+  
+  require "maven/org.hibernate/hibernate-core"
+  require "maven/org.hibernate/hibernate-annotations"
+  require "maven/org.hibernate/hibernate-tools"
+
+
   require 'dm-hibernate-adapter_ext.jar'
 rescue LoadError
   warn "missing extension jar, may it is already in the parent classloader"
