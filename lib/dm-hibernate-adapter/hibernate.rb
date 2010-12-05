@@ -37,7 +37,7 @@ module Hibernate
   def self.connection_pool_size=(size)
     config.set_property "hibernate.connection.pool_size", size
   end
-  
+
   class PropertyShim
     def initialize(config)
       @config = config
@@ -85,7 +85,7 @@ module Hibernate
       raise( "not supported" )
     end
   end
-  
+
   def self.factory()
     @factory ||= config.build_session_factory()
   end
@@ -168,7 +168,7 @@ module Hibernate
               wrapped_create(attributes)
             end
 
-            def self.all(query = nil)
+            def self.all(query = {})
               hibernate!
               wrapped_all(query)
             end
@@ -425,7 +425,7 @@ module Hibernate
               end
             EOT
             class_eval <<-EOT
-              def  #{get_name.intern}                                     
+              def  #{get_name.intern}
                 d = attribute_get(:#{name} )
                 d
               end

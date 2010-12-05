@@ -12,7 +12,7 @@ setup the gems
 
 run the eventlog - list
 
-    mvn ruby:jruby -Djruby.args="eventlog.rb list"
+    mvn ruby:jruby -Dargs="eventlog.rb list"
 
 run the eventlog - store
 
