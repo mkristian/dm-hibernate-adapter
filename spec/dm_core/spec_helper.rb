@@ -1,9 +1,12 @@
 require 'pathname'
 require 'rubygems'
 require 'spec'
+require 'dm-transactions'
+require 'dm-migrations'
 require 'dm-hibernate-adapter/spec/setup'
 
-ENV['ADAPTER'] ||= 'in_memory'
+ENV['ADAPTER'] = 'hibernate'
+ENV['ADAPTER_SUPPORTS'] = 'all'
 
 SPEC_ROOT = Pathname(__FILE__).dirname.expand_path
 LIB_ROOT = $:.select{|path| path =~ /.+dm-core.+lib/}.first
@@ -11,12 +14,17 @@ LIB_ROOT = $:.select{|path| path =~ /.+dm-core.+lib/}.first
 Pathname.glob((LIB_ROOT  + '/dm-core/spec/**/*.rb'          ).to_s).each { |file| require file }
 Pathname.glob((SPEC_ROOT + '{lib,support,*/shared}/**/*.rb').to_s).each { |file| require file }
 
-
 Spec::Runner.configure do |config|
 
   config.extend( DataMapper::Spec::Adapters::Helpers)
   config.include(DataMapper::Spec::PendingHelpers)
   config.include(DataMapper::Spec::Helpers)
+
+  config.before :all do
+    @adapter = DataMapper.setup(:default, :adapter => "hibernate", :dialect => "H2", :username => "sa", :url => "jdbc:h2:target/jibernate")
+
+    @repository = DataMapper.repository(@adapter.name)
+  end
 
   config.after :all do
     DataMapper::Spec.cleanup_models
