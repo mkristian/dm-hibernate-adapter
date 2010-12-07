@@ -54,6 +54,10 @@ you can switch the jruby version by adding to the above commands
 
         -Djruby.version=1.5.3
 
+if you are getting OutOfMemory errors, you should try to tune jruby-maven-plugin's settings
+
+        https://github.com/mkristian/jruby-maven-plugins
+
 Rails 2.3.5 demo
 ----------------
 
