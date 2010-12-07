@@ -20,12 +20,6 @@ Spec::Runner.configure do |config|
   config.include(DataMapper::Spec::PendingHelpers)
   config.include(DataMapper::Spec::Helpers)
 
-  config.before :all do
-    @adapter = DataMapper.setup(:default, :adapter => "hibernate", :dialect => "H2", :username => "sa", :url => "jdbc:h2:target/jibernate")
-
-    @repository = DataMapper.repository(@adapter.name)
-  end
-
   config.after :all do
     DataMapper::Spec.cleanup_models
   end
