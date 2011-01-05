@@ -137,105 +137,12 @@ module Hibernate
       # <monkey-patching>
       # if class wasn't mapped before
       unless model.mapped?
+        [:auto_migrate!, :auto_upgrade!, :create, :all, :copy, :first, :first_or_create, :first_or_new, :get, :last, :load].each do |method|
+          model.before_class_method(method, :hibernate!)
+        end
 
-        # what about performance ?
-        unless model.respond_to? :wrapped_create
-          model.instance_eval do
-            alias :wrapped_auto_migrate!   :auto_migrate!
-            alias :wrapped_auto_upgrade!   :auto_upgrade!
-            alias :wrapped_create          :create
-            alias :wrapped_all             :all
-            alias :wrapped_copy            :copy
-            alias :wrapped_first           :first
-            alias :wrapped_first_or_create :first_or_create
-            alias :wrapped_first_or_new    :first_or_new
-            alias :wrapped_get             :get
-            alias :wrapped_last            :last
-            alias :wrapped_load            :load
-
-            def self.auto_migrate!(repo = nil)
-              hibernate!
-              wrapped_auto_migrate!(repo)
-            end
-
-            def self.auto_upgrade!(repo = nil)
-              hibernate!
-              wrapped_auto_upgrade!(repo)
-            end
-
-            def self.create(attributes = {})
-              hibernate!
-              wrapped_create(attributes)
-            end
-
-            def self.all(query = {})
-              hibernate!
-              wrapped_all(query)
-            end
-
-            def self.copy(source, destination, query = {})
-              hibernate!
-              wrapped_copy(source,destination,query)
-            end
-
-            def self.first(*args)
-              hibernate!
-              wrapped_first(*args)
-            end
-
-            def self.first_or_create(conditions = {}, attributes = {})
-              hibernate!
-              wrapped_first_or_create(conditions,attributes)
-            end
-
-            def self.first_or_new(conditions = {}, attributes = {})
-              hibernate!
-              wrapped_first_or_new(conditions,attributes)
-            end
-
-            def self.get(*key)
-              hibernate!
-              wrapped_get(*key)
-            end
-
-            def self.last(*args)
-              hibernate!
-              wrapped_last(*args)
-            end
-
-            def self.load(records, query)
-              hibernate!
-              wrapped_load(records,query)
-            end
-          end
-
-          model.class_eval do
-            alias :wrapped_save              :save
-            alias :wrapped_update            :update
-            alias :wrapped_destroy           :destroy
-            alias :wrapped_update_attributes :update_attributes
-
-            def save
-              model.hibernate!
-              wrapped_save
-            end
-
-            def update(attributes = {})
-              model.hibernate!
-              wrapped_update(attributes)
-            end
-
-            def destroy
-              model.hibernate!
-              wrapped_destroy
-            end
-
-            def update_attributes(attributes = {}, *allowed)
-              model.hibernate!
-              wrapped_update_attributes(attributes,*allowed)
-            end
-          end
-
+        [:save, :update, :destroy, :update_attributes].each do |method|
+          model.before(method) { model.hibernate! }
         end
       end
       # </monkey-patching>
