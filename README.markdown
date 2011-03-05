@@ -58,6 +58,11 @@ if you are getting OutOfMemory errors, you should try to tune jruby-maven-plugin
 
         https://github.com/mkristian/jruby-maven-plugins
 
+if you are getting problems with specs you can skip that phase:
+
+        -Dmaven.test.skip=true
+
+
 Rails 2.3.5 demo
 ----------------
 
