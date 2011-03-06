@@ -7,4 +7,5 @@ testdb.*
 .idea/
 pkg/
 build/
+lib/dm-hibernate-adapter_ext.jar
 
