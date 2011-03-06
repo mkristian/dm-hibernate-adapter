@@ -158,7 +158,6 @@ module Hibernate
 
       def auto_migrate!(repo = nil)
         config = Hibernate::config
-
         # TODO drop only one table, not all of them !
         schema_export = SchemaExport.new(config)
         console       = true # XXX here you can turn on/off logger

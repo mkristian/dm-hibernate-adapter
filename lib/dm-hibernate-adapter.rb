@@ -1,4 +1,24 @@
 require 'java'
+require 'pathname'
+
+# 3.6.1
+# HIBERNATE_LIBS = %w(antlr-2.7.6.jar dom4j-1.6.1.jar javassist-3.12.0.GA.jar jta-1.1.jar 
+#                     log4j-1.2.14.jar slf4j-api-1.6.1.jar hibernate3.jar hibernate-jpa-2.0-api-1.0.0.Final.jar)
+
+HIBERNATE_LIBS = %w(hibernate-core-3.3.2.GA.jar log4j-1.2.14.jar hibernate-tools-3.2.4.GA.jar slf4j-log4j12-1.5.2.jar
+                    slf4j-api-1.5.2.jar javassist-3.8.0.GA.jar hibernate-annotations-3.4.0.GA.jar jta-1.1.jar
+                    antlr-2.7.6.jar dom4j-1.6.1.jar hibernate-commons-annotations-3.3.0.ga.jar ejb3-persistence-3.3.2.Beta1.jar
+                    commons-collections-3.1.jar)
+
+JDBC_DRIVERS   = %w(h2-1.3.148.jar)
+
+base_path = Pathname(__FILE__).dirname.expand_path
+dir       = "#{base_path}/dm-hibernate-adapter"
+
+(JDBC_DRIVERS + HIBERNATE_LIBS).each do |lib_name|
+  require "#{base_path}/#{lib_name}"
+end
+
 begin
   require 'dm-hibernate-adapter_ext.jar'
 rescue LoadError
@@ -16,11 +36,9 @@ require 'dm-core/adapters/abstract_adapter'
 require 'jruby/core_ext'
 require 'stringio'
 
-dir = Pathname(__FILE__).dirname.expand_path / 'dm-hibernate-adapter'
-
-require dir / 'dialects'
-require dir / 'hibernate'
-require dir / 'transaction'
+require "#{dir}/dialects"
+require "#{dir}/hibernate"
+require "#{dir}/transaction"
 
 
 module DataMapper

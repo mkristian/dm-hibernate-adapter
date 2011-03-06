@@ -1,4 +1,5 @@
 require 'rake'
+require 'rake/gempackagetask'
 
 SPEC_LOCATIONS = {
   :abstract_adapter => "spec/abstract_adapter",
@@ -55,4 +56,29 @@ with_gem 'yard' do
   end
 end
 
+specification = Gem::Specification.new do |s|
+  s.name = "dm-hibernate-adapter"
+  s.summary = "dm-hibernate-adapter = DM + Hibernate"
+  s.version = "0.0.1"
+  s.author = 'Kristian Meier Piotr Gega Douglas Ferreira'
+  s.description = s.summary
+  #s.homepage = 'http://ribs.rubyforge.org'
+  #s.rubyforge_project = 'ribs'
+
+  s.has_rdoc = false
+  #s.extra_rdoc_files = ['README.']
+  #s.rdoc_options << '--title' << 'ribs' << '--main' << 'README' << '--line-numbers'
+
+  s.email = 'piotrgega@gmail.com'
+  s.files = FileList['{lib,spec}/**/*.{rb,jar}', '[A-Z]*$', 'Rakefile'].to_a
+  s.add_dependency('dm-core', '1.0.0')
+  s.add_dependency('dm-transactions', '1.0.0')
+  s.add_dependency('dm-migrations', '1.0.0')
+  s.add_dependency("slf4r", "0.3.1")
+end
+
+Rake::GemPackageTask.new(specification) do |package|
+  package.need_zip = false
+  package.need_tar = false
+end
 
