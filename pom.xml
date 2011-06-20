@@ -138,6 +138,14 @@
       <version>1.2.14</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.jruby</groupId>
+      <artifactId>jruby-complete</artifactId>
+      <version>1.6.2</version>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
+
   </dependencies>
 
   <repositories>
@@ -160,7 +168,7 @@
   </pluginRepositories>
 
   <properties>
-    <jruby.plugins.version>0.24.0-SNAPSHOT</jruby.plugins.version>
+    <jruby.plugins.version>0.27.0</jruby.plugins.version>
     <jruby.jvmargs>-Xmx1024m</jruby.jvmargs>
     <dm.version>1.0.2</dm.version>
   </properties>
@@ -178,8 +186,11 @@
       <plugin>
         <groupId>de.saumya.mojo</groupId>
         <artifactId>gem-maven-plugin</artifactId>
-	    <version>${jruby.plugins.version}</version>
-	    <extensions>true</extensions>
+        <version>${jruby.plugins.version}</version>
+        <extensions>true</extensions>
+        <configuration>
+          <includeOpenSSL>false</includeOpenSSL>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>de.saumya.mojo</groupId>

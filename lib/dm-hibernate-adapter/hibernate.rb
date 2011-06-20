@@ -1,5 +1,6 @@
 module Hibernate
   # XXX java_import: http://jira.codehaus.org/browse/JRUBY-3538
+  java_import 'de.saumya.jibernate.JibernateClassLoader'
   java_import org.hibernate.cfg.AnnotationConfiguration
   JClass  = java.lang.Class
   JVoid   = java.lang.Void::TYPE
@@ -177,8 +178,8 @@ module Hibernate
 
       def to_java_class_name
         # http://jira.codehaus.org/browse/JRUBY-4601
-        # return properly full-specified class name (ie ruby.Z.X.Y)
-        "ruby."+self.to_s.gsub("::",".")
+        # return properly full-specified class name (ie rubyobj.Z.X.Y)
+        "rubyobj."+self.to_s.gsub("::",".")
       end
 
       def hibernate!
@@ -214,10 +215,17 @@ module Hibernate
           end
 
           add_class_annotation(annotation)
+
           Hibernate.add_model(become_java!)
 
+          unless java.lang.Thread.currentThread.contextClassLoader.is_a? JibernateClassLoader
+            java.lang.Thread.currentThread.contextClassLoader = JibernateClassLoader.new java.lang.Thread.currentThread.contextClassLoader
+          end
+
+          java.lang.Thread.currentThread.contextClassLoader.register(java_class)
+
           @@logger.debug "become_java! #{java_class}"
-         else
+        else
           @@logger.debug "become_java! fired already #{java_class}"
         end
 
