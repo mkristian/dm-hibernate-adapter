@@ -5,4 +5,4 @@ target
 *.log
 testdb.*
 .idea/
-
+dm-hibernate-adapter.gemspec.*

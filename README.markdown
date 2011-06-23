@@ -6,9 +6,9 @@ You have to:
 
 install maven3 (http://www.maven.apache.org/download.html)
 
-setup the gems
+setup the gems and compile the java extension
 
-    mvn clean gem:initialize
+    mvn clean gem:initialize compile
 
 run the eventlog - list
 

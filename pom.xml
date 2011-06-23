@@ -1,68 +1,48 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>rubygems</groupId>
   <artifactId>dm-hibernate-adapter</artifactId>
-  <version>0.1-SNAPSHOT</version>
+  <version>0.1</version>
+  <name><![CDATA[dm-hibernate-adapter]]></name>
   <packaging>java-gem</packaging>
-  <distributionManagement>
+  <repositories>
     <repository>
-      <id>ssh-repository</id>
-      <url>scpexe://mojo.saumya.de/home/mojo/public</url>
+      <id>jboss</id>
+      <url>http://repository.jboss.com/maven2</url>
     </repository>
-  </distributionManagement>
-
+    <repository>
+      <id>rubygems-releases</id>
+      <url>http://gems.saumya.de/releases</url>
+    </repository>
+  </repositories>
   <dependencies>
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>dm-core</artifactId>
-      <version>${dm.version}</version>
+      <version>1.0.2</version>
       <type>gem</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>dm-transactions</artifactId>
-      <version>${dm.version}</version>
+      <version>1.0.2</version>
       <type>gem</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>dm-migrations</artifactId>
-      <version>${dm.version}</version>
+      <version>1.0.2</version>
       <type>gem</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-core</artifactId>
-      <version>3.3.2.GA</version>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-annotations</artifactId>
-      <version>3.4.0.GA</version>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-tools</artifactId>
-      <version>3.2.4.GA</version>
-    </dependency>
-
-    <!-- L2 cache for Hibernate -->
-    <!--<dependency>-->
-    <!--<groupId>org.hibernate</groupId>-->
-    <!--<artifactId>hibernate-ehcache</artifactId>-->
-    <!--<version>3.3.2.GA</version>-->
-    <!--</dependency>-->
-    <!-- choose this version which can be downloaded publicly -->
-    <dependency>
-      <groupId>javax.transaction</groupId>
-      <artifactId>jta</artifactId>
-      <version>1.1</version>
-    </dependency>
-    <dependency>
-      <groupId>javassist</groupId>
-      <artifactId>javassist</artifactId>
-      <version>3.8.0.GA</version>
+      <groupId>rubygems</groupId>
+      <artifactId>slf4r</artifactId>
+      <version>0.3.1</version>
+      <type>gem</type>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>rubygems</groupId>
@@ -86,102 +66,95 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>rubygems</groupId>
-      <artifactId>slf4r</artifactId>
-      <version>0.3.1</version>
-      <type>gem</type>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-core</artifactId>
+      <version>3.3.2.GA</version>
+      <type>jar</type>
     </dependency>
-    <!--
-       does not load from within maven - wrong classloader !!!
-        <dependency>
-          <groupId>rubygems</groupId>
-          <artifactId>jdbc-hsqldb</artifactId>
-          <version>1.8.0.7</version>
-          <type>gem</type>
-        </dependency>
-    -->
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-annotations</artifactId>
+      <version>3.4.0.GA</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-tools</artifactId>
+      <version>3.2.4.GA</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>javax.transaction</groupId>
+      <artifactId>jta</artifactId>
+      <version>1.1</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>javassist</groupId>
+      <artifactId>javassist</artifactId>
+      <version>3.8.0.GA</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>5.1.9</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>8.4-701.jdbc4</version>
+      <type>jar</type>
+    </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>1.2.128</version>
+      <version>1.2.138</version>
+      <type>jar</type>
     </dependency>
     <dependency>
-       <groupId>org.apache.derby</groupId>
-       <artifactId>derby</artifactId>
-       <version>10.5.3.0_1</version>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derby</artifactId>
+      <version>10.5.3.0_1</version>
+      <type>jar</type>
     </dependency>
     <dependency>
-       <groupId>org.hsqldb</groupId>
-       <artifactId>hsqldb</artifactId>
-       <version>2.0.0</version>
-    </dependency>
-    <dependency>
-       <groupId>mysql</groupId>
-       <artifactId>mysql-connector-java</artifactId>
-       <version>5.1.9</version>
-    </dependency>
-    <dependency>
-       <groupId>postgresql</groupId>
-       <artifactId>postgresql</artifactId>
-       <version>8.4-701.jdbc4</version>
-    </dependency>
-    <!-- need a logger for testing -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.5.2</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.14</version>
-      <scope>test</scope>
+      <groupId>org.hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <version>2.0.0</version>
+      <type>jar</type>
     </dependency>
     <dependency>
       <groupId>org.jruby</groupId>
       <artifactId>jruby-complete</artifactId>
       <version>1.6.2</version>
       <type>jar</type>
-      <scope>compile</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.5.2</version>
+      <type>jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.14</version>
+      <type>jar</type>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
-
-  <repositories>
-    <repository>
-      <id>jboss</id>
-      <url>http://repository.jboss.com/maven2</url>
-    </repository>
-    <repository>
-      <id>rubygems-releases</id>
-      <url>http://gems.saumya.de/releases</url>
-    </repository>
-  </repositories>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <id>sonatype-nexus-snapshots</id>
-      <name>Sonatype Nexus Snapshots</name>
-      <url>http://oss.sonatype.org/content/repositories/snapshots</url>
-    </pluginRepository>
-  </pluginRepositories>
-
   <properties>
-    <jruby.plugins.version>0.27.0</jruby.plugins.version>
+    <gem.home>${project.build.directory}/rubygems</gem.home>
+    <gem.path>${project.build.directory}/rubygems</gem.path>
     <jruby.jvmargs>-Xmx1024m</jruby.jvmargs>
-    <dm.version>1.0.2</dm.version>
+    <jruby.plugins.version>0.28.1</jruby.plugins.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-
   <build>
     <finalName>${project.artifactId}_ext</finalName>
-    <extensions>
-      <extension>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-ssh-external</artifactId>
-        <version>1.0-beta-6</version>
-      </extension>
-    </extensions>
     <plugins>
       <plugin>
         <groupId>de.saumya.mojo</groupId>
@@ -189,13 +162,24 @@
         <version>${jruby.plugins.version}</version>
         <extensions>true</extensions>
         <configuration>
+          <files>lib/dm-hibernate-adapter_ext.jar,lib/dm-hibernate-adapter.rb,lib/jibernate.rb~,lib/jibernate.rb,lib/java_logger.rb~,lib/dm-hibernate-adapter,lib/dm-hibernate-adapter/dialects.rb,lib/dm-hibernate-adapter/hibernate.rb,lib/dm-hibernate-adapter/transaction.rb,lib/dm-hibernate-adapter/spec,lib/dm-hibernate-adapter/hibernate.rb-,lib/dm-hibernate-adapter/spec/setup.rb,spec/log4j.properties~,spec/abstract_adapter,spec/logger_spec.rb~,spec/transient,spec/log4j.properties,spec/dm_core,spec/abstract_adapter/spec.opts,spec/abstract_adapter/adapter_shared_spec.rb,spec/abstract_adapter/spec_helper.rb,spec/abstract_adapter/rcov.opts,spec/abstract_adapter/dm-hibernate-adapter_spec.rb,spec/transient/shared,spec/transient/lib,spec/transient/spec.opts,spec/transient/spec_helper.rb,spec/transient/rcov.opts,spec/transient/dm-hibernate-adapter_spec.rb,spec/transient/shared/resource_shared_spec.rb,spec/transient/shared/resource_spec.rb,spec/transient/shared/model_spec.rb,spec/transient/shared/adapter_shared_spec.rb,spec/transient/shared/sel_shared_spec.rb,spec/transient/shared/property_spec.rb,spec/transient/shared/finder_shared_spec.rb,spec/transient/lib/collection_helpers.rb,spec/transient/lib/pending_helpers.rb,spec/transient/lib/rspec_immediate_feedback_formatter.rb,spec/transient/lib/counter_adapter.rb,spec/transient/lib/adapter_helpers.rb,spec/dm_core/lib,spec/dm_core/public,spec/dm_core/adapter_spec.rb,spec/dm_core/semipublic,spec/dm_core/spec.opts,spec/dm_core/spec_helper.rb,spec/dm_core/unit,spec/dm_core/rcov.opts,spec/dm_core/support,spec/dm_core/db,spec/dm_core/lib/rspec_immediate_feedback_formatter.rb,spec/dm_core/public/shared,spec/dm_core/public/resource_spec.rb,spec/dm_core/public/collection_spec.rb,spec/dm_core/public/model_spec.rb,spec/dm_core/public/setup_spec.rb,spec/dm_core/public/model,spec/dm_core/public/associations,spec/dm_core/public/property_spec.rb,spec/dm_core/public/sel_spec.rb,spec/dm_core/public/property,spec/dm_core/public/finalize_spec.rb,spec/dm_core/public/shared/collection_shared_spec.rb,spec/dm_core/public/shared/finder_shared_spec.rb,spec/dm_core/public/shared/collection_finder_shared_spec.rb,spec/dm_core/public/shared/association_collection_shared_spec.rb,spec/dm_core/public/model/relationship_spec.rb,spec/dm_core/public/model/property_spec.rb,spec/dm_core/public/model/hook_spec.rb,spec/dm_core/public/associations/one_to_many_spec.rb,spec/dm_core/public/associations/many_to_many_spec.rb,spec/dm_core/public/associations/many_to_one_with_boolean_cpk_spec.rb,spec/dm_core/public/associations/many_to_one_with_custom_fk_spec.rb,spec/dm_core/public/associations/one_to_one_spec.rb,spec/dm_core/public/associations/one_to_one_with_boolean_cpk_spec.rb,spec/dm_core/public/associations/many_to_one_spec.rb,spec/dm_core/public/associations/many_to_many,spec/dm_core/public/associations/many_to_many/read_multiple_join_spec.rb,spec/dm_core/public/property/text_spec.rb,spec/dm_core/public/property/integer_spec.rb,spec/dm_core/public/property/string_spec.rb,spec/dm_core/public/property/discriminator_spec.rb,spec/dm_core/public/property/binary_spec.rb,spec/dm_core/public/property/boolean_spec.rb,spec/dm_core/public/property/time_spec.rb,spec/dm_core/public/property/date_time_spec.rb,spec/dm_core/public/property/decimal_spec.rb,spec/dm_core/public/property/float_spec.rb,spec/dm_core/public/property/class_spec.rb,spec/dm_core/public/property/object_spec.rb,spec/dm_core/public/property/serial_spec.rb,spec/dm_core/public/property/date_spec.rb,spec/dm_core/semipublic/shared,spec/dm_core/semipublic/adapters,spec/dm_core/semipublic/query,spec/dm_core/semipublic/resource_spec.rb,spec/dm_core/semipublic/collection_spec.rb,spec/dm_core/semipublic/model_spec.rb,spec/dm_core/semipublic/query_spec.rb,spec/dm_core/semipublic/associations,spec/dm_core/semipublic/property_spec.rb,spec/dm_core/semipublic/associations_spec.rb,spec/dm_core/semipublic/property,spec/dm_core/semipublic/resource,spec/dm_core/semipublic/shared/resource_shared_spec.rb,spec/dm_core/semipublic/shared/resource_state_shared_spec.rb,spec/dm_core/semipublic/shared/condition_shared_spec.rb,spec/dm_core/semipublic/shared/subject_shared_spec.rb,spec/dm_core/semipublic/adapters/abstract_adapter_spec.rb,spec/dm_core/semipublic/adapters/in_memory_adapter_spec.rb,spec/dm_core/semipublic/query/conditions,spec/dm_core/semipublic/query/path_spec.rb,spec/dm_core/semipublic/query/conditions/operation_spec.rb,spec/dm_core/semipublic/query/conditions/comparison_spec.rb,spec/dm_core/semipublic/associations/one_to_many_spec.rb,spec/dm_core/semipublic/associations/many_to_many_spec.rb,spec/dm_core/semipublic/associations/relationship_spec.rb,spec/dm_core/semipublic/associations/one_to_one_spec.rb,spec/dm_core/semipublic/associations/many_to_one_spec.rb,spec/dm_core/semipublic/property/text_spec.rb,spec/dm_core/semipublic/property/integer_spec.rb,spec/dm_core/semipublic/property/string_spec.rb,spec/dm_core/semipublic/property/discriminator_spec.rb,spec/dm_core/semipublic/property/binary_spec.rb,spec/dm_core/semipublic/property/boolean_spec.rb,spec/dm_core/semipublic/property/lookup_spec.rb,spec/dm_core/semipublic/property/time_spec.rb,spec/dm_core/semipublic/property/date_time_spec.rb,spec/dm_core/semipublic/property/decimal_spec.rb,spec/dm_core/semipublic/property/float_spec.rb,spec/dm_core/semipublic/property/class_spec.rb,spec/dm_core/semipublic/property/serial_spec.rb,spec/dm_core/semipublic/property/date_spec.rb,spec/dm_core/semipublic/resource/state_spec.rb,spec/dm_core/semipublic/resource/state,spec/dm_core/semipublic/resource/state/transient_spec.rb,spec/dm_core/semipublic/resource/state/immutable_spec.rb,spec/dm_core/semipublic/resource/state/dirty_spec.rb,spec/dm_core/semipublic/resource/state/clean_spec.rb,spec/dm_core/semipublic/resource/state/deleted_spec.rb,spec/dm_core/unit/array_spec.rb,spec/dm_core/unit/try_dup_spec.rb,spec/dm_core/unit/module_spec.rb,spec/dm_core/unit/hash_spec.rb,spec/dm_core/unit/object_spec.rb,spec/dm_core/unit/lazy_array_spec.rb,spec/dm_core/unit/hook_spec.rb,spec/dm_core/support/properties,spec/dm_core/support/properties/huge_integer.rb</files>
           <includeOpenSSL>false</includeOpenSSL>
+          <platform>java</platform>
+          <testFiles>spec/abstract_adapter/adapter_shared_spec.rb,spec/abstract_adapter/dm-hibernate-adapter_spec.rb,spec/transient/dm-hibernate-adapter_spec.rb,spec/transient/shared/resource_shared_spec.rb,spec/transient/shared/resource_spec.rb,spec/transient/shared/model_spec.rb,spec/transient/shared/adapter_shared_spec.rb,spec/transient/shared/sel_shared_spec.rb,spec/transient/shared/property_spec.rb,spec/transient/shared/finder_shared_spec.rb,spec/dm_core/adapter_spec.rb,spec/dm_core/public/resource_spec.rb,spec/dm_core/public/collection_spec.rb,spec/dm_core/public/model_spec.rb,spec/dm_core/public/setup_spec.rb,spec/dm_core/public/property_spec.rb,spec/dm_core/public/sel_spec.rb,spec/dm_core/public/finalize_spec.rb,spec/dm_core/public/shared/collection_shared_spec.rb,spec/dm_core/public/shared/finder_shared_spec.rb,spec/dm_core/public/shared/collection_finder_shared_spec.rb,spec/dm_core/public/shared/association_collection_shared_spec.rb,spec/dm_core/public/model/relationship_spec.rb,spec/dm_core/public/model/property_spec.rb,spec/dm_core/public/model/hook_spec.rb,spec/dm_core/public/associations/one_to_many_spec.rb,spec/dm_core/public/associations/many_to_many_spec.rb,spec/dm_core/public/associations/many_to_one_with_boolean_cpk_spec.rb,spec/dm_core/public/associations/many_to_one_with_custom_fk_spec.rb,spec/dm_core/public/associations/one_to_one_spec.rb,spec/dm_core/public/associations/one_to_one_with_boolean_cpk_spec.rb,spec/dm_core/public/associations/many_to_one_spec.rb,spec/dm_core/public/associations/many_to_many/read_multiple_join_spec.rb,spec/dm_core/public/property/text_spec.rb,spec/dm_core/public/property/integer_spec.rb,spec/dm_core/public/property/string_spec.rb,spec/dm_core/public/property/discriminator_spec.rb,spec/dm_core/public/property/binary_spec.rb,spec/dm_core/public/property/boolean_spec.rb,spec/dm_core/public/property/time_spec.rb,spec/dm_core/public/property/date_time_spec.rb,spec/dm_core/public/property/decimal_spec.rb,spec/dm_core/public/property/float_spec.rb,spec/dm_core/public/property/class_spec.rb,spec/dm_core/public/property/object_spec.rb,spec/dm_core/public/property/serial_spec.rb,spec/dm_core/public/property/date_spec.rb,spec/dm_core/semipublic/resource_spec.rb,spec/dm_core/semipublic/collection_spec.rb,spec/dm_core/semipublic/model_spec.rb,spec/dm_core/semipublic/query_spec.rb,spec/dm_core/semipublic/property_spec.rb,spec/dm_core/semipublic/associations_spec.rb,spec/dm_core/semipublic/shared/resource_shared_spec.rb,spec/dm_core/semipublic/shared/resource_state_shared_spec.rb,spec/dm_core/semipublic/shared/condition_shared_spec.rb,spec/dm_core/semipublic/shared/subject_shared_spec.rb,spec/dm_core/semipublic/adapters/abstract_adapter_spec.rb,spec/dm_core/semipublic/adapters/in_memory_adapter_spec.rb,spec/dm_core/semipublic/query/path_spec.rb,spec/dm_core/semipublic/query/conditions/operation_spec.rb,spec/dm_core/semipublic/query/conditions/comparison_spec.rb,spec/dm_core/semipublic/associations/one_to_many_spec.rb,spec/dm_core/semipublic/associations/many_to_many_spec.rb,spec/dm_core/semipublic/associations/relationship_spec.rb,spec/dm_core/semipublic/associations/one_to_one_spec.rb,spec/dm_core/semipublic/associations/many_to_one_spec.rb,spec/dm_core/semipublic/property/text_spec.rb,spec/dm_core/semipublic/property/integer_spec.rb,spec/dm_core/semipublic/property/string_spec.rb,spec/dm_core/semipublic/property/discriminator_spec.rb,spec/dm_core/semipublic/property/binary_spec.rb,spec/dm_core/semipublic/property/boolean_spec.rb,spec/dm_core/semipublic/property/lookup_spec.rb,spec/dm_core/semipublic/property/time_spec.rb,spec/dm_core/semipublic/property/date_time_spec.rb,spec/dm_core/semipublic/property/decimal_spec.rb,spec/dm_core/semipublic/property/float_spec.rb,spec/dm_core/semipublic/property/class_spec.rb,spec/dm_core/semipublic/property/serial_spec.rb,spec/dm_core/semipublic/property/date_spec.rb,spec/dm_core/semipublic/resource/state_spec.rb,spec/dm_core/semipublic/resource/state/transient_spec.rb,spec/dm_core/semipublic/resource/state/immutable_spec.rb,spec/dm_core/semipublic/resource/state/dirty_spec.rb,spec/dm_core/semipublic/resource/state/clean_spec.rb,spec/dm_core/semipublic/resource/state/deleted_spec.rb,spec/dm_core/unit/array_spec.rb,spec/dm_core/unit/try_dup_spec.rb,spec/dm_core/unit/module_spec.rb,spec/dm_core/unit/hash_spec.rb,spec/dm_core/unit/object_spec.rb,spec/dm_core/unit/lazy_array_spec.rb,spec/dm_core/unit/hook_spec.rb</testFiles>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>de.saumya.mojo</groupId>
-        <artifactId>jruby-maven-plugin</artifactId>
-        <version>${jruby.plugins.version}</version>
+        <executions>
+          <execution>
+            <id>in_phase_initialize</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>execute_in_phase</goal>
+            </goals>
+            <configuration>
+              <file>Mavenfile</file>
+              <phase>initialize</phase>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>de.saumya.mojo</groupId>
@@ -203,7 +187,9 @@
         <version>${jruby.plugins.version}</version>
         <executions>
           <execution>
-            <goals><goal>test</goal></goals>
+            <goals>
+              <goal>test</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>
@@ -213,43 +199,43 @@
     <profile>
       <id>transient</id>
       <build>
-	<plugins>
-	  <plugin>
-	    <groupId>de.saumya.mojo</groupId>
-	    <artifactId>rspec-maven-plugin</artifactId>
-	    <configuration>
-	      <specSourceDirectory>spec/transient</specSourceDirectory>
-	    </configuration>
-	  </plugin>
-	</plugins>
+        <plugins>
+          <plugin>
+            <groupId>de.saumya.mojo</groupId>
+            <artifactId>rspec-maven-plugin</artifactId>
+            <configuration>
+              <specSourceDirectory>spec/transient</specSourceDirectory>
+            </configuration>
+          </plugin>
+        </plugins>
       </build>
     </profile>
     <profile>
       <id>adapter</id>
       <build>
-	<plugins>
-	  <plugin>
-	    <groupId>de.saumya.mojo</groupId>
-	    <artifactId>rspec-maven-plugin</artifactId>
-	    <configuration>
-	      <specSourceDirectory>spec/abstract_adapter</specSourceDirectory>
-	    </configuration>
-	  </plugin>
-	</plugins>
+        <plugins>
+          <plugin>
+            <groupId>de.saumya.mojo</groupId>
+            <artifactId>rspec-maven-plugin</artifactId>
+            <configuration>
+              <specSourceDirectory>spec/abstract_adapter</specSourceDirectory>
+            </configuration>
+          </plugin>
+        </plugins>
       </build>
     </profile>
     <profile>
       <id>dm</id>
       <build>
-	<plugins>
-	  <plugin>
-	    <groupId>de.saumya.mojo</groupId>
-	    <artifactId>rspec-maven-plugin</artifactId>
-	    <configuration>
-	      <specSourceDirectory>spec/dm_core</specSourceDirectory>
-	    </configuration>
-	  </plugin>
-	</plugins>
+        <plugins>
+          <plugin>
+            <groupId>de.saumya.mojo</groupId>
+            <artifactId>rspec-maven-plugin</artifactId>
+            <configuration>
+              <specSourceDirectory>spec/dm_core</specSourceDirectory>
+            </configuration>
+          </plugin>
+        </plugins>
       </build>
     </profile>
   </profiles>
