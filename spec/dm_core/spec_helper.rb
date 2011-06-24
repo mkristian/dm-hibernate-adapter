@@ -22,6 +22,7 @@ Spec::Runner.configure do |config|
 
   config.after :all do
     DataMapper::Spec.cleanup_models
+    Hibernate.reset_config
   end
 
   config.after :all do

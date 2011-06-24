@@ -23,20 +23,40 @@ module Hibernate
     config.set_property "hibernate.connection.driver_class", driver_class
   end
 
+  def self.connection_driver_class
+    config.get_property "hibernate.connection.driver_class"
+  end
+
   def self.connection_url=(url)
     config.set_property "hibernate.connection.url", url
+  end
+
+  def self.connection_url()
+    config.get_property "hibernate.connection.url"
   end
 
   def self.connection_username=(username)
     config.set_property "hibernate.connection.username", username
   end
 
+  def self.connection_username
+    config.get_property "hibernate.connection.username"
+  end
+
   def self.connection_password=(password)
     config.set_property "hibernate.connection.password", password
   end
 
+  def self.connection_password
+    config.get_property "hibernate.connection.password"
+  end
+
   def self.connection_pool_size=(size)
     config.set_property "hibernate.connection.pool_size", size
+  end
+
+  def self.connection_pool_size
+    config.get_property "hibernate.connection.pool_size"
   end
 
   class PropertyShim
@@ -93,6 +113,25 @@ module Hibernate
 
   def self.session()
     factory().open_session()
+  end
+
+  def self.reset_config
+    if @config
+      # TODO make the whole with a list of property names
+      # define the static accessors with the very same list
+      dialect = self.dialect
+      username = self.connection_username
+      password = self.connection_password
+      url = self.connection_url
+      driver_class = self.connection_driver_class
+      @factory = nil
+      @config = AnnotationConfiguration.new()
+      self.dialect= dialect
+      self.connection_username = username
+      self.connection_password = password
+      self.connection_url = url
+      self.connection_driver_class = driver_class
+    end
   end
 
   def self.config()
