@@ -19,21 +19,21 @@
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>dm-core</artifactId>
-      <version>1.0.2</version>
+      <version>[1.0.0,1.0.99999]</version>
       <type>gem</type>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>dm-transactions</artifactId>
-      <version>1.0.2</version>
+      <version>[1.0.0,1.0.99999]</version>
       <type>gem</type>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>dm-migrations</artifactId>
-      <version>1.0.2</version>
+      <version>[1.0.0,1.0.99999]</version>
       <type>gem</type>
       <scope>compile</scope>
     </dependency>
