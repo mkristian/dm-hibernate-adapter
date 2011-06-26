@@ -1,22 +1,27 @@
-# SQLite version 3.x
-#   gem install sqlite3-ruby (not necessary on OS X Leopard)
+defaults: &defaults
+  adapter: hibernate
+  dialect: H2
+  username: sa
+  url: jdbc:h2:db/demo
+
 development:
-  adapter: hibernate
-  dialect: H2
-  username: sa
-  url: jdbc:h2:db/demo
+  database: db/demo3_development.db
+  <<: *defaults
 
-# Warning: The database defined as "test" will be erased and
-# re-generated from your development database when you run "rake".
-# Do not set this db to the same as development or production.
+  # Add more repositories
+  # repositories:
+  #   repo1:
+  #     adapter:  postgres
+  #     database: sample_development
+  #     username: the_user
+  #     password: secrets
+  #     host:     localhost
+  #   repo2:
+  #     ...
+
 test:
-  adapter: sqlite3
-  database: db/test.sqlite3
-  pool: 5
-  timeout: 5000
-
+  database: db/demo3_test.db
+  <<: *defaults
 production:
-  adapter: hibernate
-  dialect: H2
-  username: sa
-  url: jdbc:h2:db/demo
+  database: db/demo3_production.db
+  <<: *defaults

@@ -1,12 +1,11 @@
 class UsersController < ApplicationController
-
   # GET /users
   # GET /users.xml
   def index
-    @users = User.all()
+    @users = User.all
 
     respond_to do |format|
-      format.html
+      format.html # index.html.erb
       format.xml  { render :xml => @users }
     end
   end
@@ -14,7 +13,7 @@ class UsersController < ApplicationController
   # GET /users/1
   # GET /users/1.xml
   def show
-    @user = User.get!(params[:id])
+    @user = User.get(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
@@ -35,7 +34,7 @@ class UsersController < ApplicationController
 
   # GET /users/1/edit
   def edit
-    @user = User.get!(params[:id])
+    @user = User.get(params[:id])
   end
 
   # POST /users
@@ -45,8 +44,7 @@ class UsersController < ApplicationController
 
     respond_to do |format|
       if @user.save
-        flash[:notice] = 'User was successfully created.'
-        format.html { redirect_to(user_url(@user.id)) }
+        format.html { redirect_to(@user, :notice => 'User was successfully created.') }
         format.xml  { render :xml => @user, :status => :created, :location => @user }
       else
         format.html { render :action => "new" }
@@ -58,12 +56,11 @@ class UsersController < ApplicationController
   # PUT /users/1
   # PUT /users/1.xml
   def update
-    @user = User.get!(params[:id])
+    @user = User.get(params[:id])
 
     respond_to do |format|
       if @user.update(params[:user])
-        flash[:notice] = 'User was successfully updated.'
-        format.html { redirect_to(user_url(@user.id)) }
+        format.html { redirect_to(@user, :notice => 'User was successfully updated.') }
         format.xml  { head :ok }
       else
         format.html { render :action => "edit" }
@@ -76,10 +73,9 @@ class UsersController < ApplicationController
   # DELETE /users/1.xml
   def destroy
     @user = User.get(params[:id])
-    @user.destroy if @user
+    @user.destroy
 
     respond_to do |format|
-      flash[:notice] = 'User was successfully deleted.'
       format.html { redirect_to(users_url) }
       format.xml  { head :ok }
     end
