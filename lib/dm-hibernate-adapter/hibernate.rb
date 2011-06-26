@@ -1,6 +1,7 @@
 module Hibernate
   # XXX java_import: http://jira.codehaus.org/browse/JRUBY-3538
   java_import 'de.saumya.jibernate.JibernateClassLoader'
+  java_import 'de.saumya.jibernate.JibernateJRubyClassLoader'
   java_import org.hibernate.cfg.AnnotationConfiguration
   JClass  = java.lang.Class
   JVoid   = java.lang.Void::TYPE
@@ -257,11 +258,16 @@ module Hibernate
 
           Hibernate.add_model(become_java!)
 
-          unless java.lang.Thread.currentThread.contextClassLoader.is_a? JibernateClassLoader
-            java.lang.Thread.currentThread.contextClassLoader = JibernateClassLoader.new java.lang.Thread.currentThread.contextClassLoader
+          unless java.lang.Thread.currentThread.context_class_loader.is_a? JibernateClassLoader
+            cl = java.lang.Thread.currentThread.context_class_loader
+            if cl.is_a? org.jruby.util.JRubyClassLoader
+              java.lang.Thread.currentThread.context_class_loader = JibernateJRubyClassLoader.new(cl)
+            else
+              java.lang.Thread.currentThread.context_class_loader = JibernateClassLoader.new(cl)           
+            end
           end
 
-          java.lang.Thread.currentThread.contextClassLoader.register(java_class)
+          java.lang.Thread.currentThread.context_class_loader.register(java_class)
 
           @@logger.debug "become_java! #{java_class}"
         else

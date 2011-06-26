@@ -1,6 +1,6 @@
 require 'java'
 begin
-  require 'lib/dm-hibernate-adapter_ext.jar'
+  require 'dm-hibernate-adapter_ext.jar'
 rescue LoadError
   warn "missing extension jar, may be it is already in the parent classloader"
 end
@@ -17,9 +17,9 @@ require 'dm-core/adapters/abstract_adapter'
 require 'jruby/core_ext'
 require 'stringio'
 
-require 'lib/dm-hibernate-adapter/dialects'
-require 'lib/dm-hibernate-adapter/hibernate'
-require 'lib/dm-hibernate-adapter/transaction'
+require 'dm-hibernate-adapter/dialects'
+require 'dm-hibernate-adapter/hibernate'
+require 'dm-hibernate-adapter/transaction'
 
 
 module DataMapper
