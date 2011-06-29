@@ -1,9 +1,9 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>rails</groupId>
-  <artifactId>demo3</artifactId>
+  <artifactId>demo</artifactId>
   <version>0.0.0</version>
-  <name><![CDATA[demo3 - rails application]]></name>
+  <name><![CDATA[demo - rails application]]></name>
   <packaging>war</packaging>
   <repositories>
     <repository>
@@ -21,85 +21,196 @@
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>activesupport</artifactId>
-      <version>3.0.9</version>
       <type>gem</type>
     </dependency>
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>actionpack</artifactId>
-      <version>3.0.9</version>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>activemodel</artifactId>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>builder</artifactId>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>i18n</artifactId>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>erubis</artifactId>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>abstract</artifactId>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>rack</artifactId>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>rack-mount</artifactId>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>rack-test</artifactId>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>tzinfo</artifactId>
       <type>gem</type>
     </dependency>
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>actionmailer</artifactId>
-      <version>3.0.9</version>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>mail</artifactId>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>mime-types</artifactId>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>treetop</artifactId>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>polyglot</artifactId>
       <type>gem</type>
     </dependency>
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>railties</artifactId>
-      <version>3.0.9</version>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>rake</artifactId>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>rdoc</artifactId>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>thor</artifactId>
       <type>gem</type>
     </dependency>
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>dm-rails</artifactId>
-      <version>[1.0.0,1.0.99999]</version>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>dm-active_model</artifactId>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>dm-core</artifactId>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>addressable</artifactId>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>extlib</artifactId>
       <type>gem</type>
     </dependency>
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>dm-migrations</artifactId>
-      <version>[1.0.0,1.0.99999]</version>
       <type>gem</type>
     </dependency>
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>dm-types</artifactId>
-      <version>[1.0.0,1.0.99999]</version>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>fastercsv</artifactId>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>json_pure</artifactId>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>stringex</artifactId>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>uuidtools</artifactId>
       <type>gem</type>
     </dependency>
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>dm-validations</artifactId>
-      <version>[1.0.0,1.0.99999]</version>
       <type>gem</type>
     </dependency>
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>dm-constraints</artifactId>
-      <version>[1.0.0,1.0.99999]</version>
       <type>gem</type>
     </dependency>
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>dm-transactions</artifactId>
-      <version>[1.0.0,1.0.99999]</version>
       <type>gem</type>
     </dependency>
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>dm-aggregates</artifactId>
-      <version>[1.0.0,1.0.99999]</version>
       <type>gem</type>
     </dependency>
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>dm-timestamps</artifactId>
-      <version>[1.0.0,1.0.99999]</version>
       <type>gem</type>
     </dependency>
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>dm-observer</artifactId>
-      <version>[1.0.0,1.0.99999]</version>
       <type>gem</type>
     </dependency>
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>dm-hibernate-adapter</artifactId>
-      <version>[0.0.0,)</version>
+      <type>gem</type>
+    </dependency>
+    <dependency>
+      <groupId>rubygems</groupId>
+      <artifactId>slf4r</artifactId>
       <type>gem</type>
     </dependency>
     <dependency>
@@ -139,11 +250,249 @@
       <type>jar</type>
     </dependency>
   </dependencies>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>abstract</artifactId>
+        <version>1.0.0</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>actionmailer</artifactId>
+        <version>3.0.9</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>actionpack</artifactId>
+        <version>3.0.9</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>activemodel</artifactId>
+        <version>3.0.9</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>activesupport</artifactId>
+        <version>3.0.9</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>builder</artifactId>
+        <version>2.1.2</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>i18n</artifactId>
+        <version>0.5.0</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>erubis</artifactId>
+        <version>2.6.6</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>rack</artifactId>
+        <version>1.2.3</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>rack-mount</artifactId>
+        <version>0.6.14</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>rack-test</artifactId>
+        <version>0.5.7</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>tzinfo</artifactId>
+        <version>0.3.28</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>mail</artifactId>
+        <version>2.2.19</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>mime-types</artifactId>
+        <version>1.16</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>treetop</artifactId>
+        <version>1.4.9</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>polyglot</artifactId>
+        <version>0.3.1</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>addressable</artifactId>
+        <version>2.2.6</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>dm-active_model</artifactId>
+        <version>1.0.3</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>dm-core</artifactId>
+        <version>1.0.2</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>extlib</artifactId>
+        <version>0.9.15</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>dm-aggregates</artifactId>
+        <version>1.0.2</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>dm-constraints</artifactId>
+        <version>1.0.2</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>dm-migrations</artifactId>
+        <version>1.0.2</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>dm-hibernate-adapter</artifactId>
+        <version>0.1</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>dm-transactions</artifactId>
+        <version>1.0.2</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>slf4r</artifactId>
+        <version>0.3.1</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>dm-observer</artifactId>
+        <version>1.0.2</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>dm-rails</artifactId>
+        <version>1.0.4</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>railties</artifactId>
+        <version>3.0.9</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>rake</artifactId>
+        <version>0.9.2</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>rdoc</artifactId>
+        <version>3.6.1</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>thor</artifactId>
+        <version>0.14.6</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>dm-timestamps</artifactId>
+        <version>1.0.2</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>dm-types</artifactId>
+        <version>1.0.2</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>fastercsv</artifactId>
+        <version>1.5.4</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>json_pure</artifactId>
+        <version>1.5.3</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>stringex</artifactId>
+        <version>1.1.0</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>uuidtools</artifactId>
+        <version>2.1.2</version>
+        <type>gem</type>
+      </dependency>
+      <dependency>
+        <groupId>rubygems</groupId>
+        <artifactId>dm-validations</artifactId>
+        <version>1.0.2</version>
+        <type>gem</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <properties>
     <gem.home>${project.build.directory}/rubygems</gem.home>
     <gem.path>${project.build.directory}/rubygems</gem.path>
     <jetty.version>7.4.2.v20110526</jetty.version>
-    <jruby.plugins.version>0.28.1</jruby.plugins.version>
+    <jruby.plugins.version>0.28.2</jruby.plugins.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <rails.env>development</rails.env>
   </properties>
