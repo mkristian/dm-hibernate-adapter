@@ -1,8 +1,10 @@
 Jibernate/Hibernate module for DataMapper
 =========================================
 
-You have to:
----------
+*WARNING* Don't use `-o` if you want to access remote repositories
+
+
+### You have to:
 
     jruby -S gem install ruby-maven
 
@@ -23,8 +25,7 @@ run the eventlog - store with rollback
     rmvn gem exec eventlog.rb store_rollback something -- -o
 
 
-Howtos:
-----------
+### Howtos:
 
 how to list rake tasks (please note the jruby.rake.args part(var name))
 
@@ -69,7 +70,6 @@ if you are getting problems with specs you can skip that phase:
 
         -- -Dmaven.test.skip=true
 
-Note
-----
+### Note
 
 the ruby-maven setup will generate a pom.xml which can be used by proper maven3.
