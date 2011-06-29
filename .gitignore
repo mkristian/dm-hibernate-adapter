@@ -6,3 +6,6 @@ target
 testdb.*
 .idea/
 dm-hibernate-adapter.gemspec.*
+build
+pkg
+lib/*.jar
