@@ -293,7 +293,7 @@ module Hibernate
           @@logger.info("#{prop.model.name} gets property added #{prop.name}")
           name = prop.name
           type = prop.class
-          return name if (type == DataMapper::Types::Discriminator)
+          return name if (type == DataMapper::Property::Discriminator)
 
           column_name = prop.field
           annotation = {}
