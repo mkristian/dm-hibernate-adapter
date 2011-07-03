@@ -1,74 +1,76 @@
 Jibernate/Hibernate module for DataMapper
 =========================================
 
-You have to:
----------
+*WARNING* Don't use `-o` if you want to access remote repositories
 
-install maven3 (http://www.maven.apache.org/download.html)
+
+### You have to:
+
+    jruby -S gem install ruby-maven
 
 setup the gems and compile the java extension
 
-    mvn clean gem:initialize compile
+    rmvn clean gem:initialize compile
 
 run the eventlog - list
 
-    mvn ruby:jruby -Dargs="eventlog.rb list"
+    rmvn gem exec eventlog.rb list -- -o
 
 run the eventlog - store
 
-    mvn ruby:jruby -Dargs="eventlog.rb store something"
+    rmvn gem exec eventlog.rb store something -- -o
 
 run the eventlog - store with rollback
 
-    mvn ruby:jruby -Dargs="eventlog.rb store_rollback something"
+    rmvn gem exec eventlog.rb store_rollback something -- -o
 
 
-Howtos:
-----------
+### Howtos:
 
 how to list rake tasks (please note the jruby.rake.args part(var name))
 
-    mvn ruby:jruby -Dargs="-S rake -T"
+    rmvn rake -T -- -o
 
 how to run specs?
 
   * AbstractAdapter specs:
 
-        mvn ruby:jruby -e -Djruby.verbose=true -Dargs="-S rake spec:adapter"
+        rmvn rake spec:adapter -- -o
 	or
-        mvn test -e -Djruby.verbose=true -Padapter
+        rmvn test -- -Padapter -o
 
   * dm-core specs:
 
-        mvn ruby:jruby -e -Djruby.verbose=true -Dargs="-S rake spec:dm"
+        rmvn rake spec:dm -- -o
 	or
-        mvn test -e -Djruby.verbose=true -Pdm
+        rmvn test -- -Pdm -o
 
   * transient specs:
 
-        mvn ruby:jruby -e -Djruby.verbose=true -Dargs="-S rake spec:transient"
+        rmvn rake spec:transient -- -o
 	or
-        mvn test -e -Djruby.verbose=true -Ptransient
+        rmvn test -- -Ptransient -o
+
+when using `rmvn test` there will be a nice html rspec report in **target/rspec-report.html**.
+to get debug output use (use '--' only once which denotes the beginning of maven options)
+
+        -- -Djruby.verbose -e
 
 you can switch the jruby version by adding to the above commands
 
-        -Djruby.version=1.5.3
+        -- -Djruby.version=1.6.2
 
 if you are getting OutOfMemory errors, you should try to tune jruby-maven-plugin's settings
 
         https://github.com/mkristian/jruby-maven-plugins
 
+and set them as properties in 'Mavenfile' - see in that file
+        properties['jruby.jvmargs'] = '-Xmx1024m'
+
 if you are getting problems with specs you can skip that phase:
 
-        -Dmaven.test.skip=true
+        -- -Dmaven.test.skip=true
 
+### Note
 
-Rails 2.3.5 demo
-----------------
-
-start the server with
-        mvn rails2:server
-and point your browser to
-        http://localhost:3000/users
-or
-        http://localhost:3000/maven.html
+the ruby-maven setup will generate a pom.xml which can be used by proper maven3.

@@ -16,7 +16,7 @@ jar 'org.jruby:jruby-complete', '1.6.2'
 test_jar 'org.slf4j:slf4j-log4j12', '1.5.2'
 test_jar 'log4j:log4j', '1.2.14'
 
-repository(:jboss).url 'http://repository.jboss.com/maven2'
+repository(:jboss).url 'https://repository.jboss.org/nexus/content/groups/public-jboss/'
 
 properties['jruby.jvmargs'] = '-Xmx1024m'
 
