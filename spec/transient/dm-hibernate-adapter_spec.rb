@@ -34,7 +34,7 @@ describe DataMapper::Adapters::HibernateAdapter do
   # DRIVERS = [ :H2_EMB, :DERBY_EMB, :HSQL_EMB, :MySQL5, :PostgreSQL ].freeze
 
   # iterate over selected drivers and run specs
-  DB_CONFIGS.only(*DRIVERS).each do |driver, connection_options|
+  DRIVERS.collect{|d| [d, DB_CONFIGS[d]]}.each do |driver, connection_options|
 
     describe "with +#{driver}+ driver => " do
 
