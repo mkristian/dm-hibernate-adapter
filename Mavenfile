@@ -11,7 +11,7 @@ jar 'org.apache.derby:derby' ,'10.5.3.0_1'
 jar 'org.hsqldb:hsqldb', '2.0.0'
 
 # not sure of this is needed
-jar 'org.jruby:jruby-complete', '1.6.2'
+#jar 'org.jruby:jruby-complete', '1.6.2'
 
 test_jar 'org.slf4j:slf4j-log4j12', '1.5.2'
 test_jar 'log4j:log4j', '1.2.14'
