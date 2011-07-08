@@ -151,6 +151,7 @@ module DataMapper
           # offset
           criteria.set_first_result(offset) unless offset.nil?
           # order by
+          unless order.nil?
           order.each do |direction|
             operator = direction.operator
             # TODO column name may differ from property name
@@ -162,7 +163,8 @@ module DataMapper
             end
 
             criteria.add_order(order)
-          end
+            end
+          end            
 
           @@logger.debug(criteria.to_s)
 
