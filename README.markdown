@@ -58,7 +58,7 @@ to get debug output use (use '--' only once which denotes the beginning of maven
 
 you can switch the jruby version by adding to the above commands
 
-        -- -Djruby.version=1.6.2
+        -- -Djruby.version=1.6.3
 
 if you are getting OutOfMemory errors, you should try to tune jruby-maven-plugin's settings
 
