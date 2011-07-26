@@ -1,10 +1,13 @@
+# -*- coding: utf-8 -*-
 # create by maven - leave it as is
 Gem::Specification.new do |s|
   s.name = 'dm-hibernate-adapter'
-  s.version = '0.1'
+  s.version = '0.1pre'
 
   s.summary = 'dm-hibernate-adapter'
 
+  s.authors = ['mkristian', 'Piotr Gęga', 'Douglas Ferreira']
+  s.email = ['m.kristian@web.de', 'pietia.moo@gmail.com', 'douglasrodrigo@gmail.com']
 
   s.platform = 'java'
   s.files = Dir['lib/dm-hibernate-adapter_ext.jar']
@@ -21,5 +24,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rake', '0.8.7'
   s.add_development_dependency 'rspec', '1.3.0'
   s.add_development_dependency 'ruby-maven', '0.8.3.0.3.0.28.1'
+  s.add_development_dependency 'jruby-openssl', '0.7.4'
   s.requirements << File.read('Mavenfile')
 end

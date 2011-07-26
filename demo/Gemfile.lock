@@ -32,7 +32,7 @@ GEM
       dm-core (~> 1.1.0)
     dm-core (1.1.0)
       addressable (~> 2.2.4)
-    dm-hibernate-adapter (0.1-java)
+    dm-hibernate-adapter (0.1pre-java)
       dm-core (>= 1.1.0, < 1.1.99999)
       dm-migrations (>= 1.1.0, < 1.1.99999)
       dm-transactions (>= 1.1.0, < 1.1.99999)
@@ -101,7 +101,7 @@ DEPENDENCIES
   activesupport (= 3.0.9)
   dm-aggregates (~> 1.1.0)
   dm-constraints (~> 1.1.0)
-  dm-hibernate-adapter
+  dm-hibernate-adapter (= 0.1pre)
   dm-migrations (~> 1.1.0)
   dm-observer (~> 1.1.0)
   dm-rails (~> 1.1.0)

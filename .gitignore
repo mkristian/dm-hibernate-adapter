@@ -9,3 +9,7 @@ dm-hibernate-adapter.gemspec.*
 build
 pkg
 lib/*.jar
+.classpath
+.project
+.settings
+*.gem

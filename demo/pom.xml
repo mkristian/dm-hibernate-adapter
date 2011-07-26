@@ -492,7 +492,6 @@
     <gem.home>${project.build.directory}/rubygems</gem.home>
     <gem.path>${project.build.directory}/rubygems</gem.path>
     <jetty.version>7.4.2.v20110526</jetty.version>
-    <gem.includeRubygemsInTestResources>false</gem.includeRubygemsInTestResources>
     <jruby.plugins.version>0.28.3</jruby.plugins.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <rails.env>development</rails.env>
