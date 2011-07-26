@@ -226,6 +226,8 @@ module Hibernate
         # just make sure all the properties are there
         # initialize join models and target keys
         relationships.each do |property, relationship|
+          next unless relationship
+
           relationship.child_key
           relationship.parent_key
           relationship.through    if relationship.respond_to?(:through)
@@ -234,11 +236,11 @@ module Hibernate
         unless mapped?
           discriminator = nil
 
-          relationships().each do |rel|
+          relationships.each do |rel|
             puts "---------------relationship: #{rel.inspect()}"
           end
 
-          properties().each do |prop|
+          properties.each do |prop|
             puts "---------------property: #{prop.inspect()}"
             discriminator = add_java_property(prop) || discriminator
           end
