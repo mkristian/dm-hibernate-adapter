@@ -2,7 +2,7 @@
 # create by maven - leave it as is
 Gem::Specification.new do |s|
   s.name = 'dm-hibernate-adapter'
-  s.version = '0.1pre'
+  s.version = '0.2pre'
 
   s.summary = 'dm-hibernate-adapter'
 
