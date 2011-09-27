@@ -1,4 +1,5 @@
 module Hibernate
+
   # java_import: http://jira.codehaus.org/browse/JRUBY-3538
   java_import 'de.saumya.jibernate.JibernateClassLoader'
   java_import 'de.saumya.jibernate.JibernateJRubyClassLoader'
@@ -153,10 +154,10 @@ module Hibernate
 
   private
 
-  def self.mapped?(clazz)
-    @mapped_classes ||= []
-    @mapped_classes.member?(clazz)
-  end
+    def self.mapped?(clazz)
+      @mapped_classes ||= []
+      @mapped_classes.member?(clazz)
+    end
 
   module Model
 

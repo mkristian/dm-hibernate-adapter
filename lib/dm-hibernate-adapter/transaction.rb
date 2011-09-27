@@ -1,4 +1,5 @@
 module Hibernate
+
   class Transaction
 
     attr_reader :session
@@ -24,4 +25,5 @@ module Hibernate
     end
 
   end
+
 end

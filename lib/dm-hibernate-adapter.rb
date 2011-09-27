@@ -195,9 +195,10 @@ module DataMapper
       # extension to the adapter API
 
       def execute_update(sql)
-        unit_of_work do |session|
-          session.do_work(UpdateWork.new(sql))
-        end
+        raise "NYI"
+        # unit_of_work do |session|
+        #   session.do_work(UpdateWork.new(sql))
+        # end
       end
 
       # <dm-transactions>
@@ -277,13 +278,12 @@ module DataMapper
           end
         end
 
-        def cast_to_hibernate (value, model_type)
+        def cast_to_hibernate(value, model_type)
           case value
             when Fixnum
               # XXX Warning. ie Integer.value_of(value) returns cached objects already converted to Ruby objects!
               if    model_type == Java::JavaLang::Integer then java.lang.Integer.new(value)
               elsif model_type == Java::JavaLang::Long    then java.lang.Long.new(value)
-              else  puts "---other Hibernate type, object: #{value} type: #{value.class} Hibernate type: #{model_type} ---"
               end
             when Float    then java.lang.Float.new(value)
             when String   then value.to_java_string
@@ -378,7 +378,7 @@ module DataMapper
           operand = children.inject(operand){ |op,child| op.add(parse_conditions_tree(child, model))}
         end
 
-        def parse_the_only_child(child,model)
+        def parse_the_only_child(child, model)
           parse_conditions_tree(child, model)
         end
 
@@ -444,7 +444,7 @@ module DataMapper
         #   collection of records to print it out formatted
         #
         # @api private
-        def log_update(attributes,collection)
+        def log_update(attributes, collection)
           @@logger.debug <<-EOT
           update
              attributes:
