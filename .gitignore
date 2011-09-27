@@ -13,3 +13,4 @@ lib/*.jar
 .project
 .settings
 *.gem
+demo/db/*.db

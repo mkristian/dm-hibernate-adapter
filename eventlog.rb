@@ -62,7 +62,6 @@ when /store_both/
     person.save
   end
 
-
 when /store/
   event = Event.new
   event.title = ARGV[1]

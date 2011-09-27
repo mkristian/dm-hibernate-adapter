@@ -1,6 +1,12 @@
 require 'java'
 require 'jruby/core_ext'
 
+begin
+  require 'dm-hibernate-adapter_ext.jar'
+rescue LoadError
+  warn "missing extension jar, may be it is already in the parent classloader"
+end
+
 require 'slf4r'
 require 'slf4r/java_logger'
 

@@ -10,19 +10,19 @@ Jibernate/Hibernate module for DataMapper
 
 setup the gems and compile the java extension
 
-    rmvn clean gem:initialize compile
+    rmvn clean gem:initialize compile -- -Djruby.version=1.6.4
 
 run the eventlog - list
 
-    rmvn gem exec eventlog.rb list -- -o
+    rmvn gem exec eventlog.rb list -- -o -Djruby.version=1.6.4
 
 run the eventlog - store
 
-    rmvn gem exec eventlog.rb store something -- -o
+    rmvn gem exec eventlog.rb store something -- -o -Djruby.version=1.6.4
 
 run the eventlog - store with rollback
 
-    rmvn gem exec eventlog.rb store_rollback something -- -o
+    rmvn gem exec eventlog.rb store_rollback something -- -o -Djruby.version=1.6.4
 
 
 ### Howtos:
@@ -36,19 +36,19 @@ how to run specs?
   * AbstractAdapter specs:
 
         rmvn rake spec:adapter -- -o
-	or
+  or
         rmvn test -- -Padapter -o
 
   * dm-core specs:
 
         rmvn rake spec:dm -- -o
-	or
+  or
         rmvn test -- -Pdm -o
 
   * transient specs:
 
         rmvn rake spec:transient -- -o
-	or
+  or
         rmvn test -- -Ptransient -o
 
 when using `rmvn test` there will be a nice html rspec report in **target/rspec-report.html**.

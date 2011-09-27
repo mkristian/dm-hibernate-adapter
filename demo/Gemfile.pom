@@ -103,7 +103,7 @@
     <dependency>
       <groupId>rubygems</groupId>
       <artifactId>dm-hibernate-adapter</artifactId>
-      <version>0.1pre</version>
+      <version>0.2pre</version>
       <type>gem</type>
     </dependency>
     <dependency>
@@ -127,7 +127,7 @@
     <dependency>
       <groupId>org.jruby</groupId>
       <artifactId>jruby-complete</artifactId>
-      <version>1.6.3</version>
+      <version>1.6.2</version>
       <type>jar</type>
     </dependency>
     <dependency>

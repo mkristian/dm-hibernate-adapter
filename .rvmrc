@@ -1,2 +1,2 @@
-rvm use jruby-1.6.3@jibernate
+rvm use jruby-1.6.4@jibernate
 
