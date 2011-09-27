@@ -6,12 +6,12 @@ DataMapper.setup(:default, :adapter => "hibernate", :dialect => "H2", :username 
 
 class Event
   include DataMapper::Resource
-  
+
   property :id,    Serial
   property :title, String, :required => true, :length => 10
   property :date,  Date
 
-  has n,    :people
+  has n,   :people
 end
 
 class Person
@@ -24,65 +24,60 @@ class Person
 end
 
 if File.exists?("target/eventlog.h2.db")
-  Event.auto_upgrade!()
-  Person.auto_upgrade!()
+  Event.auto_upgrade!
+  Person.auto_upgrade!
 else
-  Event.auto_migrate!()
-  Person.auto_migrate!()
+  Event.auto_migrate!
+  Person.auto_migrate!
 end
 
 case ARGV[0]
 when /store_update/
   # Create event and store it, then it's updated
-  event = Event.new()
+  event = Event.new
   event.title = ARGV[1]
-  event.date = java.util.Date.new()
-  event.save()
-  puts "Stored!"
+  event.date = java.util.Date.new
+  event.save
   event.update(:title =>ARGV[2])
-  puts "Updated!"
-when /store_rollback/
-  # ...almost.. creates event and stores it
 
+when /store_rollback/
   Event.transaction do |tx|
 
-    event = Event.new()
+    event = Event.new
     event.title = ARGV[1]
-    event.date = Date.today()
-    event.save()
+    event.date = Date.today
+    event.save
 
-    tx.rollback()  
+    tx.rollback
   end
 
 when /store_both/
-
-  event = Event.new()
+  event = Event.new
   event.title = ARGV[1]
-  event.date = Date.today()
-  event.save()
+  event.date = Date.today
+  event.save
 
   ARGV[2].to_i.times do |i|
     person = event.people.new( :name => "John##{i}" )
-    person.save()
+    person.save
   end
 
 
 when /store/
-
-  event = Event.new()
+  event = Event.new
   event.title = ARGV[1]
-  event.date = Date.today()
-  event.save()
+  event.date = Date.today
+  event.save
 
 when /update/
    # Update event and store it
    event = Event.get(ARGV[1])
    event.title = ARGV[2]
-   event.save()
-   puts "Updated!"
+   event.save
+
 when /list/
-  list = Event.all()
-  puts "Listing all events #{list.size()} with people:"
+  list = Event.all
+  puts "Listing all events #{list.size} with people:"
   list.each do |evt|
     puts <<-EOS
     Event:
@@ -104,8 +99,8 @@ when /list/
     end
   end
 
-  list = Person.all()
-  puts "\nListing all people #{list.size()}:"
+  list = Person.all
+  puts "\nListing all people #{list.size}:"
   list.each do |p|
     puts <<-EOS
     Person:

@@ -1,8 +1,8 @@
 module Hibernate
 
+  @@mapped_classes = {}
+
   # java_import: http://jira.codehaus.org/browse/JRUBY-3538
-  java_import 'de.saumya.jibernate.JibernateClassLoader'
-  java_import 'de.saumya.jibernate.JibernateJRubyClassLoader'
   java_import org.hibernate.cfg.AnnotationConfiguration
   JClass  = java.lang.Class
   JVoid   = java.lang.Void::TYPE
@@ -142,10 +142,10 @@ module Hibernate
     @config ||= AnnotationConfiguration.new
   end
 
-  def self.add_model(model_java_class)
-    unless mapped?(model_java_class)
-      config.add_annotated_class(model_java_class)
-      @mapped_classes << model_java_class
+  def self.add_model(model_java_class, name)
+    unless mapped? name
+      config.add_annotated_class model_java_class
+      @@mapped_classes[name] = true
       @@logger.debug " model/class #{model_java_class} registered successfully"
     else
       @@logger.debug " model/class #{model_java_class} registered already"
@@ -154,9 +154,8 @@ module Hibernate
 
   private
 
-    def self.mapped?(clazz)
-      @mapped_classes ||= []
-      @mapped_classes.member?(clazz)
+    def self.mapped?(name)
+      @@mapped_classes[name]
     end
 
   module Model
@@ -249,20 +248,8 @@ module Hibernate
             annotation[javax.persistence.DiscriminatorColumn] = { "name" => discriminator }
           end
 
-          add_class_annotation(annotation)
-
-          Hibernate.add_model(become_java!)
-
-          unless java.lang.Thread.currentThread.context_class_loader.is_a? JibernateClassLoader
-            cl = java.lang.Thread.currentThread.context_class_loader
-            if cl.is_a? org.jruby.util.JRubyClassLoader
-              java.lang.Thread.currentThread.context_class_loader = JibernateJRubyClassLoader.new(cl)
-            else
-              java.lang.Thread.currentThread.context_class_loader = JibernateClassLoader.new(cl)
-            end
-          end
-
-          java.lang.Thread.currentThread.context_class_loader.register(java_class)
+          add_class_annotation annotation
+          Hibernate.add_model become_java!(false), name
 
           @@logger.debug "become_java! #{java_class}"
         else
@@ -272,7 +259,7 @@ module Hibernate
       end
 
       def mapped?
-        Hibernate.mapped? java_class
+        Hibernate.mapped? name
       end
 
       private

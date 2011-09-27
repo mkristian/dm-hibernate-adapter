@@ -1,10 +1,6 @@
 require 'java'
-begin
-  require 'dm-hibernate-adapter_ext.jar'
-rescue LoadError
-  warn "missing extension jar, may be it is already in the parent classloader"
-end
-java_import 'de.saumya.jibernate.UpdateWork'
+require 'jruby/core_ext'
+
 require 'slf4r'
 require 'slf4r/java_logger'
 
@@ -14,7 +10,6 @@ end
 
 require 'dm-core/adapters/abstract_adapter'
 
-require 'jruby/core_ext'
 require 'stringio'
 
 require 'dm-hibernate-adapter/dialects'
