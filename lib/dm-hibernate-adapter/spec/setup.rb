@@ -20,8 +20,6 @@ module DataMapper
       end
 
       use HibernateAdapter
-
-
     end
   end
 end

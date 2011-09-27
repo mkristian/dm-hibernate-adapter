@@ -3,24 +3,24 @@ module Hibernate
 
     attr_reader :session
 
-    def initialize()
-      @session = Hibernate.session()
+    def initialize
+      @session = Hibernate.session
     end
 
-    def close()
-      @session.close() if @session
+    def close
+      @session.close if @session
     end
 
-    def begin()
-      @session.begin_transaction()
+    def begin
+      @session.begin_transaction if @session
     end
 
-    def commit()
-      @session.transaction().commit()
+    def commit
+      @session.transaction.commit if @session
     end
 
-    def rollback()
-      @session.transaction().rollback() if @session
+    def rollback
+      @session.transaction.rollback if @session
     end
 
   end

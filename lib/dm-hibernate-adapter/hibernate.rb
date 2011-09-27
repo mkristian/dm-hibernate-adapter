@@ -1,5 +1,5 @@
 module Hibernate
-  # XXX java_import: http://jira.codehaus.org/browse/JRUBY-3538
+  # java_import: http://jira.codehaus.org/browse/JRUBY-3538
   java_import 'de.saumya.jibernate.JibernateClassLoader'
   java_import 'de.saumya.jibernate.JibernateJRubyClassLoader'
   java_import org.hibernate.cfg.AnnotationConfiguration
@@ -32,7 +32,7 @@ module Hibernate
     config.set_property "hibernate.connection.url", url
   end
 
-  def self.connection_url()
+  def self.connection_url
     config.get_property "hibernate.connection.url"
   end
 
@@ -61,6 +61,7 @@ module Hibernate
   end
 
   class PropertyShim
+
     def initialize(config)
       @config = config
     end
@@ -76,44 +77,45 @@ module Hibernate
     end
 
     private
-    def ensure_hibernate_key(key)
-      unless key =~ /^hibernate\./
-        key = 'hibernate.' + key
+
+      def ensure_hibernate_key(key)
+        unless key =~ /^hibernate\./
+          key = 'hibernate.' + key
+        end
+        key
       end
-      key
-    end
   end
 
-  def self.properties()
+  def self.properties
     PropertyShim.new(@config)
   end
 
-  def self.tx( &block )
+  def self.tx(&block)
     # http://community.jboss.org/wiki/sessionsandtransactions
-    if block_given?()
+    if block_given?
       s = nil
       begin
-        s = session()
-        s.begin_transaction()
-        block.call(s)
-        s.transaction().commit()
+        s = session
+        s.begin_transaction
+        block.call s
+        s.transaction.commit
       rescue => e
-        s.transaction().rollback() if s
-        raise( e )
+        s.transaction.rollback if s
+        raise e
       ensure
-        s.close() if s
+        s.close if s
       end
     else
-      raise( "not supported" )
+      raise "not supported"
     end
   end
 
-  def self.factory()
-    @factory ||= config.build_session_factory()
+  def self.factory
+    @factory ||= config.build_session_factory
   end
 
-  def self.session()
-    factory().open_session()
+  def self.session
+    factory.open_session
   end
 
   def self.reset_config
@@ -126,7 +128,7 @@ module Hibernate
       url = self.connection_url
       driver_class = self.connection_driver_class
       @factory = nil
-      @config = AnnotationConfiguration.new()
+      @config = AnnotationConfiguration.new
       self.dialect= dialect
       self.connection_username = username
       self.connection_password = password
@@ -135,8 +137,8 @@ module Hibernate
     end
   end
 
-  def self.config()
-    @config ||= AnnotationConfiguration.new()
+  def self.config
+    @config ||= AnnotationConfiguration.new
   end
 
   def self.add_model(model_java_class)
@@ -158,7 +160,6 @@ module Hibernate
 
   module Model
 
-    # TODO enhance TYPEs list
     TYPES = {
       ::String                         => java.lang.String,
       ::Integer                        => java.lang.Integer,
@@ -174,9 +175,6 @@ module Hibernate
 
       model.extend(ClassMethods)
 
-      # XXX WARNING
-      # <monkey-patching>
-      # if class wasn't mapped before
       unless model.mapped?
         [:auto_migrate!, :auto_upgrade!, :create, :all, :copy, :first, :first_or_create, :first_or_new, :get, :last, :load].each do |method|
           model.before_class_method(method, :hibernate!)
@@ -186,7 +184,6 @@ module Hibernate
           model.before(method) { model.hibernate! }
         end
       end
-      # </monkey-patching>
 
     end
 
@@ -200,15 +197,14 @@ module Hibernate
       def auto_migrate!(repo = nil)
         config = Hibernate::config
 
-        # TODO drop only one table, not all of them !
         schema_export = SchemaExport.new(config)
-        console       = true # XXX here you can turn on/off logger
+        # here you can turn on/off logger
+        console       = true
         schema_export.drop(console,true)
         schema_export.create(console,true)
       end
 
       def auto_upgrade!(repo = nil)
-        # raise "NYI" #TODO
       end
 
       def to_java_type(type)
@@ -218,13 +214,10 @@ module Hibernate
 
       def to_java_class_name
         # http://jira.codehaus.org/browse/JRUBY-4601
-        # return properly full-specified class name (ie rubyobj.Z.X.Y)
         "rubyobj."+self.to_s.gsub("::",".")
       end
 
       def hibernate!
-        # just make sure all the properties are there
-        # initialize join models and target keys
         relationships.each do |property, relationship|
           next unless relationship
 
@@ -233,15 +226,14 @@ module Hibernate
           relationship.through    if relationship.respond_to?(:through)
           relationship.via        if relationship.respond_to?(:via)
         end
+
         unless mapped?
           discriminator = nil
 
-          relationships.each do |rel|
-            puts "---------------relationship: #{rel.inspect()}"
-          end
+          # relationships.each do |rel|
+          # end
 
           properties.each do |prop|
-            puts "---------------property: #{prop.inspect()}"
             discriminator = add_java_property(prop) || discriminator
           end
 
@@ -265,7 +257,7 @@ module Hibernate
             if cl.is_a? org.jruby.util.JRubyClassLoader
               java.lang.Thread.currentThread.context_class_loader = JibernateJRubyClassLoader.new(cl)
             else
-              java.lang.Thread.currentThread.context_class_loader = JibernateClassLoader.new(cl)           
+              java.lang.Thread.currentThread.context_class_loader = JibernateClassLoader.new(cl)
             end
           end
 
@@ -278,15 +270,13 @@ module Hibernate
 
       end
 
-      #helper method
-      def mapped?()
-        Hibernate.mapped?(java_class())
+      def mapped?
+        Hibernate.mapped? java_class
       end
 
+      private
 
-        private
-
-        def hibernate_sigs()
+        def hibernate_sigs
           @hibernate_sigs ||= {}
         end
 
@@ -299,18 +289,17 @@ module Hibernate
 
           column_name = prop.field
           annotation = {}
-          # TODO honor prop.field mapping and maybe more
+
           if prop.serial?
             annotation[javax.persistence.Id] = {}
             annotation[javax.persistence.GeneratedValue] = {}
           elsif prop.key?
-            # TODO obey multi column keys
             annotation[javax.persistence.Id] = {}
           end
 
           annotation[javax.persistence.Column] = {
-                  "unique" => prop.unique?,
-                  "name"   => prop.field
+            "unique" => prop.unique?,
+            "name"   => prop.field
           }
 
           unless prop.index.nil?

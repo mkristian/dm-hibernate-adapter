@@ -44,9 +44,9 @@ module DataMapper
         :PostgreSQL     => "org.postgresql.Driver",
       }
 
-      DataMapper::Model.append_inclusions( Hibernate::Model )
+      DataMapper::Model.append_inclusions(Hibernate::Model)
 
-      extend( Chainable )
+      extend(Chainable)
 
       def initialize(name, options = {})
         dialect   = options.delete(:dialect)
@@ -57,11 +57,11 @@ module DataMapper
         url       = options.delete(:url)
         url      += "jdbc:" unless url =~ /^jdbc:/
 
-        super( name, options )
+        super(name, options)
 
         Hibernate.dialect = Hibernate::Dialects.const_get(dialect.to_s)
         Hibernate.current_session_context_class = "thread"
-        
+
         Hibernate.connection_driver_class = driver.to_s
         Hibernate.connection_url          = url.to_s # ie. "jdbc:h2:jibernate"
         Hibernate.connection_username     = username.to_s # ie. "sa"
@@ -92,8 +92,8 @@ module DataMapper
               session.persist(resource)
               count += 1
             rescue NativeException => e
-              @@logger.debug("error creating #{resource.inspect()}", e.cause())
-              session.clear()
+              @@logger.debug("error creating #{resource.inspect}", e.cause)
+              session.clear
               raise e
             end
           end
@@ -111,8 +111,8 @@ module DataMapper
       #
       # @api semipublic
       def update(attributes, collection)
-        
         log_update(attributes, collection)
+
         count = 0
         unit_of_work do |session|
           collection.each do |resource|
@@ -131,8 +131,8 @@ module DataMapper
       #
       # @api semipublic
       def read(query)
-
         log_read(query)
+
         conditions = query.conditions
         model      = query.model
         limit      = query.limit
@@ -164,7 +164,7 @@ module DataMapper
 
             criteria.add_order(order)
             end
-          end            
+          end
 
           @@logger.debug(criteria.to_s)
 
@@ -183,7 +183,6 @@ module DataMapper
       #
       # @api semipublic
       def delete(resources)
-
         unit_of_work do |session|
           resources.each do |resource|
             @@logger.debug("deleting #{resource.inspect}")
@@ -196,14 +195,13 @@ module DataMapper
       # extension to the adapter API
 
       def execute_update(sql)
-
         unit_of_work do |session|
           session.do_work(UpdateWork.new(sql))
         end
       end
 
       # <dm-transactions>
-  
+
       # Produces a fresh transaction primitive for this Adapter
       #
       # Used by Transaction to perform its various tasks.
@@ -213,9 +211,9 @@ module DataMapper
       #   and :rollback,
       #
       # @api private
-      def transaction_primitive()
+      def transaction_primitive
         # DataObjects::Transaction.create_for_uri(normalized_uri)
-        Hibernate::Transaction.new()
+        Hibernate::Transaction.new
       end
 
       # Pushes the given Transaction onto the per thread Transaction stack so
@@ -231,7 +229,7 @@ module DataMapper
       # @api private
       #
       def push_transaction(transaction)
-        transactions() << transaction
+        transactions << transaction
       end
 
       # Pop the 'current' Transaction from the per thread Transaction stack so
@@ -242,8 +240,8 @@ module DataMapper
       #   the former 'current' transaction.
       #
       # @api private
-      def pop_transaction()
-        transactions().pop()
+      def pop_transaction
+        transactions.pop
       end
 
 
@@ -256,35 +254,30 @@ module DataMapper
       #   the 'current' transaction for this Adapter.
       #
       # @api private
-      def current_transaction()
-        transactions().last()
+      def current_transaction
+        transactions.last
       end
-      
       # </dm-transactions>
 
-      
-      
-        private
 
-        # @api private
-        def transactions()
+      private
+
+        def transactions
           Thread.current[:dm_transactions]            ||= {}
           Thread.current[:dm_transactions][object_id] ||= []
         end
 
-        def unit_of_work( &block )
-          # TODO state of the session should be also checked!
-          current_tx = current_transaction()
+        def unit_of_work(&block)
+          current_tx = current_transaction
 
           if current_tx
-            block.call( current_tx.primitive_for( self ).session() )
+            block.call(current_tx.primitive_for(self).session)
           else
-            Hibernate.tx( &block )
+            Hibernate.tx(&block)
           end
         end
 
         def cast_to_hibernate (value, model_type)
-          #TODO ADD MORE TYPES!!!
           case value
             when Fixnum
               # XXX Warning. ie Integer.value_of(value) returns cached objects already converted to Ruby objects!
@@ -302,7 +295,6 @@ module DataMapper
             when NilClass then nil
             when Regexp   then value.source.to_java_string
             else
-              puts "---other Ruby type, object: #{value} type: #{value.class} ---"
               value.to_s.to_java_string
           end
         end
@@ -323,7 +315,6 @@ module DataMapper
             # TODO allow multicolumn keys !!!
             # TODO why the break in symetry ?
             subject = con.subject.parent_key.first.name.to_s
-            # why does is not work: con.subject.child_key.get(con.value).first ???
             value = con.subject.child_key.first.get(con.value.first) # value used in comparison
           end
           model_type = model.to_java_type(model.properties[subject.to_sym].class) # Java type of property (used in typecasting)
@@ -355,7 +346,6 @@ module DataMapper
                 # special case handling :x => 1..110 / :x => [1,2,3]
                 Restrictions.in(subject, cast_to_hibernate(value, model_type))
               else
-                # XXX proper ordering?
                 arr = value.is_a?(Fixnum) ? [value] : value.to_a
                 lo = arr.first
                 hi = arr.last
@@ -375,7 +365,7 @@ module DataMapper
                 Restrictions.sqlRestriction("(" + subject +" ~ ?)",
                              cast_to_hibernate(value, model_type), org::hibernate::Hibernate::STRING)
               # elsif dialect ==  "org.hibernate.dialect.DerbyDialect"
-              # TODO implement custom matching function for some dbs (see README on Wiki)
+              # implement custom matching function for some dbs (see README on Wiki)
               else
                 Restrictions.sqlRestriction("(" + subject +" regexp ?)",
                              cast_to_hibernate(value, model_type), org::hibernate::Hibernate::STRING)
@@ -397,13 +387,13 @@ module DataMapper
 
           case con
             when DataMapper::Query::Conditions::AndOperation
-              parse_all_children(children, model, Restrictions.conjunction())
+              parse_all_children(children, model, Restrictions.conjunction)
 
             when DataMapper::Query::Conditions::OrOperation
-              parse_all_children(children, model, Restrictions.disjunction())
+              parse_all_children(children, model, Restrictions.disjunction)
 
             when DataMapper::Query::Conditions::NotOperation
-              #XXX only one child may be negated in DM?
+              # only one child may be negated in DM?
               child = children.first
 
               if !(child.respond_to? :children) &&
@@ -411,20 +401,18 @@ module DataMapper
                   (child.value.class == Array)  && (child.value.empty?)
 
                 subject = child.subject.name.to_s
-                # XXX ugly workaround for Model.all(:x.not => [])
+                # workaround for Model.all(:x.not => [])
                 Restrictions.sqlRestriction(" ( "+ subject +" is null or " + subject +" is not null ) ")
               else
                 Restrictions.not(parse_the_only_child(child,model))
               end
 
             when DataMapper::Query::Conditions::NullOperation
-              # XXX NullOperation is not used in dm_core at the moment
-              raise NotImplementedError, "#{con.class} is not not used in dm_core"
+              raise NotImplementedError, "#{con.class} is not not used in dm-core"
           end
         end
 
         def parse_conditions_tree(conditions, model)
-          #conditions has children ? (in fact -> "is it comparison or operand?")
           unless conditions.respond_to?(:children)
             handle_comparison(conditions, model)
           else
@@ -440,7 +428,7 @@ module DataMapper
         # @api private
         def log_read(query)
           @@logger.debug <<-EOT
-          read()
+          read
               query:
                 #{query.inspect}
               model:
@@ -458,7 +446,7 @@ module DataMapper
         # @api private
         def log_update(attributes,collection)
           @@logger.debug <<-EOT
-          update()
+          update
              attributes:
                #{attributes.inspect}
              collection:
