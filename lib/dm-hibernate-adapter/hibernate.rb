@@ -175,6 +175,18 @@ module Hibernate
 
       model.extend(ClassMethods)
 
+      # this part is needed for the model A.create method to work
+      model.class_eval <<-EOF
+         alias :initialize_old :initialize
+         def initialize(*args)
+            if self.class.hibernate!
+              self.class.new(*args)
+            else
+              initialize_old(*args)
+            end
+         end
+EOF
+
       unless model.mapped?
         [:auto_migrate!, :auto_upgrade!, :create, :all, :copy, :first, :first_or_create, :first_or_new, :get, :last, :load].each do |method|
           model.before_class_method(method, :hibernate!)
@@ -218,6 +230,7 @@ module Hibernate
       end
 
       def hibernate!
+        result = false
         relationships.each do |property, relationship|
           next unless relationship
 
@@ -250,12 +263,13 @@ module Hibernate
 
           add_class_annotation annotation
           Hibernate.add_model become_java!(false), name
+          result = true
 
           @@logger.debug "become_java! #{java_class}"
         else
           @@logger.debug "become_java! fired already #{java_class}"
         end
-
+        result
       end
 
       def mapped?
