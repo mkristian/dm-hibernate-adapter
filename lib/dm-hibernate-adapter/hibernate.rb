@@ -175,17 +175,17 @@ module Hibernate
 
       model.extend(ClassMethods)
 
-      # this part is needed for the model A.create method to work
-      model.class_eval <<-EOF
-         alias :initialize_old :initialize
-         def initialize(*args)
-            if self.class.hibernate!
-              self.class.new(*args)
-            else
-              initialize_old(*args)
-            end
-         end
-EOF
+#       this part is needed for the model A.create method to work
+#       model.class_eval <<-EOF
+#          alias :initialize_old :initialize
+#          def initialize(*args)
+#             if self.class.hibernate!
+#               self.class.new(*args)
+#             else
+#               initialize_old(*args)
+#             end
+#          end
+# EOF
 
       unless model.mapped?
         [:auto_migrate!, :auto_upgrade!, :create, :all, :copy, :first, :first_or_create, :first_or_new, :get, :last, :load].each do |method|
