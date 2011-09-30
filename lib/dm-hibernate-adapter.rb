@@ -200,12 +200,13 @@ module DataMapper
 
       def execute_update(sql)
         unit_of_work do |session|
-          con = session.connection
-          st  = con.create_statement
-          begin
-            st.execute_update(sql)
-          ensure
-            st.close
+          session.do_work do |connection|
+            st  = connection.create_statement
+            begin
+              st.execute_update(sql)
+            ensure
+              st.close
+            end
           end
         end
       end
