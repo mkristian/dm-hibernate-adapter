@@ -28,6 +28,9 @@ module DataMapper
 
     java_import org.hibernate.criterion.Restrictions # ie. Restriction.eq
     java_import org.hibernate.criterion.Order        # ie. Order.asc
+    java_import java.sql.Connection
+    java_import java.sql.SQLException
+    java_import java.sql.Statement
 
     class HibernateAdapter < AbstractAdapter
 
@@ -196,10 +199,15 @@ module DataMapper
       # extension to the adapter API
 
       def execute_update(sql)
-        raise "NYI"
-        # unit_of_work do |session|
-        #   session.do_work(UpdateWork.new(sql))
-        # end
+        unit_of_work do |session|
+          con = session.connection
+          st  = con.create_statement
+          begin
+            st.execute_update(sql)
+          ensure
+            st.close
+          end
+        end
       end
 
       # <dm-transactions>
