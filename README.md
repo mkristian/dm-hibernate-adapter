@@ -7,11 +7,11 @@ Installation:
 
 * Install ruby-maven wrapper
 
-  `jruby -S gem install ruby-maven`
+    `jruby -S gem install ruby-maven`
 
 * setup the gems and compile the java extension
 
-  `rmvn clean gem:initialize compile -- -Djruby.version=1.6.4`
+    `rmvn clean gem:initialize compile -- -Djruby.version=1.6.4`
 
 ruby-maven
 ----------
