@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.summary = 'dm-hibernate-adapter'
 
   s.authors = ['Douglas Ferreira', 'Kristian Meier', 'Piotr Gęga']
-  s.email = ['douglasrodrigo@gmail.com', 'm.kristian@web.de', 'pietia.moo@gmail.com']
+  s.email = ['douglasrodrigo@gmail.com', 'm.kristian@web.de', 'piotrgega@gmail.com']
 
   s.platform = 'java'
   s.files = Dir['lib/dm-hibernate-adapter_ext.jar']
