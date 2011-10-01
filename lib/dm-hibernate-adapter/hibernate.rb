@@ -88,7 +88,7 @@ module Hibernate
   end
 
   def self.properties
-    PropertyShim.new(@config)
+    @@property_shim ||= PropertyShim.new(@@config)
   end
 
   def self.tx(&block)
@@ -112,7 +112,7 @@ module Hibernate
   end
 
   def self.factory
-    @factory ||= config.build_session_factory
+    @@factory ||= config.build_session_factory
   end
 
   def self.session
@@ -120,7 +120,7 @@ module Hibernate
   end
 
   def self.reset_config
-    if @config
+    if @@config
       # TODO make the whole with a list of property names
       # define the static accessors with the very same list
       dialect = self.dialect
@@ -128,8 +128,8 @@ module Hibernate
       password = self.connection_password
       url = self.connection_url
       driver_class = self.connection_driver_class
-      @factory = nil
-      @config = AnnotationConfiguration.new
+      @@factory = nil
+      @@config = AnnotationConfiguration.new
       self.dialect= dialect
       self.connection_username = username
       self.connection_password = password
@@ -139,7 +139,7 @@ module Hibernate
   end
 
   def self.config
-    @config ||= AnnotationConfiguration.new
+    @@config ||= AnnotationConfiguration.new
   end
 
   def self.add_model(model_java_class, name)

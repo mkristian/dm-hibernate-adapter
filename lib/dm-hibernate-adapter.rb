@@ -74,8 +74,8 @@ module DataMapper
 
         Hibernate.properties["cache.provider_class"]  = "org.hibernate.cache.NoCacheProvider"
         Hibernate.properties["hbm2ddl.auto"]          = "update"
-        Hibernate.properties["format_sql"]            = "false"
-        Hibernate.properties["show_sql"]              = "true"
+        Hibernate.properties["format_sql"]            = ENV['FORMAT_SQL'] == 'true' ? 'true' : 'false'
+        Hibernate.properties["show_sql"]              = ENV['SHOW_SQL']   == 'true' ? 'true' : 'false'
 
       end
 
