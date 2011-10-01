@@ -1,10 +1,8 @@
-Jibernate/Hibernate module for DataMapper
+dm-hibernate-adapter aka jibernate
 =========================================
 
-*WARNING* Don't use `-o` if you want to access remote repositories
 
-
-### You have to:
+### Installation:
 
     jruby -S gem install ruby-maven
 
@@ -12,22 +10,34 @@ setup the gems and compile the java extension
 
     rmvn clean gem:initialize compile -- -Djruby.version=1.6.4
 
-run the eventlog - list
+### ruby-maven
 
-    rmvn gem exec eventlog.rb list -- -o -Djruby.version=1.6.4
+* The ruby-maven setup will generate a pom.xml which can be used by proper maven3.
+* Don't use `-o` if you want to access remote repositories
 
-run the eventlog - store
+### Logging
 
-    rmvn gem exec eventlog.rb store something -- -o -Djruby.version=1.6.4
-
-run the eventlog - store with rollback
-
-    rmvn gem exec eventlog.rb store_rollback something -- -o -Djruby.version=1.6.4
-
+* use `SHOW_SQL=true` ENV variable in order to log SQL (turned off by default, except DDL)
+* use `FORMAT_SQL=true` ENV variable in order to format SQL logs
 
 ### Howtos:
 
-how to list rake tasks (please note the jruby.rake.args part(var name))
+
+how to test basic actions `with eventlog.rb`
+
+* how to run the eventlog - listing
+
+    rmvn gem exec eventlog.rb list -- -o -Djruby.version=1.6.4
+
+* how to run the eventlog - storing record
+
+    rmvn gem exec eventlog.rb store something -- -o -Djruby.version=1.6.4
+
+* how to run the eventlog - storing with rollback
+
+    rmvn gem exec eventlog.rb store_rollback something -- -o -Djruby.version=1.6.4
+
+* how to list rake tasks (please note the jruby.rake.args part(var name))
 
     rmvn rake -T -- -o
 
@@ -71,6 +81,4 @@ if you are getting problems with specs you can skip that phase:
 
         -- -Dmaven.test.skip=true
 
-### Note
 
-the ruby-maven setup will generate a pom.xml which can be used by proper maven3.
