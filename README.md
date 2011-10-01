@@ -5,11 +5,13 @@ dm-hibernate-adapter aka jibernate
 Installation:
 -------------
 
-    jruby -S gem install ruby-maven
+* Install ruby-maven wrapper
 
-setup the gems and compile the java extension
+  `jruby -S gem install ruby-maven`
 
-    rmvn clean gem:initialize compile -- -Djruby.version=1.6.4
+* setup the gems and compile the java extension
+
+  `rmvn clean gem:initialize compile -- -Djruby.version=1.6.4`
 
 ruby-maven
 ----------
@@ -46,41 +48,19 @@ Howtos:
 
 ### Specs
 
-* AbstractAdapter specs:
+Test suites:
 
-  `rmvn rake spec:adapter -- -o`
-or
-  `rmvn test -- -Padapter -o`
+* AbstractAdapter specs: `rmvn rake spec:adapter -- -o` or `rmvn test -- -Padapter -o`
+* dm-core specs: `rmvn rake spec:dm -- -o` or `rmvn test -- -Pdm -o`
+* transient specs: `rmvn rake spec:transient -- -o` or `rmvn test -- -Ptransient -o`
 
-* dm-core specs:
+Tips:
 
-  `rmvn rake spec:dm -- -o`
-or
-  `rmvn test -- -Pdm -o`
-
-* transient specs:
-
-  `rmvn rake spec:transient -- -o`
-or
-  `rmvn test -- -Ptransient -o`
-
-when using `rmvn test` there will be a nice html rspec report in **target/rspec-report.html**.
-to get debug output use (use '--' only once which denotes the beginning of maven options)
-
-  `-- -Djruby.verbose -e`
-
-you can switch the jruby version by adding to the above commands
-
-  `-- -Djruby.version=1.6.3`
-
-if you are getting OutOfMemory errors, you should try to tune jruby-maven-plugin's [settings](https://github.com/mkristian/jruby-maven-plugins) and set them as properties in 'Mavenfile' - see in that file
-
-  `properties['jruby.jvmargs'] = '-Xmx1024m'`
-
-if you are getting problems with specs you can skip that phase:
-
-  `-- -Dmaven.test.skip=true`
-
+* when using `rmvn test` there will be a nice html rspec report in **target/rspec-report.html**.
+to get debug output use (use '--' only once which denotes the beginning of maven options) `-- -Djruby.verbose -e`
+* you can switch the jruby version by adding to the above commands `-- -Djruby.version=1.6.3`
+* if you are getting OutOfMemory errors, you should try to tune jruby-maven-plugin's [settings](https://github.com/mkristian/jruby-maven-plugins) and set them as properties in 'Mavenfile' - see in that file (ie. `properties['jruby.jvmargs'] = '-Xmx1024m'`)
+* if you are getting problems with specs you can skip that phase: `-- -Dmaven.test.skip=true`
 
 Authors
 -------
@@ -92,6 +72,4 @@ License
 -------
 
 See `LICENSE.md`
-
-
 
