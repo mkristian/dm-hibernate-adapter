@@ -37,8 +37,3 @@ end
 profile(:dm) do |t|
   t.plugin(:rspec).configuration[:specSourceDirectory] = 'spec/dm_core'
 end
-
-execute_in_phase(:initialize) do
-  require 'fileutils'
-  FileUtils.cp("dm-hibernate-adapter.gemspec.pom", "pom.xml")
-end
