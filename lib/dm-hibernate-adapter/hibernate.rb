@@ -278,10 +278,6 @@ module Hibernate
 
       private
 
-        def hibernate_sigs
-          @hibernate_sigs ||= {}
-        end
-
         # "stolen" from http://github.com/superchris/hibernate
         def add_java_property(prop)
           @@logger.info("#{prop.model.name} gets property added #{prop.name}")
@@ -334,7 +330,7 @@ module Hibernate
           set_name = "set#{name.to_s.capitalize}"
 
           # TODO Time, Discriminator, EmbededValue
-          # to consider: in mu opinion those methods should set from/get to java objects...
+          # to consider: in my opinion those methods should set from/get to java objects...
           if (type == DataMapper::Property::Date)
             class_eval <<-EOT
               def  #{set_name.intern} (d)
