@@ -42,6 +42,8 @@ Howtos:
 
     `rmvn gem exec eventlog.rb store_rollback something -- -o -Djruby.version=1.6.4`
 
+### Rake
+
 * how to list rake tasks (please note the jruby.rake.args part(var name))
 
     `rmvn rake -T -- -o`
