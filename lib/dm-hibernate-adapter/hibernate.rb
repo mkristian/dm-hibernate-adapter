@@ -231,21 +231,15 @@ module Hibernate
 
       def hibernate!
         result = false
-        relationships.each do |property, relationship|
-          next unless relationship
-
-          relationship.child_key
-          relationship.parent_key
-          relationship.through    if relationship.respond_to?(:through)
-          relationship.via        if relationship.respond_to?(:via)
-        end
 
         unless mapped?
           discriminator = nil
 
-          # relationships.each do |rel|
-          # end
-
+          relationships.each do |relationship|
+            relationship.source_key
+            relationship.target_key
+          end
+          
           properties.each do |prop|
             discriminator = add_java_property(prop) || discriminator
           end
