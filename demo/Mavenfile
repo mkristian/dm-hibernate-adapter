@@ -7,10 +7,3 @@ jar 'com.h2database:h2', '1.2.138'
 
 jar 'org.slf4j:slf4j-log4j12', '1.5.2'
 jar 'log4j:log4j', '1.2.14'
-
-properties['jruby.plugins.version'] = '0.28.3'
-
-execute_in_phase(:initialize) do
-  require 'fileutils'
-  FileUtils.cp("Gemfile.pom", "pom.xml")
-end

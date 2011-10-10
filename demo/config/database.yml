@@ -6,6 +6,7 @@ defaults: &defaults
 
 development:
   database: db/demo3_development.db
+  allow_reload: true
   <<: *defaults
 
   # Add more repositories

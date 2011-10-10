@@ -56,4 +56,7 @@ group(:development, :test) do
   # gem 'rails_metrics', '~> 0.1', :git => 'git://github.com/engineyard/rails_metrics'
 end
 
-gem 'dm-hibernate-adapter', '0.2pre'
+gem 'dm-hibernate-adapter', '0.3pre'
+
+# this trigger ruby-maven to setup target/bin/rails with classpath for that application
+gem 'rails', RAILS_VERSION, :group=>:dummy
