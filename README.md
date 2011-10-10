@@ -73,5 +73,5 @@ Project was built on top of Charles Nutter's sample code.
 License
 -------
 
-See `LICENSE.md`
+See `LICENSE-2.0.txt`
 
