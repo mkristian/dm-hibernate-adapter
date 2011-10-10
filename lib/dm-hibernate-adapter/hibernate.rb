@@ -13,12 +13,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+begin
+  require 'dm-hibernate-adapter_ext.jar'
+rescue LoadError
+  warn "missing extension jar, may be it is already in the parent classloader"
+end
+
+java_import 'dm_hibernate_adapter.JRubyClassLoader'
+
 module Hibernate
 
   @@mapped_classes = {}
 
   # java_import: http://jira.codehaus.org/browse/JRUBY-3538
   java_import org.hibernate.cfg.AnnotationConfiguration
+
   JClass  = java.lang.Class
   JVoid   = java.lang.Void::TYPE
 
@@ -74,6 +83,14 @@ module Hibernate
 
   def self.connection_pool_size
     config.get_property "hibernate.connection.pool_size"
+  end
+
+  def self.allow_reload=(allow)
+    @allow = allow
+  end
+
+  def self.allow_reload
+    @allow || false
   end
 
   class PropertyShim
@@ -157,10 +174,10 @@ module Hibernate
     @@config ||= AnnotationConfiguration.new
   end
 
-  def self.add_model(model_java_class, name)
-    unless mapped? name
+  def self.add_model(model_java_class, model)
+    unless mapped? model
       config.add_annotated_class model_java_class
-      @@mapped_classes[name] = true
+      @@mapped_classes[model.name] = model.hash
       @@logger.debug " model/class #{model_java_class} registered successfully"
     else
       @@logger.debug " model/class #{model_java_class} registered already"
@@ -169,8 +186,11 @@ module Hibernate
 
   private
 
-    def self.mapped?(name)
-      @@mapped_classes[name]
+    def self.mapped?(model)
+      if @@mapped_classes[model.name] && @@mapped_classes[model.name] != model.hash && self.allow_reload
+        reset_config
+      end
+      @@mapped_classes[model.name] == model.hash
     end
 
   module Model
@@ -190,20 +210,8 @@ module Hibernate
 
       model.extend(ClassMethods)
 
-#       this part is needed for the model A.create method to work
-#       model.class_eval <<-EOF
-#          alias :initialize_old :initialize
-#          def initialize(*args)
-#             if self.class.hibernate!
-#               self.class.new(*args)
-#             else
-#               initialize_old(*args)
-#             end
-#          end
-# EOF
-
-      unless model.mapped?
-        [:auto_migrate!, :auto_upgrade!, :create, :all, :copy, :first, :first_or_create, :first_or_new, :get, :last, :load].each do |method|
+      unless Hibernate.mapped?(model)
+        [:auto_migrate!, :auto_upgrade!, :create, :all, :copy, :first, :first_or_create, :first_or_new, :get, :last, :load, :new].each do |method|
           model.before_class_method(method, :hibernate!)
         end
 
@@ -245,9 +253,7 @@ module Hibernate
       end
 
       def hibernate!
-        result = false
-
-        unless mapped?
+        unless Hibernate.mapped?(self)
           discriminator = nil
 
           relationships.each do |relationship|
@@ -271,18 +277,27 @@ module Hibernate
           end
 
           add_class_annotation annotation
-          Hibernate.add_model become_java!(false), name
-          result = true
 
+          reload = Hibernate.allow_reload
+          Hibernate.add_model(become_java!(reload), self)
+
+          if reload
+
+            unless java.lang.Thread.currentThread.context_class_loader.is_a? JRubyClassLoader
+              cl = java.lang.Thread.currentThread.context_class_loader
+              if cl.is_a? org.jruby.util.JRubyClassLoader
+                java.lang.Thread.currentThread.context_class_loader = JRubyClassLoader.new(cl)
+              else
+                java.lang.Thread.currentThread.context_class_loader = 'TODO'
+              end
+            end
+
+            java.lang.Thread.currentThread.context_class_loader.register(java_class)
+          end
           @@logger.debug "become_java! #{java_class}"
         else
           @@logger.debug "become_java! fired already #{java_class}"
         end
-        result
-      end
-
-      def mapped?
-        Hibernate.mapped? name
       end
 
       private
@@ -342,49 +357,49 @@ module Hibernate
           # to consider: in my opinion those methods should set from/get to java objects...
           if (type == DataMapper::Property::Date)
             class_eval <<-EOT
-              def  #{set_name.intern} (d)
+              def #{set_name.intern}(d)
                 attribute_set(:#{name} , d.nil? ? nil : Date.civil(d.year + 1900, d.month + 1, d.date))
               end
             EOT
             class_eval <<-EOT
-              def  #{get_name.intern}
+              def #{get_name.intern}
                 d = attribute_get(:#{name} )
                 org.joda.time.DateTime.new(d.year, d.month, d.day, 0, 0, 0, 0).to_date if d
               end
             EOT
           elsif (type == DataMapper::Property::DateTime)
             class_eval <<-EOT
-              def  #{set_name.intern} (d)
+              def #{set_name.intern}(d)
                 attribute_set(:#{name} , d.nil? ? nil : DateTime.civil(d.year + 1900, d.month + 1, d.date, d.hours, d.minutes, d.seconds))
               end
             EOT
             class_eval <<-EOT
-              def  #{get_name.intern}
-                d = attribute_get(:#{name} )
+              def #{get_name.intern}
+                d = attribute_get(:#{name})
                 org.joda.time.DateTime.new(d.year, d.month, d.day, d.hour, d.min, d.sec, 0).to_date if d
               end
             EOT
           elsif (type.to_s == BigDecimal || type == DataMapper::Property::Decimal)
             class_eval <<-EOT
-              def  #{set_name.intern} (d)
+              def #{set_name.intern}(d)
                 attribute_set(:#{name} , d.nil? ? nil :#{type}.new(d.to_s))
               end
             EOT
             class_eval <<-EOT
-              def  #{get_name.intern}
-                d = attribute_get(:#{name} )
+              def #{get_name.intern}
+                d = attribute_get(:#{name})
                 java.math.BigDecimal.new(d.to_i) if d
               end
             EOT
           else
             class_eval <<-EOT
-              def  #{set_name.intern} (d)
+              def #{set_name.intern}(d)
                 attribute_set(:#{name} , d)
               end
             EOT
             class_eval <<-EOT
-              def  #{get_name.intern}
-                d = attribute_get(:#{name} )
+              def #{get_name.intern}
+                d = attribute_get(:#{name})
                 d
               end
             EOT

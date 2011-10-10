@@ -24,8 +24,6 @@ packaging 'java-gem'
 
 build.final_name '${project.artifactId}_ext'
 
-plugin(:gem).configuration[:includeOpenSSL] = false
-
 profile(:transient) do |t|
   t.plugin(:rspec).configuration[:specSourceDirectory] = 'spec/transient'
 end
@@ -36,4 +34,9 @@ end
 
 profile(:dm) do |t|
   t.plugin(:rspec).configuration[:specSourceDirectory] = 'spec/dm_core'
+end
+
+execute_in_phase(:initialize) do
+  require 'fileutils'
+  FileUtils.cp("dm-hibernate-adapter.gemspec.pom", "pom.xml")
 end

@@ -16,12 +16,6 @@
 require 'java'
 require 'jruby/core_ext'
 
-begin
-  require 'dm-hibernate-adapter_ext.jar'
-rescue LoadError
-  warn "missing extension jar, may be it is already in the parent classloader"
-end
-
 require 'slf4r'
 require 'slf4r/java_logger'
 
@@ -73,11 +67,13 @@ module DataMapper
         password  = options.delete(:password)
         driver    = options.delete(:driver)    || DRIVERS[dialect.to_sym]
         pool_size = options.delete(:pool_size) || "1"
+        reload    = options.delete(:allow_reload)
         url       = options.delete(:url)
         url      += "jdbc:" unless url =~ /^jdbc:/
 
         super(name, options)
 
+        Hibernate.allow_reload = reload
         Hibernate.dialect = Hibernate::Dialects.const_get(dialect.to_s)
         Hibernate.current_session_context_class = "thread"
 
