@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.platform = 'java'
 
   # copy the jar file into place !!!
-  FileUtils.cp('target/dm-hibernate-adapter_ext.jar', 'lib')
+  FileUtils.cp('target/dm-hibernate-adapter_ext.jar', 'lib') if File.exists?('target/dm-hibernate-adapter_ext.jar')
 
   s.files = Dir['lib/dm-hibernate-adapter_ext.jar']
   s.files += Dir['lib/dm-hibernate-adapter.rb']
