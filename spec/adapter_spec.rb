@@ -13,28 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'dm-hibernate-adapter'
-require 'dm-core/spec/setup'
+require File.dirname(__FILE__) + '/spec_helper'
 
-module DataMapper
-  module Spec
-    module Adapters
-
-      class HibernateAdapter < Adapter
-
-        def setup!
-          #adapter = DataMapper.setup(name, connection_uri)
-          adapter = DataMapper.setup(:default, :adapter => "hibernate", :dialect => "H2", :username => "sa", :url => "jdbc:h2:target/jibernate")
-
-          test_connection(adapter)
-          adapter
-        rescue Exception => e
-          puts "Could not connect to the database using '#{connection_uri}' because of: #{e.inspect}"
-        end
-
-      end
-
-      use HibernateAdapter
-    end
-  end
+describe DataMapper::Adapters::HibernateAdapter do
+  it_should_behave_like 'An Adapter'
 end
+

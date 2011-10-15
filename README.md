@@ -52,9 +52,7 @@ Howtos:
 
 Test suites:
 
-* AbstractAdapter specs: `rmvn rake spec:adapter -- -o` or `rmvn test -- -Padapter -o`
-* dm-core specs: `rmvn rake spec:dm -- -o` or `rmvn test -- -Pdm -o`
-* transient specs: `rmvn rake spec:transient -- -o` or `rmvn test -- -Ptransient -o`
+* AbstractAdapter specs: `rmvn rake spec -- -o`
 
 Tips:
 
