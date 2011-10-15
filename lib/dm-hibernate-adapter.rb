@@ -22,6 +22,8 @@ require 'slf4r'
 require 'slf4r/java_logger'
 
 require 'dm-core'
+require 'dm-transactions'
+require 'dm-migrations'
 
 begin
   require 'dm-hibernate-adapter_ext.jar'

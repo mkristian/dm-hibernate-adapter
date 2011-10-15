@@ -1,6 +1,5 @@
 require 'rubygems'
-require 'lib/dm-hibernate-adapter.rb'
-require 'dm-transactions'
+require 'dm-hibernate-adapter'
 
 DataMapper.setup(:default, :adapter => "hibernate", :dialect => "H2", :username => "sa", :url => "jdbc:h2:target/eventlog")
 
