@@ -41,7 +41,6 @@ Spec::Runner.configure do |config|
 
   config.before :all do
     @adapter = DataMapper.setup(:default, DB_CONFIGS[(ENV['DIALECT'] || :H2_EMB).to_sym])
-    DataMapper.auto_migrate!
   end
 
 end

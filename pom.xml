@@ -7,14 +7,14 @@
   <packaging>java-gem</packaging>
   <developers>
     <developer>
-      <id>douglasrodrigo_at_gmail_dot_com</id>
-      <name>Douglas Ferreira</name>
-      <email>douglasrodrigo@gmail.com</email>
-    </developer>
-    <developer>
       <id>m_dot_kristian_at_web_dot_de</id>
       <name>Kristian Meier</name>
       <email>m.kristian@web.de</email>
+    </developer>
+    <developer>
+      <id>douglasrodrigo_at_gmail_dot_com</id>
+      <name>Douglas Ferreira</name>
+      <email>douglasrodrigo@gmail.com</email>
     </developer>
     <developer>
       <id>piotrgega_at_gmail_dot_com</id>
@@ -24,12 +24,12 @@
   </developers>
   <repositories>
     <repository>
-      <id>jboss</id>
-      <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-    </repository>
-    <repository>
       <id>rubygems-releases</id>
       <url>http://rubygems-proxy.torquebox.org/releases</url>
+    </repository>
+    <repository>
+      <id>jboss</id>
+      <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
     </repository>
   </repositories>
   <dependencies>
@@ -193,7 +193,7 @@
         <version>${jruby.plugins.version}</version>
         <extensions>true</extensions>
         <configuration>
-          <files>lib/dm-hibernate-adapter_ext.jar,lib/dm-hibernate-adapter.rb,lib/dm-hibernate-adapter,lib/dm-hibernate-adapter/data_mapper,lib/dm-hibernate-adapter/hibernate,lib/dm-hibernate-adapter/utils,lib/dm-hibernate-adapter/data_mapper/adapters,lib/dm-hibernate-adapter/data_mapper/adapters/hibernate_adapter.rb,lib/dm-hibernate-adapter/hibernate/dialects.rb,lib/dm-hibernate-adapter/hibernate/hibernate.rb,lib/dm-hibernate-adapter/hibernate/model.rb,lib/dm-hibernate-adapter/hibernate/property_shim.rb,lib/dm-hibernate-adapter/hibernate/transaction.rb,lib/dm-hibernate-adapter/utils/constants.rb,lib/dm-hibernate-adapter/utils/logger.rb,spec/adapter_spec.rb,spec/rcov.opts,spec/spec.opts,spec/spec_helper.rb</files>
+          <files>lib/dm-hibernate-adapter_ext.jar,lib/dm-hibernate-adapter.rb,lib/dm-hibernate-adapter,lib/dm-hibernate-adapter/data_mapper,lib/dm-hibernate-adapter/data_mapper/adapters,lib/dm-hibernate-adapter/data_mapper/adapters/hibernate_adapter.rb,lib/dm-hibernate-adapter/hibernate,lib/dm-hibernate-adapter/hibernate/dialects.rb,lib/dm-hibernate-adapter/hibernate/hibernate.rb,lib/dm-hibernate-adapter/hibernate/model.rb,lib/dm-hibernate-adapter/hibernate/property_shim.rb,lib/dm-hibernate-adapter/hibernate/transaction.rb,lib/dm-hibernate-adapter/utils,lib/dm-hibernate-adapter/utils/constants.rb,lib/dm-hibernate-adapter/utils/logger.rb,spec/adapter_spec.rb,spec/rcov.opts,spec/spec.opts,spec/spec_helper.rb</files>
           <gemspec>dm-hibernate-adapter.gemspec</gemspec>
           <platform>java</platform>
           <requiredRubygemsVersion><![CDATA[> 1.3.1]]></requiredRubygemsVersion>
