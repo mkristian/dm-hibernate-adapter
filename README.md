@@ -38,7 +38,31 @@ Howtos:
 
 Test suites:
 
-* AbstractAdapter specs: `rmvn rake spec -- -o` or `rmvn rspec spec/`
+* AbstractAdapter specs:
+
+  `rmvn rake spec -- -o` or `rmvn rspec spec/`
+
+  <table>
+    <tr>
+      <th>Database Vendor</th>
+      <th>Abstract Adapter</th>
+    </tr>
+    <tr>
+      <td>MySQL</td>
+      <td>x</td></tr>
+    <tr>
+      <td>PostgreSQL</td>
+      <td>x</td></tr>
+    <tr>
+      <td>Derby</td>
+      <td>-</td></tr>
+    <tr>
+      <td>H2</td>
+      <td>x</td></tr>
+    <tr>
+      <td>HSQLDB</td>
+      <td>-</td></tr>
+  </table>
 
 Tips:
 
@@ -47,6 +71,7 @@ to get debug output use (use '--' only once which denotes the beginning of maven
 * you can switch the jruby version by adding to the above commands `-- -Djruby.version=1.6.3`
 * if you are getting OutOfMemory errors, you should try to tune jruby-maven-plugin's [settings](https://github.com/mkristian/jruby-maven-plugins) and set them as properties in 'Mavenfile' - see in that file (ie. `properties['jruby.jvmargs'] = '-Xmx1024m'`)
 * if you are getting problems with specs you can skip that phase: `-- -Dmaven.test.skip=true`
+
 
 Authors
 -------
