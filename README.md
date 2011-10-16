@@ -28,20 +28,6 @@ Logging
 Howtos:
 -------
 
-### how to test basic actions with `eventlog.rb`
-
-* how to run the eventlog - listing
-
-    `rmvn gem exec eventlog.rb list -- -o -Djruby.version=1.6.4`
-
-* how to run the eventlog - storing record
-
-    `rmvn gem exec eventlog.rb store something -- -o -Djruby.version=1.6.4`
-
-* how to run the eventlog - storing with rollback
-
-    `rmvn gem exec eventlog.rb store_rollback something -- -o -Djruby.version=1.6.4`
-
 ### Rake
 
 * how to list rake tasks (please note the jruby.rake.args part(var name))
@@ -52,7 +38,7 @@ Howtos:
 
 Test suites:
 
-* AbstractAdapter specs: `rmvn rake spec -- -o`
+* AbstractAdapter specs: `rmvn rake spec -- -o` or `rmvn rspec spec/`
 
 Tips:
 
