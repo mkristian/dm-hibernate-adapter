@@ -18,7 +18,10 @@ module DataMapper
       class HibernateAdapter < Adapter
 
         def setup!
-          adapter = DataMapper.setup(:default, DB_CONFIGS[(ENV['DIALECT'] || :H2_EMB).to_sym])
+          adapter = DataMapper.setup(
+            :default,
+            DB_CONFIGS[(ENV['DIALECT'] || :H2_EMB).to_sym].merge(:reload => (ENV['RELOAD'] || false))
+          )
 
           test_connection(adapter)
           adapter
