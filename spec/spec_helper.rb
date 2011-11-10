@@ -20,10 +20,6 @@ require 'dm-core/spec/lib/pending_helpers'
 require 'dm-core/spec/lib/adapter_helpers'
 require 'dm-core/spec/lib/collection_helpers'
 
-# https://github.com/datamapper/dm-core/tree/master/lib/dm-core/spec
-require 'dm-core/spec/shared/adapter_spec'
-
-
 DB_CONFIGS = {
   :H2_EMB     => { :adapter => "hibernate", :dialect => "H2", :username => "sa", :url => "jdbc:h2:target/jibernate" },
   :DERBY_EMB  => { :adapter => "hibernate", :dialect => "Derby", :url => "jdbc:derby:target/jibernate;create=true" },
