@@ -15,6 +15,9 @@
 
 require File.dirname(__FILE__) + '/spec_helper'
 
+# https://github.com/datamapper/dm-core/tree/master/lib/dm-core/spec
+require 'dm-core/spec/shared/adapter_spec'
+
 describe DataMapper::Adapters::HibernateAdapter do
   it_should_behave_like 'An Adapter'
 end
