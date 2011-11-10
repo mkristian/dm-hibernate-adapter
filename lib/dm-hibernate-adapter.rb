@@ -49,4 +49,5 @@ require 'dm-hibernate-adapter/hibernate/dialects'
 require 'dm-hibernate-adapter/hibernate/transaction'
 require 'dm-hibernate-adapter/hibernate/model'
 require 'dm-hibernate-adapter/data_mapper/adapters/hibernate_adapter'
+require 'dm-hibernate-adapter/data_mapper/dm-core'
 

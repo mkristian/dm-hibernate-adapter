@@ -27,19 +27,7 @@ module Hibernate::Model
   }
 
   def self.included(model)
-
     model.extend(ClassMethods)
-
-    unless Hibernate.mapped?(model)
-      [:auto_migrate!, :auto_upgrade!, :create, :all, :copy, :first, :first_or_create, :first_or_new, :get, :last, :load, :new].each do |method|
-        model.before_class_method(method, :hibernate!)
-      end
-
-      [:save, :update, :destroy, :update_attributes].each do |method|
-        model.before(method) { model.hibernate! }
-      end
-    end
-
   end
 
   module ClassMethods
