@@ -16,3 +16,15 @@
 JClass  = java.lang.Class
 JVoid   = java.lang.Void::TYPE
 
+TYPES = {
+  ::String                         => java.lang.String,
+  ::Integer                        => java.lang.Integer,
+  ::Float                          => java.lang.Double,
+  ::BigDecimal                     => java.math.BigDecimal,
+  ::Date                           => java.util.Date,
+  ::DateTime                       => java.util.Date,
+  ::Time                           => java.util.Date,
+  ::TrueClass                      => java.lang.Boolean,
+  ::FalseClass                      => java.lang.Boolean,
+}
+

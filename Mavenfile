@@ -24,18 +24,6 @@ packaging 'java-gem'
 
 build.final_name '${project.artifactId}_ext'
 
-profile(:transient) do |t|
-  t.plugin(:rspec).configuration[:specSourceDirectory] = 'spec/transient'
-end
-
-profile(:adapter) do |t|
-  t.plugin(:rspec).configuration[:specSourceDirectory] = 'spec/abstract_adapter'
-end
-
-profile(:dm) do |t|
-  t.plugin(:rspec).configuration[:specSourceDirectory] = 'spec/dm_core'
-end
-
 # copy the pom to pom.xml so java IDEs can use it
 execute_in_phase(:initialize) do
   require 'fileutils'

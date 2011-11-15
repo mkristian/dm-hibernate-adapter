@@ -18,7 +18,13 @@ require 'lib/dm-hibernate-adapter'
 
 require 'dm-core/spec/lib/pending_helpers'
 require 'dm-core/spec/lib/adapter_helpers'
-require 'dm-core/spec/lib/collection_helpers'
+require 'dm-core/spec/lib/spec_helper'
+
+require 'dm-core/spec/setup'
+
+ENV['ADAPTER'] ||= 'hibernate'
+ENV['ADAPTER_SUPPORTS'] = 'all'
+ENV['RELOAD'] = 'true'
 
 DB_CONFIGS = {
   :H2_EMB     => { :adapter => "hibernate", :dialect => "H2", :username => "sa", :url => "jdbc:h2:target/jibernate" },
@@ -32,12 +38,20 @@ DB_CONFIGS = {
 
 Spec::Runner.configure do |config|
   config.include DataMapper::Spec::PendingHelpers
-  # config.include DataMapper::Spec::AdaptersHelpers
-  # config.include DataMapper::Spec::CollectionHelpers
+  config.extend( DataMapper::Spec::Adapters::Helpers)
+  config.include(DataMapper::Spec::Helpers)
 
   config.before :all do
-    @adapter = DataMapper.setup(:default, DB_CONFIGS[(ENV['DIALECT'] || :H2_EMB).to_sym])
-    DataMapper.auto_migrate!
+    #TODO: loading multiples specs not work
+    # we need to avoid setup adapter here
+     @adapter = DataMapper.setup(:default, DB_CONFIGS[(ENV['DIALECT'] || :H2_EMB).to_sym].merge(:reload => 'true'))
+     DataMapper.auto_migrate!
+  end
+
+  config.after :all do
+    #DataMapper::Spec.cleanup_models
+    # DataMapper::Spec.remove_ivars(self, instance_variables.reject { |ivar| ivar[0, 2] == '@_' })
+    # DataMapper::Spec.remove_ivars(Spec::Matchers.last_matcher, %w[ @expected ])
   end
 
 end
